@@ -34,6 +34,7 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @since 11 apr. 2014
  * 
  */
+@Deprecated
 public final class GreedyAgent extends OrderedSolverAgent implements
 		InequalityConstraintSolvingAgent {
 

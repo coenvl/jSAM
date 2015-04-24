@@ -33,6 +33,7 @@ import nl.coenvl.sam.variables.Variable;
  * @since 24 okt. 2014
  *
  */
+@Deprecated
 public class RandomAgent<T> extends AbstractAgent {
 
 	private final Variable<T> var;

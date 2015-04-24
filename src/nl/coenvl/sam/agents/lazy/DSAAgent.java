@@ -32,6 +32,7 @@ import nl.coenvl.sam.variables.Variable;
  * @since 11 dec. 2014
  *
  */
+@Deprecated
 public class DSAAgent extends LocalSolverAgent {
 
 	private final LocalInequalityConstraintCostFunction costfun;

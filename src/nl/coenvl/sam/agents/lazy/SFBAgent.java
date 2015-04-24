@@ -34,6 +34,7 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @since 19 mrt. 2014
  * 
  */
+@Deprecated
 public class SFBAgent extends OrderedSolverAgent implements
 		InequalityConstraintSolvingAgent {
 

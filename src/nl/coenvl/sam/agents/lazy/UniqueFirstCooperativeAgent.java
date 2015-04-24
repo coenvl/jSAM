@@ -33,6 +33,7 @@ import nl.coenvl.sam.variables.Variable;
  * @since 11 apr. 2014
  * 
  */
+@Deprecated
 public class UniqueFirstCooperativeAgent extends LocalSolverAgent {
 
 	private final LocalInequalityConstraintCostFunction costfun;

@@ -22,7 +22,7 @@ package nl.coenvl.sam.agents.lazy;
 
 import nl.coenvl.sam.agents.LocalSolverAgent;
 import nl.coenvl.sam.costfunctions.LocalInequalityConstraintCostFunction;
-import nl.coenvl.sam.solvers.CFLSolver;
+import nl.coenvl.sam.solvers.TickCFLSolver;
 import nl.coenvl.sam.variables.Variable;
 
 /**
@@ -33,6 +33,7 @@ import nl.coenvl.sam.variables.Variable;
  * @since 17 okt. 2014
  *
  */
+@Deprecated
 public class CFLAgent extends LocalSolverAgent {
 
 	private LocalInequalityConstraintCostFunction costFunction;
@@ -41,7 +42,7 @@ public class CFLAgent extends LocalSolverAgent {
 		super(name, var);
 
 		this.costFunction = new LocalInequalityConstraintCostFunction(this);
-		this.setSolver(new CFLSolver(this, this.costFunction), true);
+		this.setSolver(new TickCFLSolver(this, this.costFunction), true);
 	}
 
 }
