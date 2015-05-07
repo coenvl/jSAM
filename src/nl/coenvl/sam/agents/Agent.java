@@ -20,8 +20,6 @@
  */
 package nl.coenvl.sam.agents;
 
-import java.util.UUID;
-
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.variables.Variable;
 

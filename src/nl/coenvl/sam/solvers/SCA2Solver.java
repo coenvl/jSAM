@@ -149,7 +149,7 @@ public class SCA2Solver implements IterativeSolver {
 		default:
 		case Value:
 			if (!this.committed)
-				//pickBestLocalValue();
+				pickBestLocalValue();
 
 			sendValue();
 			this.committed = false;
