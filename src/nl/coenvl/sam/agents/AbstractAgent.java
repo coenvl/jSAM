@@ -20,8 +20,12 @@
  */
 package nl.coenvl.sam.agents;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
+import nl.coenvl.sam.exceptions.InvalidPropertyException;
+import nl.coenvl.sam.exceptions.PropertyNotSetException;
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.variables.Variable;
 
@@ -36,6 +40,8 @@ import nl.coenvl.sam.variables.Variable;
  */
 public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 
+	private final Map<String, Object> properties;
+
 	private final String name;
 
 	private final Variable<?> variable;
@@ -45,6 +51,7 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 	protected AbstractAgent(String name, Variable<?> var) {
 		this.name = name;
 		this.variable = var;
+		this.properties = new HashMap<String, Object>();
 		allAgents.add(this);
 	}
 
@@ -89,6 +96,28 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 			a.reset();
 		}
 		allAgents.clear();
+	}
+
+	@Override
+	public final boolean has(String key) {
+		return this.properties.containsKey(key);
+	}
+	
+	@Override
+	public final Object get(String key) throws PropertyNotSetException {
+		if (!this.properties.containsKey(key))
+			throw new PropertyNotSetException(key);
+
+		return this.properties.get(key);
+	}
+
+	@Override
+	public final void set(String key, Object val)
+			throws InvalidPropertyException {
+		if (key == null || key.isEmpty())
+			throw new InvalidPropertyException("Property name cannot be empty");
+
+		this.properties.put(key, val);
 	}
 
 	/*

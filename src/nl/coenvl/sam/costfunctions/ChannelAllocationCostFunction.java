@@ -1,5 +1,5 @@
 /**
- * File LocalInequalityConstraintCostFunction.java
+ * File LocalGameTheoreticCostFunction.java
  *
  * This file is part of the jSAM project 2014.
  * 
@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import nl.coenvl.sam.agents.Agent;
 import nl.coenvl.sam.agents.LocalCommunicatingAgent;
+import nl.coenvl.sam.exceptions.PropertyNotSetException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
 import nl.coenvl.sam.problemcontexts.LocalProblemContext;
 import nl.coenvl.sam.problemcontexts.ProblemContext;
@@ -36,41 +37,28 @@ import nl.coenvl.sam.problemcontexts.ProblemContext;
  * @since 19 may 2014
  * 
  */
-public class LocalInequalityConstraintCostFunction implements CostFunction {
+public class ChannelAllocationCostFunction implements CostFunction {
+
+	private final static boolean USE_STEP_COST_FUN = false;
 
 	private final LocalCommunicatingAgent localAgent;
 
 	/**
 	 * @param Agent
 	 */
-	public LocalInequalityConstraintCostFunction(LocalCommunicatingAgent me) {
+	public ChannelAllocationCostFunction(LocalCommunicatingAgent me) {
 		this.localAgent = me;
 	}
-
-	// public double currentValue() throws VariableNotSetException {
-	// HashMap<Agent, Integer> assignment = new HashMap<Agent, Integer>();
-	//
-	// assignment.put(localAgent, (Integer)
-	// localAgent.getVariable().getValue());
-	// for (Agent a : localAgent.getNeighborhood())
-	// assignment.put(a, (Integer) a.getVariable().getValue());
-	//
-	// LocalProblemContext<Integer> cpc = new
-	// LocalProblemContext<Integer>(localAgent);
-	// cpc.setAssignment(assignment);
-	//
-	// return this.evaluate(cpc);
-	// }
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * nl.coenvl.sam.CostFunction#evaluate(nl.coenvl.sam.IndexedProblemContext)
+	 * org.anon.cocoa.CostFunction#evaluate(org.anon.cocoa.IndexedProblemContext
+	 * )
 	 */
 	@Override
 	public double evaluate(ProblemContext<?> pc) {
-
 		if (!(pc instanceof LocalProblemContext<?>))
 			throw new RuntimeException(
 					"Error using LocalInequalityConstraintCostFunction with invalid problemcontext");
@@ -96,24 +84,65 @@ public class LocalInequalityConstraintCostFunction implements CostFunction {
 
 		double cost = 0;
 
-		for (Agent neighbor : this.localAgent.getNeighborhood()) {
-			CompareCounter.compare();
-			if (currentAssignments.containsKey(neighbor)
-					&& myAssignedValue.equals(currentAssignments.get(neighbor)))
-				cost++;
+		try {
+			double x = (Double) this.localAgent.get("xpos");
+			double y = (Double) this.localAgent.get("ypos");
+			double z;
+			if (this.localAgent.has("zpos"))
+				z = (Double) this.localAgent.get("zpos");
+			else
+				z = 0;
+
+			for (Agent neighbor : this.localAgent.getNeighborhood()) {
+				if (currentAssignments.containsKey(neighbor)) {
+					CompareCounter.compare();
+					int neighborValue = currentAssignments.get(neighbor);
+					int channelDist = Math.abs(myAssignedValue - neighborValue);
+
+					if (channelDist > 2)
+						continue;
+
+					double neighbor_x = (Double) neighbor.get("xpos");
+					double neighbor_y = (Double) neighbor.get("ypos");
+					double neighbor_z;
+					if (neighbor.has("zpos"))
+						neighbor_z = (Double) neighbor.get("zpos");
+					else
+						neighbor_z = 0;
+
+					double dist = dist(x, neighbor_x, y, neighbor_y, z,
+							neighbor_z);
+					double close = 0;
+
+					if (channelDist == 0) {
+						close = 30;
+					} else if (channelDist == 1) {
+						close = 10;
+					} else if (channelDist == 2) {
+						close = 5;
+					} else
+						throw new RuntimeException(
+								"Invalid value for channelDistance at this point: "
+										+ channelDist);
+
+					if (USE_STEP_COST_FUN)
+						cost += (dist < close ? 1 : 0);
+					else
+						cost += (dist - 3 * close) * (dist - 3 * close)
+								/ (9 * close * close);
+
+				}
+			}
+		} catch (PropertyNotSetException e) {
+			throw new RuntimeException(e);
 		}
 
-		// Iterate over all values in the problem context to see if there is one
-		// with the same value
-		// Start with negative one because it should always equal to itself
-		// double cost = -1.0;
-		//
-		// for (Iterator<Integer> iter = context.iterator(); iter.hasNext();) {
-		// nComparisons++;
-		// if (assignedValue.equals(iter.next()))
-		// cost++;
-		// }
-
 		return cost;
+	}
+
+	private double dist(double xa, double xb, double ya, double yb, double za,
+			double zb) {
+		return Math.sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb)
+				+ (za - zb) * (za - zb));
 	}
 }

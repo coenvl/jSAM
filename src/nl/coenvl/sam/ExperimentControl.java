@@ -23,9 +23,7 @@ package nl.coenvl.sam;
 import nl.coenvl.sam.agents.AbstractAgent;
 import nl.coenvl.sam.agents.AbstractSolverAgent;
 import nl.coenvl.sam.agents.OrderedSolverAgent;
-import nl.coenvl.sam.costfunctions.InequalityConstraintCostFunction;
-import nl.coenvl.sam.costfunctions.LocalGameTheoreticCostFunction;
-import nl.coenvl.sam.costfunctions.LocalInequalityConstraintCostFunction;
+import nl.coenvl.sam.costfunctions.CompareCounter;
 
 /**
  * ExperimentControl
@@ -41,21 +39,12 @@ public class ExperimentControl {
 		AbstractAgent.destroyAgents();
 //		HashMessage.resetCount();
 		AbstractSolverAgent.resetMessageCount();
-		InequalityConstraintCostFunction.nComparisons = 0;
-		LocalInequalityConstraintCostFunction.nComparisons = 0;
-		LocalGameTheoreticCostFunction.nComparisons = 0;
+		CompareCounter.reset();
 		OrderedSolverAgent.maxSequenceID = 0;
-		/*try {
-			Thread.sleep(10);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}*/
 	}
 	
 	public static int getNumberEvals() {
-		return InequalityConstraintCostFunction.nComparisons + 
-				LocalInequalityConstraintCostFunction.nComparisons +
-				LocalGameTheoreticCostFunction.nComparisons;
+		return CompareCounter.getComparisons();
 	}
 
 }

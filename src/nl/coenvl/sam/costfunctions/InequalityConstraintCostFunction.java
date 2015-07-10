@@ -37,8 +37,6 @@ import nl.coenvl.sam.problemcontexts.ProblemContext;
  */
 public class InequalityConstraintCostFunction implements CostFunction {
 
-	public static int nComparisons = 0;
-
 	private HashSet<Integer> constraintsIndices = new HashSet<Integer>();
 
 	private final Integer myIndex;
@@ -83,7 +81,7 @@ public class InequalityConstraintCostFunction implements CostFunction {
 		ArrayList<Integer> currentAssignment = context.getAssignment();
 
 		for (Iterator<Integer> v = constraintsIndices.iterator(); v.hasNext();) {
-			nComparisons++;
+			CompareCounter.compare();
 			Integer constraintIdx = v.next();
 			if (currentAssignment.size() > constraintIdx
 					&& assignedValue.equals(currentAssignment

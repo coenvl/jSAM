@@ -20,6 +20,8 @@
  */
 package nl.coenvl.sam.agents;
 
+import nl.coenvl.sam.exceptions.InvalidPropertyException;
+import nl.coenvl.sam.exceptions.PropertyNotSetException;
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.variables.Variable;
 
@@ -42,5 +44,11 @@ public interface Agent {
 	public void push(Message m);
 
 	public void reset();
+	
+	public boolean has(String key);
+	
+	public Object get(String key) throws PropertyNotSetException;
+	
+	public void set(String key, Object val) throws InvalidPropertyException;
 
 }

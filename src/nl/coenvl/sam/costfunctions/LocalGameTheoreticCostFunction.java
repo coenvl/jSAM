@@ -38,8 +38,6 @@ import nl.coenvl.sam.problemcontexts.ProblemContext;
  */
 public class LocalGameTheoreticCostFunction implements CostFunction {
 
-	public static int nComparisons = 0;
-
 	private final LocalCommunicatingAgent localAgent;
 
 	/**
@@ -48,21 +46,6 @@ public class LocalGameTheoreticCostFunction implements CostFunction {
 	public LocalGameTheoreticCostFunction(LocalCommunicatingAgent me) {
 		this.localAgent = me;
 	}
-
-	// public double currentValue() throws VariableNotSetException {
-	// HashMap<Agent, Integer> assignment = new HashMap<Agent, Integer>();
-	//
-	// assignment.put(localAgent, (Integer)
-	// localAgent.getVariable().getValue());
-	// for (Agent a : localAgent.getNeighborhood())
-	// assignment.put(a, (Integer) a.getVariable().getValue());
-	//
-	// LocalProblemContext<Integer> cpc = new
-	// LocalProblemContext<Integer>(localAgent);
-	// cpc.setAssignment(assignment);
-	//
-	// return this.evaluate(cpc);
-	// }
 
 	/*
 	 * (non-Javadoc)
@@ -80,8 +63,6 @@ public class LocalGameTheoreticCostFunction implements CostFunction {
 
 		@SuppressWarnings("unchecked")
 		LocalProblemContext<Integer> context = (LocalProblemContext<Integer>) pc;
-
-		LocalGameTheoreticCostFunction.nComparisons++;
 
 		// Get the current assignment in the problemcontext
 		HashMap<Agent, Integer> currentAssignments = context.getAssignment();
@@ -103,6 +84,8 @@ public class LocalGameTheoreticCostFunction implements CostFunction {
 
 		for (Agent neighbor : this.localAgent.getNeighborhood()) {
 			if (currentAssignments.containsKey(neighbor)) {
+				CompareCounter.compare();
+				
 				Integer otherValue = currentAssignments.get(neighbor);
 				if (myAssignedValue == 1 && otherValue == 1)
 					cost += 1;
@@ -130,17 +113,6 @@ public class LocalGameTheoreticCostFunction implements CostFunction {
 			}
 
 		}
-
-		// Iterate over all values in the problem context to see if there is one
-		// with the same value
-		// Start with negative one because it should always equal to itself
-		// double cost = -1.0;
-		//
-		// for (Iterator<Integer> iter = context.iterator(); iter.hasNext();) {
-		// nComparisons++;
-		// if (assignedValue.equals(iter.next()))
-		// cost++;
-		// }
 
 		return cost;
 	}

@@ -59,15 +59,14 @@ public class RandomCostFunction implements CostFunction {
 	 */
 	@Override
 	public double evaluate(ProblemContext<?> pc) {
-
+		
 		if (!(pc instanceof LocalProblemContext<?>))
 			throw new RuntimeException(
 					"Error using RandomCostFunction with invalid problemcontext");
 
 		@SuppressWarnings("unchecked")
 		LocalProblemContext<Integer> context = (LocalProblemContext<Integer>) pc;
-		LocalInequalityConstraintCostFunction.nComparisons++;
-
+		
 		// Get the current assignment in the problemcontext
 		HashMap<Agent, Integer> currentAssignments = context.getAssignment();
 
@@ -90,6 +89,8 @@ public class RandomCostFunction implements CostFunction {
 			if (!this.costs.containsKey(neighbor))
 				this.costs.put(neighbor, new CostMatrix(localAgent, neighbor));
 
+			CompareCounter.compare();
+			
 			Integer neighborAssignment = currentAssignments.get(neighbor);
 			if (neighborAssignment == null)
 				continue;

@@ -70,6 +70,7 @@ public class MobilityCostFunction implements CostFunction {
 		// Calculate the packet loss
 		double packet_loss = 0;
 		for (Integer a : cpa) {
+			CompareCounter.compare();
 			if (a == null)
 				continue;
 			packet_loss += a / 4;
