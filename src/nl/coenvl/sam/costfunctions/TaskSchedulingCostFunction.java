@@ -1,5 +1,5 @@
 /**
- * File ChannelAllocationCostFunction.java
+ * File TaskSchedulingCostFunction.java
  *
  * This file is part of the jSAM project 2014.
  * 
@@ -30,23 +30,21 @@ import nl.coenvl.sam.problemcontexts.LocalProblemContext;
 import nl.coenvl.sam.problemcontexts.ProblemContext;
 
 /**
- * ChannelAllocationCostFunction
+ * TaskSchedulingCostFunction
  * 
  * @author leeuwencjv
  * @version 0.1
  * @since 19 may 2014
  * 
  */
-public class ChannelAllocationCostFunction implements CostFunction {
-
-	private final static boolean USE_STEP_COST_FUN = false;
+public class TaskSchedulingCostFunction implements CostFunction {
 
 	private final LocalCommunicatingAgent localAgent;
 
 	/**
 	 * @param Agent
 	 */
-	public ChannelAllocationCostFunction(LocalCommunicatingAgent me) {
+	public TaskSchedulingCostFunction(LocalCommunicatingAgent me) {
 		this.localAgent = me;
 	}
 
@@ -85,52 +83,18 @@ public class ChannelAllocationCostFunction implements CostFunction {
 		double cost = 0;
 
 		try {
-			double x = (Double) this.localAgent.get("xpos");
-			double y = (Double) this.localAgent.get("ypos");
-			double z;
-			if (this.localAgent.has("zpos"))
-				z = (Double) this.localAgent.get("zpos");
-			else
-				z = 0;
+			double data = (Double) this.localAgent.get("data");
+			double ops = (Double) this.localAgent.get("ops");
 
 			for (Agent neighbor : this.localAgent.getNeighborhood()) {
 				if (currentAssignments.containsKey(neighbor)) {
 					CompareCounter.compare();
 					int neighborValue = currentAssignments.get(neighbor);
-					int channelDist = Math.abs(myAssignedValue - neighborValue);
 
-					if (channelDist > 2)
-						continue;
+					int delta = Math.abs(myAssignedValue - neighborValue);
 
-					double neighbor_x = (Double) neighbor.get("xpos");
-					double neighbor_y = (Double) neighbor.get("ypos");
-					double neighbor_z;
-					if (neighbor.has("zpos"))
-						neighbor_z = (Double) neighbor.get("zpos");
-					else
-						neighbor_z = 0;
-
-					double dist = dist(x, neighbor_x, y, neighbor_y, z,
-							neighbor_z);
-					double close = 0;
-
-					if (channelDist == 0) {
-						close = 30;
-					} else if (channelDist == 1) {
-						close = 10;
-					} else if (channelDist == 2) {
-						close = 5;
-					} else
-						throw new RuntimeException(
-								"Invalid value for channelDistance at this point: "
-										+ channelDist);
-
-					if (USE_STEP_COST_FUN)
-						cost += (dist < close ? 1 : 0);
-					else
-						cost += (dist - 3 * close) * (dist - 3 * close)
-								/ (9 * close * close);
-
+					cost += (data * delta) + (delta == 0 ? ops : 0);
+					//cost += (data * delta) + (ops / (delta + 1));
 				}
 			}
 		} catch (PropertyNotSetException e) {
@@ -138,11 +102,5 @@ public class ChannelAllocationCostFunction implements CostFunction {
 		}
 
 		return cost;
-	}
-
-	private double dist(double xa, double xb, double ya, double yb, double za,
-			double zb) {
-		return Math.sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb)
-				+ (za - zb) * (za - zb));
 	}
 }

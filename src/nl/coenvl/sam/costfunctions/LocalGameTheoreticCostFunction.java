@@ -29,7 +29,7 @@ import nl.coenvl.sam.problemcontexts.LocalProblemContext;
 import nl.coenvl.sam.problemcontexts.ProblemContext;
 
 /**
- * LocalInequalityConstraintCostFunction
+ * LocalGameTheoreticCostFunction
  * 
  * @author leeuwencjv
  * @version 0.1

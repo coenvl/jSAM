@@ -36,6 +36,9 @@ import nl.coenvl.sam.variables.IntegerVariable;
 
 /**
  * MGM2Solver
+ * 
+ * Based on the paper 'Distributed Algorithms for DCOP: A Graphical-Game-Based
+ * Approach' of Maheswaran, Pearce and Tambe.
  *
  * @author leeuwencjv
  * @version 0.1
@@ -60,11 +63,13 @@ public class MGM2Solver implements IterativeSolver {
 
 	// private static final double ACTIVATION_PROBABILITY = 0.5; // (P in paper)
 
-	private static final String UPDATE_VALUE = "SCA2:UpdateValue";
+	private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
 
-	private static final String OFFER = "SCA2:MoveOffer";
+	private static final String UPDATE_VALUE = "MGM2:UpdateValue";
 
-	private static final String ACCEPT = "SCA2:AcceptOffer";
+	private static final String OFFER = "MGM2:MoveOffer";
+
+	private static final String ACCEPT = "MGM2:AcceptOffer";
 
 	private static final String GAIN = "MGM2:UtilityGain";
 
@@ -106,7 +111,8 @@ public class MGM2Solver implements IterativeSolver {
 		this.neighborGains = new HashMap<Agent, Double>();
 
 		// So that it will not try to pick a local best at first
-		this.committedOffer = new Offer(null, null, null, null, null);
+		this.committedOffer = null; // new Offer(null, null, null, null, null);
+		this.isOfferer = false;
 
 		try {
 			this.myVariable.setValue(this.myVariable.getRandomValue());
@@ -148,22 +154,22 @@ public class MGM2Solver implements IterativeSolver {
 				System.err.println("Warning, something stinky is going on!");
 				return;
 			}
-			
+
 			try {
 				if (this.isOfferer) {
-					assert(source == this.committedOffer.receiver);
-					assert(this.parent == this.committedOffer.offerer);
+					assert (source == this.committedOffer.receiver);
+					assert (this.parent == this.committedOffer.offerer);
 
-//					System.out.println(this.parent.getName()
-//							+ " is go as offerer");
+					// System.out.println(this.parent.getName()
+					// + " is go as offerer");
 
 					this.myVariable.setValue(this.committedOffer.offererValue);
 				} else {
-					assert(source == this.committedOffer.offerer);
-					assert(this.parent == this.committedOffer.receiver);
+					assert (source == this.committedOffer.offerer);
+					assert (this.parent == this.committedOffer.receiver);
 
-//					System.out.println(this.parent.getName()
-//							+ " is go as receiver");
+					// System.out.println(this.parent.getName()
+					// + " is go as receiver");
 
 					this.myVariable.setValue(this.committedOffer.receiverValue);
 				}
@@ -181,7 +187,7 @@ public class MGM2Solver implements IterativeSolver {
 	public synchronized void tick() {
 		switch (this.algoState) {
 		case Offer:
-			sendOffer();
+			this.sendOffer();
 			this.algoState = State.AcceptReject;
 			break;
 
@@ -207,7 +213,6 @@ public class MGM2Solver implements IterativeSolver {
 			this.algoState = State.Offer;
 			break;
 		}
-
 	}
 
 	private void sendValue() {
@@ -227,9 +232,13 @@ public class MGM2Solver implements IterativeSolver {
 	}
 
 	/**
-	 * 
+	 * Decides IF this neighbor is an offerer or a receiver. If we are an
+	 * offerer: send a list of offers to the neighbor with local cost
+	 * reductions. If receiver, do nothing.
 	 */
 	private void sendOffer() {
+		// if (1 == 1)	return;
+		
 		// First determine wether we will offer or receive
 		if (Math.random() > MGM2Solver.OFFER_PROBABILITY) {
 
@@ -294,6 +303,7 @@ public class MGM2Solver implements IterativeSolver {
 	 * 
 	 */
 	private void sendAccept() {
+		//if (1 == 1) return;
 
 		// Only if this Agent did not offer to anyone else...
 		if (!this.isOfferer) {
@@ -316,8 +326,9 @@ public class MGM2Solver implements IterativeSolver {
 
 				double val = this.myCostFunction.evaluate(temp);
 				suggestedOffer.reiceverReduction = before - val;
-				double globalReduction = suggestedOffer.offererReduction
-						+ suggestedOffer.reiceverReduction;
+				double globalReduction = computeGlobalGain(
+						suggestedOffer.offererReduction,
+						suggestedOffer.reiceverReduction);
 				if (globalReduction > 0 && globalReduction > bestGain) {
 					bestGain = globalReduction;
 					bestOffer = suggestedOffer;
@@ -330,8 +341,8 @@ public class MGM2Solver implements IterativeSolver {
 				accept.addContent("source", this.parent);
 				accept.addContent("offer", bestOffer);
 
-//				System.out.println(this.parent.getName()
-//						+ " accepts offer from " + bestOffer.offerer.getName());
+				// System.out.println(this.parent.getName()
+				// + " accepts offer from " + bestOffer.offerer.getName());
 				bestOffer.offerer.push(accept);
 
 				// Set the value now
@@ -349,21 +360,27 @@ public class MGM2Solver implements IterativeSolver {
 	}
 
 	private void sendGain() {
-//		System.out.println(this.parent.getName() + " sending gain messages");
+		// System.out.println(this.parent.getName() + " sending gain messages");
 		Message gainMessage = new HashMessage(MGM2Solver.GAIN);
 		gainMessage.addContent("source", this.parent);
 		if (this.committedOffer != null) {
 
-			this.bestLocalReduction = this.committedOffer.offererReduction
-					+ this.committedOffer.reiceverReduction;
+			this.bestLocalReduction = computeGlobalGain(
+					this.committedOffer.offererReduction,
+					this.committedOffer.reiceverReduction);
 			gainMessage.addContent("gain", this.bestLocalReduction);
 
 		} else {
 
-			double bestCost = Double.MAX_VALUE;
-			Integer bestAssignment = null;
+			try {
+				this.myProblemContext.setValue(this.myVariable.getValue());
+			} catch (VariableNotSetException e) {
+				e.printStackTrace();
+			}
 
 			double before = this.myCostFunction.evaluate(this.myProblemContext);
+			double bestCost = before; //Double.MAX_VALUE;
+			Integer bestAssignment = null;
 
 			for (Integer assignment : this.myVariable) {
 				this.myProblemContext.setValue(assignment);
@@ -388,21 +405,30 @@ public class MGM2Solver implements IterativeSolver {
 	}
 
 	private void sendGo() {
-//		System.out.println(this.parent.getName() + "Analyzing!");
+		// System.out.println(this.parent.getName() + "Analyzing!");
 
 		if (committedOffer == null) {
+			// If there was no better solution skip this step
+			if (bestLocalAssignment == null)
+				return;
+
 			Double bestNeighborReduction = Double.MIN_VALUE;
 			for (Agent n : this.parent.getNeighborhood())
 				if (this.neighborGains.get(n) > bestNeighborReduction)
 					bestNeighborReduction = this.neighborGains.get(n);
 
-			if (this.bestLocalReduction > bestNeighborReduction) {
-				try {
+			// If this solution is better than any of the neighbors, do the
+			// update
+			try {
+				if (this.bestLocalReduction > bestNeighborReduction)
 					this.myVariable.setValue(bestLocalAssignment);
-				} catch (InvalidValueException e) {
-					e.printStackTrace();
-				}
+				if (this.bestLocalReduction == bestNeighborReduction
+						&& Math.random() > EQUAL_UPDATE_PROBABILITY)
+					this.myVariable.setValue(bestLocalAssignment);
+			} catch (InvalidValueException e) {
+				e.printStackTrace();
 			}
+
 		} else {
 			Agent partner;
 			if (this.isOfferer) {
@@ -412,21 +438,25 @@ public class MGM2Solver implements IterativeSolver {
 				assert (this.committedOffer.receiver == this.parent);
 				partner = this.committedOffer.offerer;
 			}
-			
+
 			Double bestNeighborReduction = Double.MIN_VALUE;
 			for (Agent n : this.parent.getNeighborhood())
-				if (n != partner && this.neighborGains.get(n) > bestNeighborReduction)
+				if (n != partner
+						&& this.neighborGains.get(n) > bestNeighborReduction)
 					bestNeighborReduction = this.neighborGains.get(n);
-			
-			Message goMessage = new HashMessage(MGM2Solver.GO);
-			// This is not strictly necessary, but do it for assertion later
-			// on
-			goMessage.addContent("source", this.parent);
-//			System.out.println(this.parent.getName() + " GO with partner "
-//					+ partner.getName());
-			partner.push(goMessage);
-			
-			committedOffer = null;
+
+			if (this.bestLocalReduction > bestNeighborReduction) {
+				Message goMessage = new HashMessage(MGM2Solver.GO);
+				// This is not strictly necessary, but do it for assertion later
+				// on
+				goMessage.addContent("source", this.parent);
+				// System.out.println(this.parent.getName() +
+				// " GO with partner "
+				// + partner.getName());
+				partner.push(goMessage);
+			}
+
+			// committedOffer = null;
 		}
 
 		this.neighborGains.clear();
@@ -458,6 +488,11 @@ public class MGM2Solver implements IterativeSolver {
 			this.receiverValue = receiverValue;
 			this.offererReduction = offererReduction;
 		}
+	}
+
+	private static double computeGlobalGain(double localGain, double remoteGain) {
+		return localGain + remoteGain - Math.abs(localGain - remoteGain);
+		// return (localGain + remoteGain) / 2;
 	}
 
 }
