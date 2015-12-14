@@ -65,6 +65,7 @@ public class CFLSolver implements Solver {
 		this.myCostFunction = costfunction;
 		this.myVariable = (IntegerVariable) this.parent.getVariable();
 		this.valueProb = new HashMap<Integer, Double>();
+		throw new RuntimeException("Use the TickTCFLSolver");
 	}
 
 	@Override

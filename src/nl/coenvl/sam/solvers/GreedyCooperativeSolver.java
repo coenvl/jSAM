@@ -78,6 +78,7 @@ public class GreedyCooperativeSolver implements Solver {
 		// Assume we DO always have an integer variable
 		this.myVariable = (IntegerVariable) parent.getVariable();
 		this.activatedNeighbors = new HashSet<Agent>();
+		throw new RuntimeException("I said don't use me!");
 	}
 
 	private void activateNextNeighbor() {
