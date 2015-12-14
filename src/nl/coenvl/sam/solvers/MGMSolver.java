@@ -44,25 +44,17 @@ import nl.coenvl.sam.variables.IntegerVariable;
 public class MGMSolver implements IterativeSolver {
 
 	private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
-
 	private static final String UPDATE_VALUE = "MGM:UpdateValue";
-
 	private static final String LOCAL_REDUCTION = "MGM:BestLocalReduction";
 
 	private CostFunction myCostFunction;
-
 	private LocalProblemContext<Integer> myProblemContext;
-
 	private IntegerVariable myVariable;
-
 	private LocalCommunicatingAgent parent;
 
 	private Map<Agent, Double> neighborReduction;
-
 	private Set<Agent> receivedValues;
-
 	private double bestLocalReduction;
-
 	private Integer bestLocalAssignment;
 
 	public MGMSolver(LocalCommunicatingAgent agent, CostFunction costfunction) {
@@ -105,12 +97,11 @@ public class MGMSolver implements IterativeSolver {
 			}
 
 		} else if (m.getType().equals(MGMSolver.LOCAL_REDUCTION)) {
-			Double reduction = (Double) m.getContent("LR");
+			final Double reduction = (Double) m.getContent("LR");
 
 			this.neighborReduction.put(source, reduction);
 
-			if (this.neighborReduction.size() == parent.getNeighborhood()
-					.size())
+			if (this.neighborReduction.size() == parent.getNeighborhood().size())
 				this.pickValue();
 		}
 	}
@@ -120,8 +111,7 @@ public class MGMSolver implements IterativeSolver {
 		try {
 			Message updateMsg = new HashMessage(MGMSolver.UPDATE_VALUE);
 
-			updateMsg
-					.addContent("value", this.myVariable.getValue().intValue());
+			updateMsg.addContent("value", this.myVariable.getValue().intValue());
 			updateMsg.addContent("source", this.parent);
 
 			for (Agent n : this.parent.getNeighborhood())
@@ -138,7 +128,6 @@ public class MGMSolver implements IterativeSolver {
 	private void computeLocalReductions() {
 		// By now the problem context should be updated with all the neighbors'
 		// values
-
 		try {
 			this.myProblemContext.setValue(this.myVariable.getValue());
 		} catch (VariableNotSetException e) {
@@ -146,7 +135,7 @@ public class MGMSolver implements IterativeSolver {
 		}
 
 		double before = this.myCostFunction.evaluate(myProblemContext);
-		double bestCost = before; //Double.MAX_VALUE; //
+		double bestCost = before; // Double.MAX_VALUE; //
 		Integer bestAssignment = null;
 
 		for (Integer assignment : this.myVariable) {
@@ -175,7 +164,7 @@ public class MGMSolver implements IterativeSolver {
 	/**
 	 * 
 	 */
-	public void pickValue() {
+	private void pickValue() {
 		Double bestNeighborReduction = Double.MIN_VALUE;
 		for (Agent n : this.parent.getNeighborhood())
 			if (this.neighborReduction.get(n) > bestNeighborReduction)
@@ -184,8 +173,7 @@ public class MGMSolver implements IterativeSolver {
 		try {
 			if (this.bestLocalReduction > bestNeighborReduction)
 				this.myVariable.setValue(bestLocalAssignment);
-			if (this.bestLocalReduction == bestNeighborReduction
-					&& Math.random() > EQUAL_UPDATE_PROBABILITY)
+			if (this.bestLocalReduction == bestNeighborReduction && Math.random() > EQUAL_UPDATE_PROBABILITY)
 				this.myVariable.setValue(bestLocalAssignment);
 		} catch (InvalidValueException e) {
 			e.printStackTrace();

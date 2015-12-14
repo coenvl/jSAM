@@ -60,41 +60,25 @@ public class MGM2Solver implements IterativeSolver {
 	}
 
 	private static final double OFFER_PROBABILITY = 0.5; // (Q in paper)
-
 	// private static final double ACTIVATION_PROBABILITY = 0.5; // (P in paper)
 
 	private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
-
 	private static final String UPDATE_VALUE = "MGM2:UpdateValue";
-
 	private static final String OFFER = "MGM2:MoveOffer";
-
 	private static final String ACCEPT = "MGM2:AcceptOffer";
-
 	private static final String GAIN = "MGM2:UtilityGain";
-
 	private static final String GO = "MGM2:GO";
 
 	private CostFunction myCostFunction;
-
 	private LocalProblemContext<Integer> myProblemContext;
-
 	private IntegerVariable myVariable;
-
 	private LocalCommunicatingAgent parent;
-
 	private State algoState;
-
 	private List<Offer> receivedOffers;
-
 	private Map<Agent, Double> neighborGains;
-
 	private boolean isOfferer;
-
 	private Offer committedOffer;
-
 	private Integer bestLocalAssignment;
-
 	private double bestLocalReduction;
 
 	public MGM2Solver(LocalCommunicatingAgent agent, CostFunction costfunction) {
@@ -123,10 +107,10 @@ public class MGM2Solver implements IterativeSolver {
 
 	@Override
 	public synchronized void push(Message m) {
-		Agent source = (Agent) m.getContent("source");
+		final Agent source = (Agent) m.getContent("source");
 
 		if (m.getType().equals(MGM2Solver.UPDATE_VALUE)) {
-			Integer value = (Integer) m.getContent("value");
+			final Integer value = (Integer) m.getContent("value");
 
 			this.myProblemContext.setValue(source, value);
 		} else if (m.getType().equals(MGM2Solver.OFFER)) {
@@ -145,7 +129,7 @@ public class MGM2Solver implements IterativeSolver {
 		} else if (m.getType().equals(MGM2Solver.GAIN)) {
 
 			// Any ACCEPT message should contain this...
-			Double gain = (Double) m.getContent("gain");
+			final Double gain = (Double) m.getContent("gain");
 			this.neighborGains.put(source, gain);
 
 		} else if (m.getType().equals(MGM2Solver.GO)) {
@@ -413,7 +397,7 @@ public class MGM2Solver implements IterativeSolver {
 				return;
 
 			Double bestNeighborReduction = Double.MIN_VALUE;
-			for (Agent n : this.parent.getNeighborhood())
+			for (Agent n : this.neighborGains.keySet())
 				if (this.neighborGains.get(n) > bestNeighborReduction)
 					bestNeighborReduction = this.neighborGains.get(n);
 
@@ -440,7 +424,7 @@ public class MGM2Solver implements IterativeSolver {
 			}
 
 			Double bestNeighborReduction = Double.MIN_VALUE;
-			for (Agent n : this.parent.getNeighborhood())
+			for (Agent n : this.neighborGains.keySet())
 				if (n != partner
 						&& this.neighborGains.get(n) > bestNeighborReduction)
 					bestNeighborReduction = this.neighborGains.get(n);
@@ -468,15 +452,15 @@ public class MGM2Solver implements IterativeSolver {
 	}
 
 	private class Offer {
-		public Agent offerer;
+		public final Agent offerer;
 
-		public Agent receiver;
+		public final Agent receiver;
 
-		public Integer offererValue;
+		public final Integer offererValue;
 
-		public Integer receiverValue;
+		public final Integer receiverValue;
 
-		public Double offererReduction;
+		public final Double offererReduction;
 
 		public Double reiceverReduction;
 
