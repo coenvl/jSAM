@@ -28,7 +28,7 @@ package nl.coenvl.sam.exceptions;
  * @since 4 feb. 2014
  * 
  */
-public class InvalidValueException extends Exception {
+public class InvalidValueException extends RuntimeException {
 
 	/**
      * 

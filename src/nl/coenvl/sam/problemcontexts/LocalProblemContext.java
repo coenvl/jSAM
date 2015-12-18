@@ -66,6 +66,13 @@ public final class LocalProblemContext<T> implements ProblemContext<T> {
 	}
 
 	/**
+     * 
+     */
+	public void clearValue(Agent a) {
+		this.currentAssignment.remove(a);
+	}
+	
+	/**
 	 * Get the current (partial) assignment.
 	 * 
 	 * @return
@@ -104,7 +111,7 @@ public final class LocalProblemContext<T> implements ProblemContext<T> {
 	 * 
 	 * @param assignment
 	 */
-	public void setAssignment(HashMap<Agent, T> assignment) {
+	public void setAssignment(HashMap<Agent, ? extends T> assignment) {
 		// currentAssignment.clear();
 		for (Agent a : assignment.keySet())
 			currentAssignment.put(a, assignment.get(a));

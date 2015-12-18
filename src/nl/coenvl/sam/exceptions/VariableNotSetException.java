@@ -28,7 +28,7 @@ package nl.coenvl.sam.exceptions;
  * @since 14 mrt. 2014
  * 
  */
-public class VariableNotSetException extends Exception {
+public class VariableNotSetException extends RuntimeException {
 
 	/**
      * 

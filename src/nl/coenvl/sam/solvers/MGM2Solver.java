@@ -62,7 +62,7 @@ public class MGM2Solver implements IterativeSolver {
 	private static final double OFFER_PROBABILITY = 0.5; // (Q in paper)
 	// private static final double ACTIVATION_PROBABILITY = 0.5; // (P in paper)
 
-	private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
+	// private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
 	private static final String UPDATE_VALUE = "MGM2:UpdateValue";
 	private static final String OFFER = "MGM2:MoveOffer";
 	private static final String ACCEPT = "MGM2:AcceptOffer";
@@ -397,9 +397,12 @@ public class MGM2Solver implements IterativeSolver {
 				return;
 
 			Double bestNeighborReduction = Double.MIN_VALUE;
+			Agent bestNeighbor = null;
 			for (Agent n : this.neighborGains.keySet())
-				if (this.neighborGains.get(n) > bestNeighborReduction)
+				if (this.neighborGains.get(n) > bestNeighborReduction) {
 					bestNeighborReduction = this.neighborGains.get(n);
+					bestNeighbor = n;
+				}
 
 			// If this solution is better than any of the neighbors, do the
 			// update
@@ -407,7 +410,7 @@ public class MGM2Solver implements IterativeSolver {
 				if (this.bestLocalReduction > bestNeighborReduction)
 					this.myVariable.setValue(bestLocalAssignment);
 				if (this.bestLocalReduction == bestNeighborReduction
-						&& Math.random() > EQUAL_UPDATE_PROBABILITY)
+						&& this.parent.getName().compareTo(bestNeighbor.getName()) < 0)
 					this.myVariable.setValue(bestLocalAssignment);
 			} catch (InvalidValueException e) {
 				e.printStackTrace();
