@@ -47,21 +47,6 @@ public class LocalInequalityConstraintCostFunction implements CostFunction {
 		this.localAgent = me;
 	}
 
-	// public double currentValue() throws VariableNotSetException {
-	// HashMap<Agent, Integer> assignment = new HashMap<Agent, Integer>();
-	//
-	// assignment.put(localAgent, (Integer)
-	// localAgent.getVariable().getValue());
-	// for (Agent a : localAgent.getNeighborhood())
-	// assignment.put(a, (Integer) a.getVariable().getValue());
-	//
-	// LocalProblemContext<Integer> cpc = new
-	// LocalProblemContext<Integer>(localAgent);
-	// cpc.setAssignment(assignment);
-	//
-	// return this.evaluate(cpc);
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -81,39 +66,44 @@ public class LocalInequalityConstraintCostFunction implements CostFunction {
 		// Get the current assignment in the problemcontext
 		HashMap<Agent, Integer> currentAssignments = context.getAssignment();
 
-		Integer myAssignedValue = currentAssignments.get(this.localAgent);
-
-		try {
-			assert (myAssignedValue == this.localAgent.getVariable().getValue());
-		} catch (VariableNotSetException e) {
-			throw new RuntimeException(
-					"Variable value should not be null here?");
-		}
-
-		// Should never be the case right?
-		if (myAssignedValue == null)
-			return 0.0;
+		if (!currentAssignments.containsKey(localAgent))
+			throw new VariableNotSetException();
+		int myAssignedValue = currentAssignments.get(this.localAgent);
 
 		double cost = 0;
-
 		for (Agent neighbor : this.localAgent.getNeighborhood()) {
 			CompareCounter.compare();
 			if (currentAssignments.containsKey(neighbor)
-					&& myAssignedValue.equals(currentAssignments.get(neighbor)))
+					&& myAssignedValue == currentAssignments.get(neighbor))
 				cost++;
 		}
 
-		// Iterate over all values in the problem context to see if there is one
-		// with the same value
-		// Start with negative one because it should always equal to itself
-		// double cost = -1.0;
-		//
-		// for (Iterator<Integer> iter = context.iterator(); iter.hasNext();) {
-		// nComparisons++;
-		// if (assignedValue.equals(iter.next()))
-		// cost++;
-		// }
-
 		return cost;
 	}
+	
+	@Override
+	public double evaluateFull(ProblemContext<?> pc) {
+		if (!(pc instanceof LocalProblemContext<?>))
+			throw new RuntimeException(
+					"Error using LocalInequalityConstraintCostFunction with invalid problemcontext");
+
+		@SuppressWarnings("unchecked")
+		LocalProblemContext<Integer> context = (LocalProblemContext<Integer>) pc;
+		HashMap<Agent, Integer> currentAssignments = context.getAssignment();
+		
+		double cost = 0;
+		
+		for (Agent one : currentAssignments.keySet()) {
+			for (Agent other : currentAssignments.keySet()) {
+				if (one == other) continue;
+				
+				CompareCounter.compare();
+				if (currentAssignments.get(one) == currentAssignments.get(other))
+					cost++;
+			}
+		}
+		
+		return cost;
+	}
+	
 }

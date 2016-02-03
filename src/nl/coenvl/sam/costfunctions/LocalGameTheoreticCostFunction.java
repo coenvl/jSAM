@@ -56,64 +56,88 @@ public class LocalGameTheoreticCostFunction implements CostFunction {
 	 */
 	@Override
 	public double evaluate(ProblemContext<?> pc) {
-
 		if (!(pc instanceof LocalProblemContext<?>))
-			throw new RuntimeException(
-					"Error using LocalInequalityConstraintCostFunction with invalid problemcontext");
+			throw new RuntimeException("Error using LocalInequalityConstraintCostFunction with invalid problemcontext");
 
 		@SuppressWarnings("unchecked")
 		LocalProblemContext<Integer> context = (LocalProblemContext<Integer>) pc;
-
-		// Get the current assignment in the problemcontext
 		HashMap<Agent, Integer> currentAssignments = context.getAssignment();
 
-		Integer myAssignedValue = currentAssignments.get(this.localAgent);
-
-		try {
-			assert (myAssignedValue == this.localAgent.getVariable().getValue());
-		} catch (VariableNotSetException e) {
-			throw new RuntimeException(
-					"Variable value should not be null here?");
-		}
-
-		// Should never be the case right?
-		if (myAssignedValue == null)
-			return 0.0;
+		if (!currentAssignments.containsKey(localAgent))
+			throw new VariableNotSetException();
+		int myAssignedValue = currentAssignments.get(this.localAgent);
 
 		double cost = 0;
 
 		for (Agent neighbor : this.localAgent.getNeighborhood()) {
 			if (currentAssignments.containsKey(neighbor)) {
 				CompareCounter.compare();
-				
+
 				Integer otherValue = currentAssignments.get(neighbor);
-				if (myAssignedValue == 1 && otherValue == 1)
-					cost += 1;
-				else if (myAssignedValue == 2 && otherValue == 2)
-					cost += 1;
-				else if (myAssignedValue == 3 && otherValue == 3)
-					cost += 1;
-				else if (myAssignedValue == 1 && otherValue == 2)
-					cost += 0;
-				else if (myAssignedValue == 2 && otherValue == 3)
-					cost += 0;
-				else if (myAssignedValue == 3 && otherValue == 1)
-					cost += 0;
-				else if (myAssignedValue == 1 && otherValue == 3)
-					cost += 3;
-				else if (myAssignedValue == 2 && otherValue == 1)
-					cost += 3;
-				else if (myAssignedValue == 3 && otherValue == 2)
-					cost += 3;
-				else
-					throw new RuntimeException(
-							"Invalid values for the GameTheoretic cost function! ("
-									+ myAssignedValue + " & " + otherValue
-									+ ")");
+				cost += LocalGameTheoreticCostFunction.getCost(myAssignedValue, otherValue);
 			}
 
 		}
 
 		return cost;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.coenvl.sam.costfunctions.CostFunction#evaluateFull(nl.coenvl.sam.
+	 * problemcontexts.ProblemContext)
+	 */
+	@Override
+	public double evaluateFull(ProblemContext<?> pc) {
+		if (!(pc instanceof LocalProblemContext<?>))
+			throw new RuntimeException("Error using LocalInequalityConstraintCostFunction with invalid problemcontext");
+
+		@SuppressWarnings("unchecked")
+		LocalProblemContext<Integer> context = (LocalProblemContext<Integer>) pc;
+		HashMap<Agent, Integer> currentAssignments = context.getAssignment();
+
+		double cost = 0;
+
+		for (Agent one : currentAssignments.keySet()) {
+			for (Agent two : currentAssignments.keySet()) {
+				CompareCounter.compare();
+
+				Integer a1 = currentAssignments.get(one);
+				Integer a2 = currentAssignments.get(two);
+				cost += LocalGameTheoreticCostFunction.getCost(a1, a2);
+			}
+
+		}
+
+		return cost;
+	}
+
+	/**
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	private static double getCost(int a, int b) {
+		if (a == 1 && b == 1)
+			return 1;
+		else if (a == 2 && b == 2)
+			return 1;
+		else if (a == 3 && b == 3)
+			return 1;
+		else if (a == 1 && b == 2)
+			return 0;
+		else if (a == 2 && b == 3)
+			return 0;
+		else if (a == 3 && b == 1)
+			return 0;
+		else if (a == 1 && b == 3)
+			return 3;
+		else if (a == 2 && b == 1)
+			return 3;
+		else if (a == 3 && b == 2)
+			return 3;
+		else
+			throw new RuntimeException("Invalid values for the GameTheoretic cost function! (" + a + " & " + b + ")");
 	}
 }

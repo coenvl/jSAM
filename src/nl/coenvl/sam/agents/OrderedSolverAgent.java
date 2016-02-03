@@ -78,8 +78,8 @@ public class OrderedSolverAgent extends AbstractSolverAgent implements
 	public final int compareTo(Agent other) {
 		if (other instanceof OrderedAgent)
 			return this.sequenceID - ((OrderedAgent) other).getSequenceID();
-		else
-			return super.compareTo(other);
+		//else
+		return super.compareTo(other);
 	}
 
 	/*

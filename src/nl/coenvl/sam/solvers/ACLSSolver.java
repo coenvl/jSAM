@@ -68,7 +68,7 @@ public class ACLSSolver implements IterativeSolver {
 	 * @see nl.coenvl.sam.solvers.Solver#init()
 	 */
 	@Override
-	public void init() {
+	public synchronized void init() {
 		this.myProblemContext = new LocalProblemContext<Integer>(this.parent);
 		this.neighborValues = new HashMap<Agent, Integer>();
 		this.impactCosts = new HashMap<Agent, Double>();
@@ -86,7 +86,7 @@ public class ACLSSolver implements IterativeSolver {
 	 * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
 	 */
 	@Override
-	public void push(Message m) {
+	public synchronized void push(Message m) {
 		final Agent source = (Agent) m.getContent("source");
 		
 		if (m.getType().equals(ACLSSolver.UPDATE_VALUE)) {
@@ -227,7 +227,7 @@ public class ACLSSolver implements IterativeSolver {
 	 * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
 	 */
 	@Override
-	public void tick() {
+	public synchronized void tick() {
 		try {
 			Message updateMsg = new HashMessage(ACLSSolver.UPDATE_VALUE);
 

@@ -49,7 +49,7 @@ public class UniqueFirstCooperativeSolver implements Solver {
 
 	private static enum State {
 		ACTIVE, DONE, HOLD, IDLE
-	};
+	}
 
 	private static final String ASSIGN_VAR = "UniqueFirstCooperativeSolver:PickAVar";
 
@@ -208,12 +208,12 @@ public class UniqueFirstCooperativeSolver implements Solver {
 
 		if (this.receivedMaps.size() < this.parent.getNeighborhood().size()) {
 			return;
-		} else {
-			try {
-				pickValue();
-			} catch (InvalidValueException e) {
-				throw new RuntimeException(e);
-			}
+		}
+		
+		try {
+			pickValue();
+		} catch (InvalidValueException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

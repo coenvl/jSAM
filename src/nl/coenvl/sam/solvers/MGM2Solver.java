@@ -88,7 +88,7 @@ public class MGM2Solver implements IterativeSolver {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		this.algoState = State.Value;
 		this.myProblemContext = new LocalProblemContext<Integer>(this.parent);
 		this.receivedOffers = new LinkedList<Offer>();
@@ -220,6 +220,7 @@ public class MGM2Solver implements IterativeSolver {
 	 * offerer: send a list of offers to the neighbor with local cost
 	 * reductions. If receiver, do nothing.
 	 */
+	@SuppressWarnings("null")
 	private void sendOffer() {
 		// if (1 == 1)	return;
 		
@@ -255,8 +256,8 @@ public class MGM2Solver implements IterativeSolver {
 			HashMap<Agent, Integer> assignment = (HashMap<Agent, Integer>) this.myProblemContext
 					.getAssignment().clone();
 			temp.setAssignment(assignment);
-
-			double before = this.myCostFunction.evaluate(myProblemContext);
+			temp.setValue(this.myVariable.getValue());
+			double before = this.myCostFunction.evaluate(temp);
 
 			for (Integer i : this.myVariable) {
 				temp.setValue(i);
@@ -299,7 +300,9 @@ public class MGM2Solver implements IterativeSolver {
 					.getAssignment().clone();
 
 			double bestGain = Double.MIN_VALUE;
-			double before = this.myCostFunction.evaluate(myProblemContext);
+			temp.setAssignment(cpa);
+			temp.setValue(this.myVariable.getValue());
+			double before = this.myCostFunction.evaluate(temp);
 			Offer bestOffer = null;
 
 			for (Offer suggestedOffer : this.receivedOffers) {
@@ -388,6 +391,7 @@ public class MGM2Solver implements IterativeSolver {
 			n.push(gainMessage);
 	}
 
+	@SuppressWarnings("null")
 	private void sendGo() {
 		// System.out.println(this.parent.getName() + "Analyzing!");
 

@@ -140,9 +140,17 @@ public class ChannelAllocationCostFunction implements CostFunction {
 		return cost;
 	}
 
-	private double dist(double xa, double xb, double ya, double yb, double za,
+	private static double dist(double xa, double xb, double ya, double yb, double za,
 			double zb) {
 		return Math.sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb)
 				+ (za - zb) * (za - zb));
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.costfunctions.CostFunction#evaluateFull(nl.coenvl.sam.problemcontexts.ProblemContext)
+	 */
+	@Override
+	public double evaluateFull(ProblemContext<?> context) {
+		throw new RuntimeException("NYI");
 	}
 }

@@ -36,5 +36,13 @@ public interface CostFunction {
 	 * @param context
 	 * @return
 	 */
-	double evaluate(ProblemContext<?> context);
+	public double evaluate(ProblemContext<?> context);
+	
+	/**
+	 * Disregarding any local contexts, compute full problem context costs
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public double evaluateFull(ProblemContext<?> context);
 }

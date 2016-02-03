@@ -65,6 +65,7 @@ public class DSASolver implements IterativeSolver {
 		this.parent = parent;
 		this.costfun = costfun;
 		this.myVar = (IntegerVariable) this.parent.getVariable();
+		this.context = new LocalProblemContext<Integer>(parent);
 	}
 
 	/*
@@ -73,8 +74,8 @@ public class DSASolver implements IterativeSolver {
 	 * @see org.anon.cocoa.solvers.Solver#init()
 	 */
 	@Override
-	public void init() {
-		this.context = new LocalProblemContext<Integer>(parent);
+	public synchronized void init() {
+		//this.context = new LocalProblemContext<Integer>(parent);
 		updateMyValue(myVar.getRandomValue());
 	}
 
@@ -84,7 +85,7 @@ public class DSASolver implements IterativeSolver {
 	 * @see org.anon.cocoa.solvers.Solver#push(org.anon.cocoa.messages.Message)
 	 */
 	@Override
-	public void push(Message m) {
+	public synchronized void push(Message m) {
 		if (m.getType().equals(DSASolver.UPDATE_VALUE))
 			this.updateContext(m);
 	}
@@ -103,7 +104,7 @@ public class DSASolver implements IterativeSolver {
 	 * 
 	 */
 	@Override
-	public void tick() {
+	public synchronized void tick() {
 		double bestCost = Double.MAX_VALUE;
 		Vector<Integer> bestAssignment = new Vector<Integer>();
 

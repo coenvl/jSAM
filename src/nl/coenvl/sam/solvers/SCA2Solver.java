@@ -178,6 +178,7 @@ public class SCA2Solver implements IterativeSolver {
 	/**
 	 * 
 	 */
+	@SuppressWarnings("null")
 	private void sendOffer() {
 		// First determine wether we will offer or receive
 		if (Math.random() > SCA2Solver.OFFER_PROBABILITY) {
@@ -254,7 +255,9 @@ public class SCA2Solver implements IterativeSolver {
 					.getAssignment().clone();
 
 			double bestGain = Double.MIN_VALUE;
-			double before = this.myCostFunction.evaluate(myProblemContext);
+			temp.setAssignment(cpa);
+			temp.setValue(this.myVariable.getValue());
+			double before = this.myCostFunction.evaluate(temp);
 			Offer bestOffer = null;
 
 			for (Offer suggestedOffer : this.receivedOffers) {

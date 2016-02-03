@@ -34,8 +34,7 @@ import nl.coenvl.sam.variables.Variable;
  * @since 11 apr. 2014
  * 
  */
-public class LocalSolverAgent extends AbstractSolverAgent implements
-		LocalCommunicatingAgent {
+public class LocalSolverAgent extends AbstractSolverAgent implements LocalCommunicatingAgent {
 
 	private final SortedSet<Agent> neighborhood;
 
@@ -48,8 +47,7 @@ public class LocalSolverAgent extends AbstractSolverAgent implements
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * nl.coenvl.sam.agents.LocalCommunicatingAgent#addToNeighborhood(nl.coenvl
-	 * .sam.agents.Agent)
+	 * nl.coenvl.sam.agents.LocalCommunicatingAgent
 	 */
 	@Override
 	public final void addToNeighborhood(Agent agent) {

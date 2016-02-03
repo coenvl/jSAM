@@ -56,9 +56,9 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 		 * 
 		 * @param ref
 		 */
-		private IntegerVariableIterator(IntegerVariable ref) {
+		IntegerVariableIterator(IntegerVariable ref) {
 			this.value = ref.getLowerBound();
-			this.upperBound = ref.upperBound;
+			this.upperBound = ref.getUpperBound();
 		}
 
 		/*
@@ -306,7 +306,7 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 	public String toString() {
 		if (set)
 			return "" + this.name + ": " + this.value;
-		else
-			return "" + this.name + ": (unset)";
+		//else
+		return "" + this.name + ": (unset)";
 	}
 }

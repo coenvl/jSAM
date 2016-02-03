@@ -20,8 +20,6 @@
  */
 package nl.coenvl.sam.problemcontexts;
 
-import java.util.Iterator;
-
 /**
  * ProblemContext
  * 
@@ -32,11 +30,11 @@ import java.util.Iterator;
  */
 public interface ProblemContext<T> {
 
-	public void clearValue();
+	//public void clearValue();
 
-	public Iterator<T> getIterator();
+	//public Iterator<T> getIterator();
 
-	public T getValue();
+	//public T getValue();
 
 	void setValue(T value);
 

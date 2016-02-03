@@ -78,7 +78,7 @@ public class TickCFLSolver implements IterativeSolver {
 
 	@Override
 	public void push(Message m) {
-	
+		// This function should never be called
 	}
 	
 	@Override

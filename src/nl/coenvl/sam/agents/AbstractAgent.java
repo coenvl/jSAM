@@ -78,7 +78,8 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 
 	@Override
 	public void reset() {
-		this.variable.clear();
+		if (this.variable != null)
+			this.variable.clear();
 	}
 
 	/**
@@ -92,7 +93,10 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 
 	public final static void destroyAgents() {
 		for (Agent a : allAgents) {
-			a.getVariable().clear();
+			Variable<?> var = a.getVariable();
+			if (var != null)
+				var.clear();
+			
 			a.reset();
 		}
 		allAgents.clear();

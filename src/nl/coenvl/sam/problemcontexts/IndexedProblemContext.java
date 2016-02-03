@@ -21,7 +21,6 @@
 package nl.coenvl.sam.problemcontexts;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * IndexedProblemContext
@@ -60,10 +59,10 @@ public final class IndexedProblemContext<T> implements ProblemContext<T> {
 	/**
      * 
      */
-	@Override
-	public void clearValue() {
-		this.setValue(null);
-	}
+	//@Override
+	//public void clearValue() {
+	//	this.setValue(null);
+	//}
 
 	/**
 	 * Get the current (partial) assignment.
@@ -81,20 +80,20 @@ public final class IndexedProblemContext<T> implements ProblemContext<T> {
 	 * 
 	 * @return
 	 */
-	@Override
-	public Iterator<T> getIterator() {
-		return currentAssignment.iterator();
-	}
+	//@Override
+	//public Iterator<T> getIterator() {
+	//	return currentAssignment.iterator();
+	//}
 
 	/**
 	 * Get the value of the modifiable entry
 	 * 
 	 * @return
 	 */
-	@Override
-	public T getValue() {
-		return currentAssignment.get(variableIndex);
-	}
+	//@Override
+	//public T getValue() {
+	//	return currentAssignment.get(variableIndex);
+	//}
 
 	public T getValue(int index) {
 		return currentAssignment.get(index);

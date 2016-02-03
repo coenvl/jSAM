@@ -21,7 +21,6 @@
 package nl.coenvl.sam.problemcontexts;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import nl.coenvl.sam.agents.Agent;
 
@@ -60,17 +59,17 @@ public final class LocalProblemContext<T> implements ProblemContext<T> {
 	/**
      * 
      */
-	@Override
-	public void clearValue() {
-		this.setValue(null);
-	}
+	//@Override
+	//public void clearValue() {
+	//	this.setValue(null);
+	//}
 
 	/**
      * 
      */
-	public void clearValue(Agent a) {
-		this.currentAssignment.remove(a);
-	}
+	//public void clearValue(Agent a) {
+	//	this.currentAssignment.remove(a);
+	//}
 	
 	/**
 	 * Get the current (partial) assignment.
@@ -86,20 +85,20 @@ public final class LocalProblemContext<T> implements ProblemContext<T> {
 	 * 
 	 * @return
 	 */
-	@Override
-	public Iterator<T> getIterator() {
-		return currentAssignment.values().iterator();
-	}
+	//@Override
+	//public Iterator<T> getIterator() {
+	//	return currentAssignment.values().iterator();
+	//}
 
 	/**
 	 * Get the value of the modifiable entry
 	 * 
 	 * @return
 	 */
-	@Override
-	public T getValue() {
-		return this.getValue(problemOwner);
-	}
+	//@Override
+	//public T getValue() {
+	//	return this.getValue(problemOwner);
+	//}
 
 	public T getValue(Agent neighbor) {
 		return currentAssignment.get(neighbor);

@@ -99,5 +99,13 @@ public class MobilityCostFunction implements CostFunction {
 	public void setLeadingVehicleIndex(int idx) {
 		this.leadingIdx = idx;
 	}
+	
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.costfunctions.CostFunction#evaluateFull(nl.coenvl.sam.problemcontexts.ProblemContext)
+	 */
+	@Override
+	public double evaluateFull(ProblemContext<?> context) {
+		throw new RuntimeException("NYI");
+	}
 
 }

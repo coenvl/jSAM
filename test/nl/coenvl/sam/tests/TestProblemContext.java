@@ -51,47 +51,39 @@ public class TestProblemContext {
 
 	@Test
 	public void testIndexedContext() throws InvalidValueException {
-		IndexedProblemContext<Integer> pc = new IndexedProblemContext<Integer>(
-				testIndex);
-
+		IndexedProblemContext<Integer> pc = new IndexedProblemContext<Integer>(testIndex);
 		pc.setValue(testValue);
 
 		ArrayList<Integer> cpa = pc.getAssignment();
 		assertEquals(testValue, cpa.get(testIndex));
-		assertEquals(testValue, pc.getValue());
+		assertEquals(testValue, pc.getValue(testIndex));
 
-		IndexedProblemContext<Integer> pc2 = new IndexedProblemContext<Integer>(
-				0);
+		IndexedProblemContext<Integer> pc2 = new IndexedProblemContext<Integer>(0);
 		pc2.setAssignment(cpa);
 		ArrayList<Integer> cpa2 = pc2.getAssignment();
 		assertEquals(testValue, cpa2.get(testIndex));
-		assertNotEquals(testValue, pc2.getValue());
+		assertNotEquals(testValue, pc2.getValue(0));
 	}
 
 	@Test
-	public void testLocalContext() throws InvalidValueException,
-			InvalidDomainException {
-		Agent testAgent = new LocalSolverAgent("TestAgent",
-				new IntegerVariable(0, 10));
-		LocalProblemContext<Integer> pc = new LocalProblemContext<Integer>(
-				testAgent);
-		
+	public void testLocalContext() throws InvalidValueException, InvalidDomainException {
+		Agent testAgent = new LocalSolverAgent("TestAgent", new IntegerVariable(0, 10));
+		LocalProblemContext<Integer> pc = new LocalProblemContext<Integer>(testAgent);
+
 		pc.setValue(testValue);
 		HashMap<Agent, Integer> cpa = pc.getAssignment();
-		
-		assertEquals(testValue, cpa.get(testAgent));
-		assertEquals(testValue, pc.getValue());
 
-		Agent neighborAgent = new LocalSolverAgent("NeighborAgent",
-				new IntegerVariable(0, 10));
-		LocalProblemContext<Integer> pc2 = new LocalProblemContext<Integer>(
-				neighborAgent);
-		
+		assertEquals(testValue, cpa.get(testAgent));
+		assertEquals(testValue, pc.getValue(testAgent));
+
+		Agent neighborAgent = new LocalSolverAgent("NeighborAgent", new IntegerVariable(0, 10));
+		LocalProblemContext<Integer> pc2 = new LocalProblemContext<Integer>(neighborAgent);
+
 		pc2.setAssignment(cpa);
 		HashMap<Agent, Integer> cpa2 = pc2.getAssignment();
-		
+
 		assertEquals(testValue, cpa2.get(testAgent));
-		assertNotEquals(testValue, pc2.getValue());
+		assertNotEquals(testValue, pc2.getValue(neighborAgent));
 	}
 
 }

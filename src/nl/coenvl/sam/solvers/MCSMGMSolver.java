@@ -44,7 +44,7 @@ public class MCSMGMSolver implements IterativeSolver {
 	private static final String UPDATE_VALUE = "MCSMGM:UpdateValue";
 	private static final String IMPACT_VALUE = "MCSMGM:ImpactValue";
 	private static final String LOCAL_REDUCTION = "MCSMGM:BestLocalReduction";
-	private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
+	//private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
 
 	private CostFunction myCostFunction;
 	//private LocalProblemContext<Integer> myProblemContext;
@@ -76,7 +76,7 @@ public class MCSMGMSolver implements IterativeSolver {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		this.myVariable.setValue(this.myVariable.getRandomValue());
 		//this.myProblemContext = new LocalProblemContext<Integer>(this.parent);
 		//this.myProblemContext.setValue(this.myVariable.getValue());
@@ -93,7 +93,7 @@ public class MCSMGMSolver implements IterativeSolver {
 	}
 
 	@Override
-	public void push(final Message m) {
+	public synchronized void push(final Message m) {
 		final Agent source = (Agent) m.getContent("source");
 		int numNeighbors = parent.getNeighborhood().size();
 		
@@ -133,7 +133,7 @@ public class MCSMGMSolver implements IterativeSolver {
 	}
 
 	@Override
-	public void tick() {
+	public synchronized void tick() {
 		Message updateMsg = new HashMessage(MCSMGMSolver.UPDATE_VALUE);
 
 		updateMsg.addContent("value", this.myVariable.getValue());
@@ -271,6 +271,7 @@ public class MCSMGMSolver implements IterativeSolver {
 	/**
 	 * 
 	 */
+	@SuppressWarnings("null")
 	private void pickValue() {
 		Double bestNeighborReduction = Double.MIN_VALUE;
 		Agent bestNeighbor = null;

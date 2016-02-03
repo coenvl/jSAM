@@ -24,6 +24,7 @@ import nl.coenvl.sam.agents.AbstractAgent;
 import nl.coenvl.sam.agents.AbstractSolverAgent;
 import nl.coenvl.sam.agents.OrderedSolverAgent;
 import nl.coenvl.sam.costfunctions.CompareCounter;
+import nl.coenvl.sam.costfunctions.SemiRandomCostFunction;
 
 /**
  * ExperimentControl
@@ -41,6 +42,7 @@ public class ExperimentControl {
 		AbstractSolverAgent.resetMessageCount();
 		CompareCounter.reset();
 		OrderedSolverAgent.maxSequenceID = 0;
+		SemiRandomCostFunction.resetCostMatrices();
 	}
 	
 	public static int getNumberEvals() {

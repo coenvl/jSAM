@@ -41,7 +41,7 @@ import nl.coenvl.sam.variables.IntegerVariable;
  */
 public class MGMSolver implements IterativeSolver {
 
-	private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
+	//private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
 	private static final String UPDATE_VALUE = "MGM:UpdateValue";
 	private static final String LOCAL_REDUCTION = "MGM:BestLocalReduction";
 
@@ -149,6 +149,7 @@ public class MGMSolver implements IterativeSolver {
 	/**
 	 * 
 	 */
+	@SuppressWarnings("null")
 	private void pickValue() {
 		Double bestNeighborReduction = Double.MIN_VALUE;
 		Agent bestNeighbor = null;

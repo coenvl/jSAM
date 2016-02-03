@@ -40,6 +40,7 @@ import nl.coenvl.sam.variables.IntegerVariable.IntegerVariableIterator;
  * @since 19 mrt. 2014
  * 
  */
+@Deprecated
 public class FBSolver implements Solver {
 
 	public static final String CPA_MSG = "FBSO:CPA_MSG";
@@ -180,8 +181,9 @@ public class FBSolver implements Solver {
 			// backtrack
 			if (msg.hasContent("paCost")) {
 				this.pastCost = (Double) msg.getContent("paCost");
-				myProblemContext.clearValue();
-				this.exploredValues.clear();
+				throw new RuntimeException("Don't use this function anymore");
+				//myProblemContext.clearValue();
+				//this.exploredValues.clear();
 			}
 
 			double cost = myCostFunction.evaluate(myProblemContext);

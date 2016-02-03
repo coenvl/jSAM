@@ -66,10 +66,12 @@ public class TaskSchedulingCostFunction implements CostFunction {
 
 		// Get the current assignment in the problemcontext
 		HashMap<Agent, Integer> currentAssignments = context.getAssignment();
+		
+		if (!currentAssignments.containsKey(localAgent))
+			throw new VariableNotSetException();
+		int myAssignedValue = currentAssignments.get(this.localAgent);
 
-		Integer myAssignedValue = currentAssignments.get(this.localAgent);
-
-		try {
+		/*try {
 			assert (myAssignedValue == this.localAgent.getVariable().getValue());
 		} catch (VariableNotSetException e) {
 			throw new RuntimeException(
@@ -78,7 +80,7 @@ public class TaskSchedulingCostFunction implements CostFunction {
 
 		// Should never be the case right?
 		if (myAssignedValue == null)
-			return 0.0;
+			return 0.0;*/
 
 		double cost = 0;
 
@@ -102,5 +104,13 @@ public class TaskSchedulingCostFunction implements CostFunction {
 		}
 
 		return cost;
+	}
+	
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.costfunctions.CostFunction#evaluateFull(nl.coenvl.sam.problemcontexts.ProblemContext)
+	 */
+	@Override
+	public double evaluateFull(ProblemContext<?> context) {
+		throw new RuntimeException("NYI");
 	}
 }

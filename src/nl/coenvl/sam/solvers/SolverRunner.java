@@ -32,6 +32,7 @@ import nl.coenvl.sam.messages.Message;
  * @since 4 apr. 2014
  * 
  */
+@SuppressWarnings("synthetic-access")
 public class SolverRunner implements Solver {
 
 	private class Runner implements Runnable {
@@ -92,6 +93,7 @@ public class SolverRunner implements Solver {
 	 * 
 	 * @see nl.coenvl.sam.Solver#init()
 	 */
+	
 	@Override
 	public void init() {
 		this.myRunner = new Runner();
