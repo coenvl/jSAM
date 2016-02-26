@@ -22,6 +22,7 @@ package nl.coenvl.sam.agents;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.solvers.Solver;
@@ -40,10 +41,16 @@ import nl.coenvl.sam.variables.Variable;
  */
 public abstract class AbstractSolverAgent extends AbstractAgent {
 
+	private static double MESSAGE_SUCCESS_PROBABILITY = 1;
+
 	private static HashMap<String, Integer> messageCounterMap = new HashMap<String, Integer>();
 
 	private static int sentMessages = 0;
 
+	public static void setArrivalProbability(double d) {
+		MESSAGE_SUCCESS_PROBABILITY = d;
+	}
+	
 	public static Map<String, Integer> getSentMessages() {
 		return messageCounterMap;
 	}
@@ -88,7 +95,8 @@ public abstract class AbstractSolverAgent extends AbstractAgent {
 
 		AbstractSolverAgent.sentMessages++;
 
-		this.mySolver.push(m);
+		if (Math.random() < AbstractSolverAgent.MESSAGE_SUCCESS_PROBABILITY)
+			this.mySolver.push(m);
 	}
 
 	/*

@@ -20,6 +20,7 @@ package nl.coenvl.sam.solvers;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
 
 /**
@@ -121,10 +122,18 @@ public class SolverRunner implements Solver {
 	public void reset() {
 		if (this.myRunner != null)
 			this.myRunner.running = false;
-
-		if (this.myThread != null)
+		
+		if (this.myThread != null) {
 			this.myThread.interrupt();
-
+		
+			try {
+				this.myThread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			this.myThread = null;
+		}
 		this.mySolver.reset();
 		this.queue.clear();
 	}

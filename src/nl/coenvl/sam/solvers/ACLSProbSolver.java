@@ -1,5 +1,5 @@
 /**
- * File ACLSSolver.java
+ * File ACLSUBSolver.java
  * 
  * This file is part of the jSAM project.
  *
@@ -19,14 +19,14 @@
  */
 package nl.coenvl.sam.solvers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
 
 import nl.coenvl.sam.agents.Agent;
 import nl.coenvl.sam.agents.LocalCommunicatingAgent;
 import nl.coenvl.sam.costfunctions.CostFunction;
-import nl.coenvl.sam.exceptions.InvalidValueException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
@@ -40,11 +40,11 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 11 dec. 2015
  */
-public class ACLSSolver implements IterativeSolver {
+public class ACLSProbSolver implements IterativeSolver {
 
-	private static final String UPDATE_VALUE = "ACLS:UpdateValue";
-	private static final String PROPOSED_UPDATE = "ACLS:ProposedUpdateValue";
-	private static final String IMPACT_MESSAGE = "ACLS:ProposalImpact";
+	private static final String UPDATE_VALUE = "ACLSProb:UpdateValue";
+	private static final String PROPOSED_UPDATE = "ACLSProb:ProposedUpdateValue";
+	private static final String IMPACT_MESSAGE = "ACLSProb:ProposalImpact";
 	private static final double UPDATE_PROBABILITY = 0.5;
 
 	private final LocalCommunicatingAgent parent;
@@ -56,7 +56,7 @@ public class ACLSSolver implements IterativeSolver {
 	private HashMap<Agent, Integer> neighborValues;
 	private HashMap<Agent, Double> impactCosts;
 	
-	public ACLSSolver(LocalCommunicatingAgent agent, CostFunction costfunction) {
+	public ACLSProbSolver(LocalCommunicatingAgent agent, CostFunction costfunction) {
 		this.parent = agent;
 		this.myCostFunction = costfunction;
 		this.myVariable = (IntegerVariable) this.parent.getVariable();
@@ -72,12 +72,7 @@ public class ACLSSolver implements IterativeSolver {
 		this.myProblemContext = new LocalProblemContext<Integer>(this.parent);
 		this.neighborValues = new HashMap<Agent, Integer>();
 		this.impactCosts = new HashMap<Agent, Double>();
-
-		try {
-			this.myVariable.setValue(this.myVariable.getRandomValue());
-		} catch (InvalidValueException e) {
-			throw new RuntimeException(e);
-		}
+		this.myVariable.setValue(this.myVariable.getRandomValue());
 	}
 
 	/*
@@ -89,7 +84,7 @@ public class ACLSSolver implements IterativeSolver {
 	public synchronized void push(Message m) {
 		final Agent source = (Agent) m.getContent("source");
 		
-		if (m.getType().equals(ACLSSolver.UPDATE_VALUE)) {
+		if (m.getType().equals(ACLSProbSolver.UPDATE_VALUE)) {
 			final Integer value = (Integer) m.getContent("value");
 			this.neighborValues.put(source, value);
 
@@ -98,9 +93,9 @@ public class ACLSSolver implements IterativeSolver {
 				this.impactCosts.clear();
 				this.proposeAssignment();
 			}
-		} else if (m.getType().equals(ACLSSolver.PROPOSED_UPDATE)) {
+		} else if (m.getType().equals(ACLSProbSolver.PROPOSED_UPDATE)) {
 			replyWithLocalCost(m);
-		} else if (m.getType().equals(ACLSSolver.IMPACT_MESSAGE)) {
+		} else if (m.getType().equals(ACLSProbSolver.IMPACT_MESSAGE)) {
 			
 			if (myProposal != null) {
 				final Double impact = (Double) m.getContent("costImpact");
@@ -124,27 +119,25 @@ public class ACLSSolver implements IterativeSolver {
 		// Compute local reductions
 		this.myProblemContext.setAssignment(neighborValues);
 		this.myProblemContext.setValue(this.myVariable.getValue());
-		double currentCost = this.myCostFunction.evaluate(this.myProblemContext);
+		//double currentCost = this.myCostFunction.evaluate(this.myProblemContext);
 
 		LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(parent);
 		temp.setAssignment(myProblemContext.getAssignment());
-		ArrayList<Integer> improvementSet = new ArrayList<Integer>();
+		NavigableMap<Double, Integer> improvementMap = new TreeMap<Double, Integer>();
+		double total = 0;
 		for (Integer i : this.myVariable) {
 			temp.setValue(i);
 			double val = this.myCostFunction.evaluate(temp);
-			if (val < currentCost)
-				improvementSet.add(i);
+			total += val;
+			improvementMap.put(total, new Integer(i));
 		}
 
-		// Determine the proposol for this round
-		// Fix if zero
-		if (improvementSet.isEmpty())
-			myProposal = null;
-		else
-			myProposal = improvementSet.get((new Random()).nextInt(improvementSet.size()));
-
+		// Determine the proposal for this round
+		double r = (new Random()).nextDouble() * total;
+		this.myProposal = improvementMap.ceilingEntry(r).getValue();
+				
 		// Send the proposal to all neighbors
-		Message updateMsg = new HashMessage(ACLSSolver.PROPOSED_UPDATE);
+		Message updateMsg = new HashMessage(ACLSProbSolver.PROPOSED_UPDATE);
 
 		updateMsg.addContent("source", this.parent);
 		updateMsg.addContent("proposal", myProposal);
@@ -168,11 +161,7 @@ public class ACLSSolver implements IterativeSolver {
 			LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(parent);
 			temp.setAssignment(myProblemContext.getAssignment());
 			
-			try {
-				temp.setValue(this.myVariable.getValue());
-			} catch (VariableNotSetException e) {
-				throw new RuntimeException("Unexpected unset variable at this point", e);
-			}
+			temp.setValue(this.myVariable.getValue());
 			double currentCost = this.myCostFunction.evaluate(temp);
 			
 			// Compute cost after update
@@ -181,7 +170,7 @@ public class ACLSSolver implements IterativeSolver {
 		}
 		
 		// And send back impact such that negative impact means improvement
-		Message impactMsg = new HashMessage(ACLSSolver.IMPACT_MESSAGE);
+		Message impactMsg = new HashMessage(ACLSProbSolver.IMPACT_MESSAGE);
 
 		impactMsg.addContent("source", this.parent);
 		impactMsg.addContent("costImpact", new Double(impact));
@@ -194,6 +183,7 @@ public class ACLSSolver implements IterativeSolver {
 	private void decideAssignment() {
 		LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(parent);
 		temp.setAssignment(myProblemContext.getAssignment());
+		
 		temp.setValue(this.myVariable.getValue());
 		double currentCost = this.myCostFunction.evaluate(temp);
 		
@@ -205,11 +195,7 @@ public class ACLSSolver implements IterativeSolver {
 			totalImpact += impact;
 		
 		if (totalImpact < 0 && (new Random()).nextDouble() < UPDATE_PROBABILITY)
-			try {
-				this.myVariable.setValue(myProposal);
-			} catch (InvalidValueException e) {
-				throw new RuntimeException("Unexpected Exception", e);
-			}
+			this.myVariable.setValue(myProposal);
 	}
 	
 	/*
@@ -220,7 +206,7 @@ public class ACLSSolver implements IterativeSolver {
 	@Override
 	public synchronized void tick() {
 		try {
-			Message updateMsg = new HashMessage(ACLSSolver.UPDATE_VALUE);
+			Message updateMsg = new HashMessage(ACLSProbSolver.UPDATE_VALUE);
 
 			updateMsg.addContent("source", this.parent);
 			updateMsg.addContent("value", this.myVariable.getValue());

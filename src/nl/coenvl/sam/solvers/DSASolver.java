@@ -110,13 +110,7 @@ public class DSASolver implements IterativeSolver {
 
 		Iterator<Integer> iter = this.myVar.iterator();
 
-		if (this.myVar.isSet()) {
-			try {
-				context.setValue(this.myVar.getValue());
-			} catch (VariableNotSetException e) {
-				throw new RuntimeException(e);
-			}
-		}
+		context.setValue(this.myVar.getValue());
 		double oldCost = this.costfun.evaluate(context);
 
 		while (iter.hasNext()) {
@@ -155,13 +149,8 @@ public class DSASolver implements IterativeSolver {
 			assign = bestAssignment.elementAt(0);
 		}
 
-		try {
-			if (assign != this.myVar.getValue()) {
-				updateMyValue(assign);
-			}
-		} catch (VariableNotSetException e) {
-			throw new RuntimeException(e);
-		}
+		if (assign != this.myVar.getValue())
+			updateMyValue(assign);
 	}
 
 	/**
@@ -178,11 +167,7 @@ public class DSASolver implements IterativeSolver {
 	 * @param assign
 	 */
 	private void updateMyValue(Integer assign) {
-		try {
-			this.myVar.setValue(assign);
-		} catch (InvalidValueException e) {
-			throw new RuntimeException(e);
-		}
+		this.myVar.setValue(assign);
 
 		HashMessage nextMessage = new HashMessage(DSASolver.UPDATE_VALUE);
 		nextMessage.addContent("agent", this.parent);
