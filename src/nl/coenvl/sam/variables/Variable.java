@@ -20,6 +20,8 @@
  */
 package nl.coenvl.sam.variables;
 
+import java.util.UUID;
+
 import nl.coenvl.sam.exceptions.InvalidValueException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
 
@@ -129,5 +131,11 @@ public interface Variable<T> {
 	 * @throws InvalidValueException
 	 */
 	public Variable<T> setValue(T value) throws InvalidValueException;
+
+	/**
+	 * Returns the unique id of the variable. Can be used as the key for a value
+	 * map.
+	 */
+	public UUID getID();
 
 }

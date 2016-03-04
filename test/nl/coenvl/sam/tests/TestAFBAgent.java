@@ -21,13 +21,16 @@
 package nl.coenvl.sam.tests;
 
 import static org.junit.Assert.assertTrue;
-import nl.coenvl.sam.agents.lazy.AFBAgent;
-import nl.coenvl.sam.exceptions.InvalidDomainException;
-import nl.coenvl.sam.exceptions.InvalidValueException;
-import nl.coenvl.sam.exceptions.InvalidVariableException;
-import nl.coenvl.sam.variables.IntegerVariable;
 
 import org.junit.Test;
+
+import nl.coenvl.sam.agents.Agent;
+import nl.coenvl.sam.agents.OrderedSolverAgent;
+import nl.coenvl.sam.agents.SolverAgent;
+import nl.coenvl.sam.exceptions.InvalidDomainException;
+import nl.coenvl.sam.exceptions.InvalidValueException;
+import nl.coenvl.sam.solvers.DSASolver;
+import nl.coenvl.sam.variables.IntegerVariable;
 
 /**
  * TestAFBAgent
@@ -37,19 +40,21 @@ import org.junit.Test;
  * @since 4 feb. 2014
  * 
  */
+@SuppressWarnings("static-method")
 public class TestAFBAgent {
 
 	@Test
-	public void test() throws InvalidVariableException, InvalidValueException,
+	public void test() throws InvalidValueException,
 			InvalidDomainException {
 		IntegerVariable var = new IntegerVariable(1, 10);
-		AFBAgent agent = new AFBAgent("Alice", var);
-
-		System.out.println(agent);
-		agent.reset();
+		SolverAgent<IntegerVariable,Integer> alice = new SolverAgent<IntegerVariable,Integer>(var, "Alice");
+		alice.setSolver(new AFBSolver<IntegerVariable, Integer>());
+		
+		System.out.println(alice);
+		alice.reset();
 		assertTrue(true); // Just for formality
 
-		System.out.println(agent);
+		System.out.println(alice);
 	}
 
 }

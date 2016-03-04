@@ -20,9 +20,8 @@
 package nl.coenvl.sam.solvers;
 
 import nl.coenvl.sam.agents.Agent;
-import nl.coenvl.sam.costfunctions.CostFunction;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.variables.Variable;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
  * RandomSolver
@@ -31,13 +30,12 @@ import nl.coenvl.sam.variables.Variable;
  * @version 0.1
  * @since 12 feb. 2016
  */
-public class RandomSolver<T> implements Solver {
+public class RandomSolver<T extends DiscreteVariable<V>, V> implements Solver<T,V> {
 
-	private final Variable<T> myVariable;
+	private final T myVariable;
 	
-	@SuppressWarnings("unchecked")
-	public RandomSolver(Agent agent, CostFunction costfunction) {
-		this.myVariable = (Variable<T>) agent.getVariable();
+	public RandomSolver(Agent<T, V> agent) {
+		this.myVariable = agent.getVariable();
 	}
 	
 	/* (non-Javadoc)

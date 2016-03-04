@@ -1,9 +1,9 @@
 /**
- * File DSAAgent.java
+ * File SymmetricRandomConstraint.java
  * 
  * This file is part of the jSAM project.
  *
- * Copyright 2014 Coen van Leeuwen
+ * Copyright 2016 TNO
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,35 +17,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.coenvl.sam.agents.lazy;
+package nl.coenvl.sam.constraints;
 
-import nl.coenvl.sam.agents.LocalSolverAgent;
-import nl.coenvl.sam.costfunctions.LocalInequalityConstraintCostFunction;
-import nl.coenvl.sam.solvers.DSASolver;
-import nl.coenvl.sam.variables.Variable;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
- * DSAAgent
+ * SymmetricRandomConstraint
  *
  * @author leeuwencjv
  * @version 0.1
- * @since 11 dec. 2014
- *
+ * @since 4 mrt. 2016
  */
-@Deprecated
-public class DSAAgent extends LocalSolverAgent {
-
-	private final LocalInequalityConstraintCostFunction costfun;
+public class SymmetricRandomConstraint<T extends DiscreteVariable<V>, V> extends CostMatrixConstraint<T, V> {
 
 	/**
-	 * @param name
-	 * @param var
+	 * @param var1
+	 * @param var2
 	 */
-	public DSAAgent(String name, Variable<?> var) {
-		super(name, var);
-
-		this.costfun = new LocalInequalityConstraintCostFunction(this);
-		this.setSolver(new DSASolver(this, costfun), true);
+	public SymmetricRandomConstraint(T var1, T var2) {
+		super(var1, var2, RandomConstraint.randomMatrix(var1.getRange(), var2.getRange()));
 	}
 
 }

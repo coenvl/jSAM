@@ -20,6 +20,10 @@
  */
 package nl.coenvl.sam.messages;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 /**
  * Message
  * 
@@ -32,12 +36,22 @@ public interface Message {
 
 	public String getType();
 
-	public Object addContent(String key, Object value);
+	public void addString(String key, String value);
+	
+	public String getString(String key);
+	
+	public void addNumber(String key, Number value);
+	
+	public Number getNumber(String key);
+	
+	public void addValueMap(String key, Map<UUID, Number> value);
+	
+	public Map<UUID, Number> getValueMap(String key);
 
 	public boolean hasContent(String key);
 
-	public Object getContent(String key);
-
+	public Set<String> getKeys();
+	
 	public long size();
 	
 	public Message clone();

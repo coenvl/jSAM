@@ -20,8 +20,8 @@ package nl.coenvl.sam.solvers;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.variables.Variable;
 
 /**
  * SolverRunner
@@ -34,7 +34,7 @@ import nl.coenvl.sam.messages.Message;
  * 
  */
 @SuppressWarnings("synthetic-access")
-public class SolverRunner implements Solver {
+public class SolverRunner<T extends Variable<V>,V> implements Solver<T, V> {
 
 	private class Runner implements Runnable {
 
@@ -67,7 +67,7 @@ public class SolverRunner implements Solver {
 	private static int solverRunnerCounter = 0;
 
 	private Runner myRunner;
-	private volatile Solver mySolver;
+	private volatile Solver<T,V> mySolver;
 	private Thread myThread;
 	private LinkedBlockingQueue<Message> queue;
 
@@ -76,13 +76,13 @@ public class SolverRunner implements Solver {
 	/**
 	 * @param greedySolver
 	 */
-	public SolverRunner(Solver solver) {
+	public SolverRunner(Solver<T,V> solver) {
 		this.queue = new LinkedBlockingQueue<Message>();
 		this.mySolver = solver;
 		this.threadName = "SolverRunnerThread-" + solverRunnerCounter++;
 	}
 
-	public SolverRunner(Solver s, String threadName) {
+	public SolverRunner(Solver<T,V> s, String threadName) {
 		this.queue = new LinkedBlockingQueue<Message>();
 		this.mySolver = s;
 		this.threadName = threadName;

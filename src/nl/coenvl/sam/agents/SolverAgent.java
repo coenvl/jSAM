@@ -20,10 +20,6 @@
  */
 package nl.coenvl.sam.agents;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.solvers.Solver;
 import nl.coenvl.sam.solvers.SolverRunner;
@@ -39,35 +35,16 @@ import nl.coenvl.sam.variables.Variable;
  * @since 11 apr. 2014
  * 
  */
-public abstract class AbstractSolverAgent extends AbstractAgent {
+public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> {
 
-	private static double MESSAGE_SUCCESS_PROBABILITY = 1;
-
-	private static HashMap<String, Integer> messageCounterMap = new HashMap<String, Integer>();
-
-	private static int sentMessages = 0;
-
-	public static void setArrivalProbability(double d) {
-		MESSAGE_SUCCESS_PROBABILITY = d;
-	}
+	private Solver<T,V> mySolver;
 	
-	public static Map<String, Integer> getSentMessages() {
-		return messageCounterMap;
-	}
-
-	public static int getTotalSentMessages() {
-		return sentMessages;
-	}
-
-	public static void resetMessageCount() {
-		messageCounterMap.clear();
-		sentMessages = 0;
-	}
-
-	private Solver mySolver;
-
-	public AbstractSolverAgent(String name, Variable<?> var) {
-		super(name, var);
+	/**
+	 * @param name
+	 * @param var
+	 */
+	public SolverAgent(T var, String name) {
+		super(var, name);
 	}
 
 	/*
@@ -87,16 +64,8 @@ public abstract class AbstractSolverAgent extends AbstractAgent {
 	 */
 	@Override
 	public final synchronized void push(Message m) {
-		if (!messageCounterMap.containsKey(m.getType()))
-			messageCounterMap.put(m.getType(), 1);
-		else
-			messageCounterMap.put(m.getType(),
-					messageCounterMap.get(m.getType()) + 1);
-
-		AbstractSolverAgent.sentMessages++;
-
-		if (Math.random() < AbstractSolverAgent.MESSAGE_SUCCESS_PROBABILITY)
-			this.mySolver.push(m);
+		//if (Math.random() < AbstractSolverAgent.MESSAGE_SUCCESS_PROBABILITY)
+		this.mySolver.push(m);
 	}
 
 	/*
@@ -110,13 +79,13 @@ public abstract class AbstractSolverAgent extends AbstractAgent {
 		this.mySolver.reset();
 	}
 
-	public final void setSolver(Solver solver) {
-		this.mySolver = new SolverRunner(solver);
+	public final void setSolver(Solver<T, V> solver) {
+		this.mySolver = new SolverRunner<T,V>(solver);
 	}
 
-	public final void setSolver(Solver solver, boolean asynchronous) {
+	public final void setSolver(Solver<T,V> solver, boolean asynchronous) {
 		if (asynchronous)
-			this.mySolver = new SolverRunner(solver);
+			this.mySolver = new SolverRunner<T,V>(solver);
 		else {
 			// System.err.println("Warning: You are using a synchronous solver!");
 			this.mySolver = solver;

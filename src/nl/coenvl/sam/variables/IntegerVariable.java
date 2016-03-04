@@ -22,6 +22,7 @@ package nl.coenvl.sam.variables;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import nl.coenvl.sam.exceptions.InvalidDomainException;
 import nl.coenvl.sam.exceptions.InvalidValueException;
@@ -100,13 +101,15 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 
 	private static int unnamedVariableSequence = 0;
 
+	private final UUID id;
+	
 	private final int lowerBound;
 
 	private final String name;
 
-	private boolean set = false;
-
 	private final int upperBound;
+	
+	private boolean set = false;
 
 	private int value;
 
@@ -118,7 +121,7 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 	 * @param lowerBound
 	 *            the lower bound of the variable domain
 	 * @param upperBound
-	 *            the lower bound of the variable domain
+	 *            the upper bound of the variable domain
 	 * 
 	 * @throws InvalidDomainException
 	 *             exception is the lower bound is higher than the upper bound
@@ -127,12 +130,7 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 	 */
 	public IntegerVariable(int lowerBound, int upperBound)
 			throws InvalidDomainException {
-		if (lowerBound > upperBound)
-			throw new InvalidDomainException();
-
-		this.name = "MyIntegerVariable" + unnamedVariableSequence++;
-		this.lowerBound = lowerBound;
-		this.upperBound = upperBound;
+		this(lowerBound, upperBound, "MyIntegerVariable" + unnamedVariableSequence++);
 	}
 
 	/**
@@ -157,7 +155,7 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 	 * @param lowerBound
 	 *            the lower bound of the variable domain
 	 * @param upperBound
-	 *            the lower bound of the variable domain
+	 *            the upper bound of the variable domain
 	 * @param name
 	 *            The name of the variable
 	 * 
@@ -174,6 +172,7 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 		this.name = name;
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
+		this.id = UUID.randomUUID();
 	}
 
 	/*
@@ -308,5 +307,13 @@ public final class IntegerVariable implements DiscreteVariable<Integer> {
 			return "" + this.name + ": " + this.value;
 		//else
 		return "" + this.name + ": (unset)";
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.variables.Variable#getID()
+	 */
+	@Override
+	public UUID getID() {
+		return this.id;
 	}
 }

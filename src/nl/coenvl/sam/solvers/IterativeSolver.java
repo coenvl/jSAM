@@ -18,6 +18,8 @@
  */
 package nl.coenvl.sam.solvers;
 
+import nl.coenvl.sam.variables.Variable;
+
 /**
  * Solver
  * 
@@ -26,7 +28,7 @@ package nl.coenvl.sam.solvers;
  * @since 19 mrt. 2014
  * 
  */
-public interface IterativeSolver extends Solver {
+public interface IterativeSolver<T extends Variable<V>, V> extends Solver<T, V> {
 
 	public void tick();
 

@@ -19,19 +19,16 @@
  */
 package nl.coenvl.sam.solvers;
 
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.UUID;
 import java.util.Vector;
 
-import nl.coenvl.sam.agents.Agent;
-import nl.coenvl.sam.agents.LocalCommunicatingAgent;
-import nl.coenvl.sam.costfunctions.CostFunction;
-import nl.coenvl.sam.exceptions.InvalidValueException;
-import nl.coenvl.sam.exceptions.VariableNotSetException;
+import nl.coenvl.sam.MailMan;
+import nl.coenvl.sam.agents.SolverAgent;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.problemcontexts.LocalProblemContext;
-import nl.coenvl.sam.variables.IntegerVariable;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
  * DSASolver
@@ -41,31 +38,32 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @since 11 dec. 2014
  *
  */
-public class DSASolver implements IterativeSolver {
+public class DSASolver<T extends DiscreteVariable<V>, V extends Number> implements IterativeSolver<T,V> {
 
 	public static final double CHANGE_TO_EQUAL_PROB = 0.5;
 
 	public static final double CHANGE_TO_IMPROVE_PROB = 1;
 
 	public static final String UPDATE_VALUE = "DSASolver:Value";
+	
+	public static final String KEY_VARID = "varID";
+	
+	public static final String KEY_VARVALUE = "value";
 
-	private volatile LocalProblemContext<Integer> context;
+	private final T myVar;
 
-	private CostFunction costfun;
-
-	private IntegerVariable myVar;
-
-	private LocalCommunicatingAgent parent;
+	private final SolverAgent<T, V> parent;
+	
+	private HashMap<UUID, V> context;
 
 	/**
 	 * @param dsaAgent
 	 * @param costfun
 	 */
-	public DSASolver(LocalCommunicatingAgent parent, CostFunction costfun) {
+	public DSASolver(SolverAgent<T, V> parent) {
 		this.parent = parent;
-		this.costfun = costfun;
-		this.myVar = (IntegerVariable) this.parent.getVariable();
-		this.context = new LocalProblemContext<Integer>(parent);
+		this.myVar = this.parent.getVariable();
+		this.context = new HashMap<UUID, V>();
 	}
 
 	/*
@@ -75,7 +73,6 @@ public class DSASolver implements IterativeSolver {
 	 */
 	@Override
 	public synchronized void init() {
-		//this.context = new LocalProblemContext<Integer>(parent);
 		updateMyValue(myVar.getRandomValue());
 	}
 
@@ -85,9 +82,13 @@ public class DSASolver implements IterativeSolver {
 	 * @see org.anon.cocoa.solvers.Solver#push(org.anon.cocoa.messages.Message)
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public synchronized void push(Message m) {
-		if (m.getType().equals(DSASolver.UPDATE_VALUE))
-			this.updateContext(m);
+		if (m.getType().equals(DSASolver.UPDATE_VALUE)) {
+			UUID varId = UUID.fromString(m.getString(KEY_VARID));
+			V newValue = (V) m.getNumber(KEY_VARVALUE);
+			this.context.put(varId, newValue);
+		}
 	}
 
 	/*
@@ -97,7 +98,8 @@ public class DSASolver implements IterativeSolver {
 	 */
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
+		this.context = new HashMap<UUID, V>();
+		this.myVar.clear();
 	}
 
 	/**
@@ -106,18 +108,15 @@ public class DSASolver implements IterativeSolver {
 	@Override
 	public synchronized void tick() {
 		double bestCost = Double.MAX_VALUE;
-		Vector<Integer> bestAssignment = new Vector<Integer>();
+		Vector<V> bestAssignment = new Vector<V>();
 
-		Iterator<Integer> iter = this.myVar.iterator();
+		context.put(this.myVar.getID(), this.myVar.getValue());
+		double oldCost = this.parent.getLocalCostIf(context);
+		
+		for (V value : this.myVar) {
+			context.put(this.myVar.getID(), value);
 
-		context.setValue(this.myVar.getValue());
-		double oldCost = this.costfun.evaluate(context);
-
-		while (iter.hasNext()) {
-			Integer iterAssignment = iter.next();
-			context.setValue(iterAssignment);
-
-			double localCost = costfun.evaluate(context);
+			double localCost = this.parent.getLocalCostIf(context);
 
 			if (localCost < bestCost) {
 				bestCost = localCost;
@@ -125,7 +124,7 @@ public class DSASolver implements IterativeSolver {
 			}
 
 			if (localCost <= bestCost) {
-				bestAssignment.add(iterAssignment);
+				bestAssignment.add(value);
 			}
 		}
 
@@ -141,7 +140,7 @@ public class DSASolver implements IterativeSolver {
 			return;
 
 		// Chose any of the "best" assignments
-		Integer assign;
+		V assign;
 		if (bestAssignment.size() > 1) {
 			int i = (new Random()).nextInt(bestAssignment.size());
 			assign = bestAssignment.elementAt(i);
@@ -154,27 +153,17 @@ public class DSASolver implements IterativeSolver {
 	}
 
 	/**
-	 * @param m
-	 */
-	private void updateContext(Message m) {
-		LocalCommunicatingAgent neighbor = (LocalCommunicatingAgent) m
-				.getContent("agent");
-		Integer newValue = (Integer) m.getContent("value");
-		this.context.setValue(neighbor, newValue);
-	}
-
-	/**
 	 * @param assign
 	 */
-	private void updateMyValue(Integer assign) {
+	private void updateMyValue(V assign) {
 		this.myVar.setValue(assign);
 
 		HashMessage nextMessage = new HashMessage(DSASolver.UPDATE_VALUE);
-		nextMessage.addContent("agent", this.parent);
-		nextMessage.addContent("value", assign);
+		nextMessage.addString(KEY_VARID, this.myVar.getID().toString());
+		nextMessage.addNumber(KEY_VARVALUE, assign.intValue());
 
-		for (Agent neighbor : this.parent.getNeighborhood())
-			neighbor.push(nextMessage.clone());
+		for (UUID id : this.parent.getConstraintIds())
+			MailMan.sendMessage(id, nextMessage);
 	}
 
 }

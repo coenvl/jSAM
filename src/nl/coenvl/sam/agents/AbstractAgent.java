@@ -23,9 +23,14 @@ package nl.coenvl.sam.agents;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
+import nl.coenvl.sam.MailMan;
+import nl.coenvl.sam.constraints.Constraint;
 import nl.coenvl.sam.exceptions.InvalidPropertyException;
 import nl.coenvl.sam.exceptions.PropertyNotSetException;
+import nl.coenvl.sam.exceptions.VariableNotInvolvedException;
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.variables.Variable;
 
@@ -38,23 +43,31 @@ import nl.coenvl.sam.variables.Variable;
  * @since 4 feb. 2014
  * 
  */
-public abstract class AbstractAgent implements Agent, Comparable<Agent> {
+public abstract class AbstractAgent<T extends Variable<V>, V> implements Agent<T, V>, Comparable<Agent<T, V>> {
 
+	private final static HashSet<Agent<?,?>> allAgents = new HashSet<Agent<?,?>>();
+
+	protected final Set<Constraint<T, V>> constraints;
+	
 	private final Map<String, Object> properties;
 
 	private final String name;
 
-	private final Variable<?> variable;
+	private final T variable;
 
-	private final static HashSet<Agent> allAgents = new HashSet<Agent>();
-
-	protected AbstractAgent(String name, Variable<?> var) {
+	protected AbstractAgent(T var, String name) {
 		this.name = name;
 		this.variable = var;
 		this.properties = new HashMap<String, Object>();
+		this.constraints = new HashSet<Constraint<T, V>>();
 		allAgents.add(this);
+		MailMan.registerOwner(var, this);
 	}
 
+	protected AbstractAgent(T var) {
+		this(var, "Anonymous agent");
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -67,12 +80,11 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 
 	@Override
 	public final String toString() {
-		return "" + this.getClass().getSimpleName() + " " + this.name + " ("
-				+ this.getVariable() + ")";
+		return "" + this.getClass().getSimpleName() + " " + this.name + " (" + this.getVariable() + ")";
 	}
 
 	@Override
-	public final synchronized Variable<?> getVariable() {
+	public final synchronized T getVariable() {
 		return this.variable;
 	}
 
@@ -83,20 +95,20 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 	}
 
 	/**
-     * 
-     */
+	 * 
+	 */
 	public final static void broadCast(Message m) {
-		for (Agent a : allAgents) {
+		for (Agent<?,?> a : allAgents) {
 			a.push(m.clone());
 		}
 	}
 
 	public final static void destroyAgents() {
-		for (Agent a : allAgents) {
+		for (Agent<?,?> a : allAgents) {
 			Variable<?> var = a.getVariable();
 			if (var != null)
 				var.clear();
-			
+
 			a.reset();
 		}
 		allAgents.clear();
@@ -106,7 +118,7 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 	public final boolean has(String key) {
 		return this.properties.containsKey(key);
 	}
-	
+
 	@Override
 	public final Object get(String key) throws PropertyNotSetException {
 		if (!this.properties.containsKey(key))
@@ -116,8 +128,7 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 	}
 
 	@Override
-	public final void set(String key, Object val)
-			throws InvalidPropertyException {
+	public final void set(String key, Object val) throws InvalidPropertyException {
 		if (key == null || key.isEmpty())
 			throw new InvalidPropertyException("Property name cannot be empty");
 
@@ -130,7 +141,47 @@ public abstract class AbstractAgent implements Agent, Comparable<Agent> {
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(Agent o) {
+	public int compareTo(Agent<T,V> o) {
 		return this.name.compareTo(o.getName());
+	}
+
+	@Override
+	public void addConstraint(Constraint<T,V> c) {
+		if (!c.getVariableIds().contains(this.variable.getID()))
+			throw new VariableNotInvolvedException(
+					"The variable of the agent " + this.name + " is not involved in the provided constraint");
+
+		this.constraints.add(c);
+	}
+	
+	@Override
+	public void removeConstraint(Constraint<T,V> c) {
+		this.constraints.remove(c);
+	}
+	
+	@Override
+	public double getLocalCost() {
+		double cost = 0;
+		for (Constraint<T, V> c : constraints)
+			cost += c.getCost(this.variable);
+		return cost;
+	}
+	
+	@Override
+	public double getLocalCostIf(Map<UUID, V> valueMap) {
+		double cost = 0;
+		for (Constraint<T, V> c : constraints)
+			cost += c.getCostIf(this.variable, valueMap);
+		return cost;
+	}
+	
+	public Set<UUID> getConstraintIds() {
+		Set<UUID> set = new HashSet<UUID>();
+	
+		for (Constraint<T, V> c : constraints)
+			set.addAll(c.getVariableIds());
+		set.remove(variable.getID());
+		
+		return set;
 	}
 }

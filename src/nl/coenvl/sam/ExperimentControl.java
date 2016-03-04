@@ -21,10 +21,7 @@
 package nl.coenvl.sam;
 
 import nl.coenvl.sam.agents.AbstractAgent;
-import nl.coenvl.sam.agents.AbstractSolverAgent;
-import nl.coenvl.sam.agents.OrderedSolverAgent;
-import nl.coenvl.sam.costfunctions.CompareCounter;
-import nl.coenvl.sam.costfunctions.SemiRandomCostFunction;
+import nl.coenvl.sam.constraints.CompareCounter;
 
 /**
  * ExperimentControl
@@ -38,15 +35,12 @@ public class ExperimentControl {
 
 	public static void ResetExperiment() {
 		AbstractAgent.destroyAgents();
-//		HashMessage.resetCount();
-		AbstractSolverAgent.resetMessageCount();
+		MailMan.resetMessageCount();
 		CompareCounter.reset();
-		OrderedSolverAgent.maxSequenceID = 0;
-		SemiRandomCostFunction.resetCostMatrices();
 	}
 	
 	public static int getNumberEvals() {
 		return CompareCounter.getComparisons();
 	}
-
+	
 }

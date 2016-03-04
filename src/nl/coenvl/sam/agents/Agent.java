@@ -20,6 +20,10 @@
  */
 package nl.coenvl.sam.agents;
 
+import java.util.Map;
+import java.util.UUID;
+
+import nl.coenvl.sam.constraints.Constraint;
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.variables.Variable;
 
@@ -31,16 +35,24 @@ import nl.coenvl.sam.variables.Variable;
  * @since 4 feb. 2014
  * 
  */
-public interface Agent extends PropertyOwner {
+public interface Agent<T extends Variable<V>, V> extends PropertyOwner {
 
 	public String getName();
 
-	public Variable<?> getVariable();
-
+	public T getVariable();
+	
 	public void init();
 
 	public void push(Message m);
 
 	public void reset();
+	
+	public void addConstraint(Constraint<T, V> c);
+	
+	public void removeConstraint(Constraint<T, V> c);
 
+	public double getLocalCost();
+	
+	public double getLocalCostIf(Map<UUID, V> valueMap);
+	
 }

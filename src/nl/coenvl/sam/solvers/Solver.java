@@ -19,6 +19,7 @@
 package nl.coenvl.sam.solvers;
 
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.variables.Variable;
 
 /**
  * Solver
@@ -28,7 +29,7 @@ import nl.coenvl.sam.messages.Message;
  * @since 19 mrt. 2014
  * 
  */
-public interface Solver {
+public interface Solver<T extends Variable<V>, V> {
 
 	public void init();
 

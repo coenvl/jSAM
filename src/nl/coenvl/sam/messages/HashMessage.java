@@ -21,6 +21,9 @@
 package nl.coenvl.sam.messages;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Message
@@ -41,11 +44,51 @@ public final class HashMessage implements Message {
 		content = new HashMap<String, Object>();
 	}
 
-	@Override
+	/*@Override
 	public Object addContent(String key, Object value) {
 		return content.put(key, value);
+	}*/
+
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.messages.Message#addContent(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void addString(String key, String value) {
+		content.put(key, value);
+	}
+	
+	@Override
+	public String getString(String key) {
+		return (String) content.get(key);
 	}
 
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.messages.Message#addContent(java.lang.String, java.lang.Number)
+	 */
+	@Override
+	public void addNumber(String key, Number value) {
+		content.put(key, value);
+	}
+
+	@Override
+	public Number getNumber(String key) {
+		return (Number) content.get(key);
+	}
+	
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.messages.Message#addContent(java.lang.String, java.util.Map)
+	 */
+	@Override
+	public void addValueMap(String key, Map<UUID, Number> value) {
+		content.put(key, value);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<UUID, Number> getValueMap(String key) {
+		return (Map<UUID, Number>) content.get(key);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public HashMessage clone() {
@@ -54,11 +97,14 @@ public final class HashMessage implements Message {
 		return clone;
 	}
 
+	/* (non-Javadoc)
+	 * @see nl.coenvl.sam.messages.Message#getKeys()
+	 */
 	@Override
-	public Object getContent(String key) {
-		return content.get(key);
+	public Set<String> getKeys() {
+		return content.keySet();
 	}
-
+	
 	@Override
 	public String getType() {
 		return this.type;
@@ -78,4 +124,5 @@ public final class HashMessage implements Message {
 	public String toString() {
 		return "Message of Type " + this.type + "(" + this.content + ")";
 	}
+
 }
