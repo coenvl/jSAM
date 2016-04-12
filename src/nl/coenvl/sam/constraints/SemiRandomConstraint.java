@@ -1,6 +1,6 @@
 /**
  * File SemiRandomConstraint.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -28,13 +28,13 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @version 0.1
  * @since 26 feb. 2016
  */
-public class SemiRandomConstraint<T extends DiscreteVariable<V>, V> extends CostMatrixConstraint<T, V> {
+public class SemiRandomConstraint<V> extends CostMatrixConstraint<V> {
 
 	public static final double COST_ZERO_PROB = 0.35;
 
 	public static final int MAX_COST = 100;
 
-	public SemiRandomConstraint(T var1, T var2) {
+	public SemiRandomConstraint(DiscreteVariable<V> var1, DiscreteVariable<V> var2) {
 		super(var1,
 				var2,
 				SemiRandomConstraint.randomMatrix(var1.getRange(), var2.getRange()),
@@ -43,7 +43,7 @@ public class SemiRandomConstraint<T extends DiscreteVariable<V>, V> extends Cost
 
 	/**
 	 * Create a random matrix
-	 * 
+	 *
 	 * @param v2
 	 * @param v1
 	 * @return
@@ -51,10 +51,13 @@ public class SemiRandomConstraint<T extends DiscreteVariable<V>, V> extends Cost
 	private static double[][] randomMatrix(int x, int y) {
 		double[][] costs = new double[x][y];
 
-		for (int i = 0; i < x; i++)
-			for (int j = 0; j < x; j++)
-				if (Math.random() > COST_ZERO_PROB)
-					costs[i][j] = Math.random() * MAX_COST;
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				if (Math.random() > SemiRandomConstraint.COST_ZERO_PROB) {
+					costs[i][j] = Math.random() * SemiRandomConstraint.MAX_COST;
+				}
+			}
+		}
 
 		return costs;
 	}

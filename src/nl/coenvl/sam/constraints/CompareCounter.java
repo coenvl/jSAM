@@ -1,6 +1,6 @@
 /**
  * File CompareCounter.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2015 TNO

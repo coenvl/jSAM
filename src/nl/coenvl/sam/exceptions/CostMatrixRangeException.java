@@ -1,6 +1,6 @@
 /**
  * File CostMatrixRangeException.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -29,10 +29,10 @@ package nl.coenvl.sam.exceptions;
 public class CostMatrixRangeException extends RuntimeException {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7312424837820215430L;
-	
+
 	public CostMatrixRangeException(String msg) {
 		super(msg);
 	}

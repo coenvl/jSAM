@@ -1,5 +1,5 @@
 /**
- * File CFLSolver.java
+ * File MGMSolver.java
  *
  * Copyright 2014 Coen van Leeuwen
  *
@@ -8,125 +8,123 @@
  * You may obtain a copy of the License at
  *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package nl.coenvl.sam.solvers;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
 
 import nl.coenvl.sam.agents.Agent;
-import nl.coenvl.sam.agents.LocalCommunicatingAgent;
-import nl.coenvl.sam.costfunctions.CostFunction;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.problemcontexts.LocalProblemContext;
-import nl.coenvl.sam.variables.IntegerVariable;
+import nl.coenvl.sam.variables.AssignmentMap;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
- * TickCFLSolver
+ * MGMSolver
  *
  * @author leeuwencjv
  * @version 0.1
  * @since 17 okt. 2014
  *
  */
-public class MGMSolver implements IterativeSolver {
+public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
 
-	//private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
-	private static final String UPDATE_VALUE = "MGM:UpdateValue";
-	private static final String LOCAL_REDUCTION = "MGM:BestLocalReduction";
+	private enum State {
+		SENDVALUE,
+		SENDGAIN,
+		PICKVALUE
+	}
 
-	private CostFunction myCostFunction;
-	private LocalProblemContext<Integer> myProblemContext;
-	private IntegerVariable myVariable;
-	private LocalCommunicatingAgent parent;
+	// private static final double EQUAL_UPDATE_PROBABILITY = 0.5;
+	protected static final String UPDATE_VALUE = "MGM:UpdateValue";
+	protected static final String LOCAL_REDUCTION = "MGM:BestLocalReduction";
 
-	private Map<Agent, Double> neighborReduction;
-	private Set<Agent> receivedValues;
-	private double bestLocalReduction;
-	private Integer bestLocalAssignment;
+	protected final AssignmentMap<V> myProblemContext;
+	private final AssignmentMap<Double> neighborReduction;
 
-	public MGMSolver(LocalCommunicatingAgent agent, CostFunction costfunction) {
-		this.parent = agent;
-		this.myCostFunction = costfunction;
-		this.myVariable = (IntegerVariable) this.parent.getVariable();
+	private State algoState;
+	protected double bestLocalReduction;
+	protected V bestLocalAssignment;
+
+	public MGMSolver(Agent<DiscreteVariable<V>, V> agent) {
+		super(agent);
+		this.myProblemContext = new AssignmentMap<>();
+		this.neighborReduction = new AssignmentMap<>();
 	}
 
 	@Override
 	public void init() {
-		this.myProblemContext = new LocalProblemContext<Integer>(this.parent);
-		this.receivedValues = new HashSet<Agent>();
-		this.neighborReduction = new HashMap<Agent, Double>();
+		this.algoState = State.SENDVALUE;
 		this.myVariable.setValue(this.myVariable.getRandomValue());
 	}
 
 	@Override
-	public void push(Message m) {
-		final Agent source = (Agent) m.getContent("source");
+	public synchronized void push(Message m) {
+		final UUID source = m.getUUID("source");
 
 		if (m.getType().equals(MGMSolver.UPDATE_VALUE)) {
-			final Integer value = (Integer) m.getContent("value");
-
-			this.myProblemContext.setValue(source, value);
-			this.receivedValues.add(source);
-
-			if (this.receivedValues.size() == parent.getNeighborhood().size()) {
-				// Clear ASAP to stay in line with asynchronous running
-				// neighbors
-				this.receivedValues.clear();
-				this.computeLocalReductions();
-			}
-
+			@SuppressWarnings("unchecked")
+			final V value = (V) m.getInteger("value");
+			this.myProblemContext.put(source, value);
 		} else if (m.getType().equals(MGMSolver.LOCAL_REDUCTION)) {
-			final Double reduction = (Double) m.getContent("LR");
-
-			this.neighborReduction.put(source, reduction);
-
-			if (this.neighborReduction.size() == parent.getNeighborhood().size())
-				this.pickValue();
+			this.neighborReduction.put(source, m.getDouble("LR"));
 		}
 	}
 
 	@Override
-	public void tick() {
-		Message updateMsg = new HashMessage(MGMSolver.UPDATE_VALUE);
+	public synchronized void tick() {
+		switch (this.algoState) {
+		case SENDGAIN:
+			this.sendGain();
+			this.algoState = State.PICKVALUE;
+			break;
 
-		updateMsg.addContent("value", this.myVariable.getValue().intValue());
-		updateMsg.addContent("source", this.parent);
+		case PICKVALUE:
+			this.pickValue();
+			this.algoState = State.SENDVALUE;
+			break;
 
-		for (Agent n : this.parent.getNeighborhood())
-			n.push(updateMsg);
+		default:
+		case SENDVALUE:
+			this.sendValue();
+			this.algoState = State.SENDGAIN;
+			break;
+		}
+	}
+
+	protected void sendValue() {
+		final Message updateMsg = new HashMessage(MGMSolver.UPDATE_VALUE);
+
+		updateMsg.put("value", this.myVariable.getValue());
+		updateMsg.put("source", this.myVariable.getID());
+
+		this.sendToNeighbors(updateMsg);
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	@SuppressWarnings("unchecked")
-	private void computeLocalReductions() {
-		// By now the problem context should be updated with all the neighbors'
-		// values
-		this.myProblemContext.setValue(this.myVariable.getValue());
+	private void sendGain() {
+		// By now the problem context should be updated with all the neighbors' values
+		this.myProblemContext.setAssignment(this.myVariable, this.myVariable.getValue());
 
-		double before = this.myCostFunction.evaluate(myProblemContext);
+		final double before = this.parent.getLocalCostIf(this.myProblemContext);
 		double bestCost = before; // Double.MAX_VALUE; //
-		Integer bestAssignment = null;
+		V bestAssignment = null;
 
-		LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(this.parent);
-		temp.setAssignment((HashMap<Agent, Integer>) this.myProblemContext.getAssignment().clone());
-		
-		for (Integer assignment : this.myVariable) {
-			temp.setValue(assignment);
+		final AssignmentMap<V> temp = this.myProblemContext.clone();
 
-			double localCost = this.myCostFunction.evaluate(temp);
+		for (final V assignment : this.myVariable) {
+			temp.setAssignment(this.myVariable, assignment);
+
+			final double localCost = this.parent.getLocalCostIf(temp);
 
 			if (localCost < bestCost) {
 				bestCost = localCost;
@@ -137,40 +135,40 @@ public class MGMSolver implements IterativeSolver {
 		this.bestLocalReduction = before - bestCost;
 		this.bestLocalAssignment = bestAssignment;
 
-		Message lrMsg = new HashMessage(MGMSolver.LOCAL_REDUCTION);
+		final Message lrMsg = new HashMessage(MGMSolver.LOCAL_REDUCTION);
 
-		lrMsg.addContent("source", this.parent);
-		lrMsg.addContent("LR", this.bestLocalReduction);
+		lrMsg.put("source", this.myVariable.getID());
+		lrMsg.put("LR", this.bestLocalReduction);
 
-		for (Agent n : this.parent.getNeighborhood())
-			n.push(lrMsg);
+		this.sendToNeighbors(lrMsg);
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	@SuppressWarnings("null")
-	private void pickValue() {
+	protected void pickValue() {
 		Double bestNeighborReduction = Double.MIN_VALUE;
-		Agent bestNeighbor = null;
-		for (Agent n : this.parent.getNeighborhood())
-			if (this.neighborReduction.get(n) > bestNeighborReduction) {
-				bestNeighborReduction = this.neighborReduction.get(n);
-				bestNeighbor = n;
+		UUID bestNeighbor = null;
+		for (UUID id : this.parent.getConstraintIds()) {
+			if (this.neighborReduction.get(id) > bestNeighborReduction) {
+				bestNeighborReduction = this.neighborReduction.get(id);
+				bestNeighbor = id;
 			}
+		}
 
-		if (this.bestLocalReduction > bestNeighborReduction)
-			this.myVariable.setValue(bestLocalAssignment);
-		if (this.bestLocalReduction == bestNeighborReduction
-				&& this.parent.getName().compareTo(bestNeighbor.getName()) < 0) //Math.random() > EQUAL_UPDATE_PROBABILITY)
-			this.myVariable.setValue(bestLocalAssignment);
-
-		this.neighborReduction.clear();
+		if (this.bestLocalReduction > bestNeighborReduction) {
+			this.myVariable.setValue(this.bestLocalAssignment);
+		}
+		if (this.bestLocalReduction == bestNeighborReduction && this.myVariable.getID().compareTo(bestNeighbor) < 0) {
+			this.myVariable.setValue(this.bestLocalAssignment);
+		}
 	}
 
 	@Override
 	public void reset() {
 		this.myVariable.clear();
+		this.myProblemContext.clear();
+		this.neighborReduction.clear();
 	}
 
 }

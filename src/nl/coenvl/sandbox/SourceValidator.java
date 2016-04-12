@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,30 +46,26 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * <p>
- * A sample demonstrating how to use the JAXP 1.4 Validation API to create a
- * validator and use the validator to validate input from SAX, DOM, StAX or a
- * stream. The output of this program shows the time spent executing the
+ * A sample demonstrating how to use the JAXP 1.4 Validation API to create a validator and use the validator to validate
+ * input from SAX, DOM, StAX or a stream. The output of this program shows the time spent executing the
  * Validator.validate(Source) method.
  * </p>
- * 
+ *
  * <p>
- * This class is useful as a "poor-man's" performance tester to compare the
- * speed of various JAXP 1.4 validators with different input sources. However,
- * it is important to note that the first validation time of a validator will
- * include both VM class load time and validator initialization that would not
- * be present in subsequent validations with the same document. Also note that
- * when the source for validation is SAX, StAX or a stream, the validation time
- * will also include the time to parse the document, whereas the DOM validation
- * is completely in memory.
+ * This class is useful as a "poor-man's" performance tester to compare the speed of various JAXP 1.4 validators with
+ * different input sources. However, it is important to note that the first validation time of a validator will include
+ * both VM class load time and validator initialization that would not be present in subsequent validations with the
+ * same document. Also note that when the source for validation is SAX, StAX or a stream, the validation time will also
+ * include the time to parse the document, whereas the DOM validation is completely in memory.
  * </p>
- * 
+ *
  * <p>
- * <strong>Note:</strong> The results produced by this program should never be
- * accepted as true performance measurements.
+ * <strong>Note:</strong> The results produced by this program should never be accepted as true performance
+ * measurements.
  * </p>
- * 
+ *
  * @author Michael Glavassevich, IBM
- * 
+ *
  * @version $Id: SourceValidator.java 903082 2010-01-26 05:18:20Z mrglavas $
  */
 public class SourceValidator implements ErrorHandler {
@@ -109,32 +105,32 @@ public class SourceValidator implements ErrorHandler {
 	protected static final String DEFAULT_VALIDATION_SOURCE = "sax";
 
 	/**
-	 * Generate synthetic schema annotations feature id
-	 * (http://apache.org/xml/features/generate-synthetic-annotations).
+	 * Generate synthetic schema annotations feature id (http://apache.org/xml/features/generate-synthetic-annotations).
 	 */
-	protected static final String GENERATE_SYNTHETIC_ANNOTATIONS_ID = "http://apache.org/xml/features/generate-synthetic-annotations";
+	protected static final String GENERATE_SYNTHETIC_ANNOTATIONS_ID =
+			"http://apache.org/xml/features/generate-synthetic-annotations";
 
 	/**
-	 * Honour all schema locations feature id
-	 * (http://apache.org/xml/features/honour-all-schemaLocations).
+	 * Honour all schema locations feature id (http://apache.org/xml/features/honour-all-schemaLocations).
 	 */
-	protected static final String HONOUR_ALL_SCHEMA_LOCATIONS_ID = "http://apache.org/xml/features/honour-all-schemaLocations";
+	protected static final String HONOUR_ALL_SCHEMA_LOCATIONS_ID =
+			"http://apache.org/xml/features/honour-all-schemaLocations";
 
 	/**
 	 * StAX support for reporting line and column numbers property id
 	 * (javax.xml.stream.isSupportingLocationCoordinates).
 	 */
-	protected static final String IS_SUPPORTING_LOCATION_COORDINATES = "javax.xml.stream.isSupportingLocationCoordinates";
+	protected static final String IS_SUPPORTING_LOCATION_COORDINATES =
+			"javax.xml.stream.isSupportingLocationCoordinates";
 
 	/**
-	 * Schema full checking feature id
-	 * (http://apache.org/xml/features/validation/schema-full-checking).
+	 * Schema full checking feature id (http://apache.org/xml/features/validation/schema-full-checking).
 	 */
-	protected static final String SCHEMA_FULL_CHECKING_FEATURE_ID = "http://apache.org/xml/features/validation/schema-full-checking";
+	protected static final String SCHEMA_FULL_CHECKING_FEATURE_ID =
+			"http://apache.org/xml/features/validation/schema-full-checking";
 
 	/**
-	 * Validate schema annotations feature id
-	 * (http://apache.org/xml/features/validate-annotations)
+	 * Validate schema annotations feature id (http://apache.org/xml/features/validate-annotations)
 	 */
 	protected static final String VALIDATE_ANNOTATIONS_ID = "http://apache.org/xml/features/validate-annotations";
 
@@ -151,21 +147,21 @@ public class SourceValidator implements ErrorHandler {
 
 		// is there anything to do?
 		if (argv.length == 0) {
-			printUsage();
+			SourceValidator.printUsage();
 			System.exit(1);
 		}
 
 		// variables
 		Vector schemas = null;
 		Vector instances = null;
-		String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
-		int repetition = DEFAULT_REPETITION;
-		String validationSource = DEFAULT_VALIDATION_SOURCE;
-		boolean schemaFullChecking = DEFAULT_SCHEMA_FULL_CHECKING;
-		boolean honourAllSchemaLocations = DEFAULT_HONOUR_ALL_SCHEMA_LOCATIONS;
-		boolean validateAnnotations = DEFAULT_VALIDATE_ANNOTATIONS;
-		boolean generateSyntheticAnnotations = DEFAULT_GENERATE_SYNTHETIC_ANNOTATIONS;
-		boolean memoryUsage = DEFAULT_MEMORY_USAGE;
+		String schemaLanguage = SourceValidator.DEFAULT_SCHEMA_LANGUAGE;
+		int repetition = SourceValidator.DEFAULT_REPETITION;
+		String validationSource = SourceValidator.DEFAULT_VALIDATION_SOURCE;
+		boolean schemaFullChecking = SourceValidator.DEFAULT_SCHEMA_FULL_CHECKING;
+		boolean honourAllSchemaLocations = SourceValidator.DEFAULT_HONOUR_ALL_SCHEMA_LOCATIONS;
+		boolean validateAnnotations = SourceValidator.DEFAULT_VALIDATE_ANNOTATIONS;
+		boolean generateSyntheticAnnotations = SourceValidator.DEFAULT_GENERATE_SYNTHETIC_ANNOTATIONS;
+		boolean memoryUsage = SourceValidator.DEFAULT_MEMORY_USAGE;
 
 		// process arguments
 		for (int i = 0; i < argv.length; ++i) {
@@ -175,35 +171,31 @@ public class SourceValidator implements ErrorHandler {
 				if (option.equals("l")) {
 					// get schema language name
 					if (++i == argv.length) {
-						System.err
-								.println("error: Missing argument to -l option.");
+						System.err.println("error: Missing argument to -l option.");
 					} else {
 						schemaLanguage = argv[i];
 					}
 					continue;
 				}
 				if (option.equals("xsd11")) {
-					schemaLanguage = XSD11_SCHEMA_LANGUAGE;
+					schemaLanguage = SourceValidator.XSD11_SCHEMA_LANGUAGE;
 					continue;
 				}
 				if (option.equals("x")) {
 					if (++i == argv.length) {
-						System.err
-								.println("error: Missing argument to -x option.");
+						System.err.println("error: Missing argument to -x option.");
 						continue;
 					}
 					String number = argv[i];
 					try {
 						int value = Integer.parseInt(number);
 						if (value < 1) {
-							System.err
-									.println("error: Repetition must be at least 1.");
+							System.err.println("error: Repetition must be at least 1.");
 							continue;
 						}
 						repetition = value;
 					} catch (NumberFormatException e) {
-						System.err.println("error: invalid number (" + number
-								+ ").");
+						System.err.println("error: invalid number (" + number + ").");
 					}
 					continue;
 				}
@@ -212,8 +204,7 @@ public class SourceValidator implements ErrorHandler {
 					if (schemas == null) {
 						schemas = new Vector();
 					}
-					while (i + 1 < argv.length
-							&& !(arg = argv[i + 1]).startsWith("-")) {
+					while (i + 1 < argv.length && !(arg = argv[i + 1]).startsWith("-")) {
 						schemas.add(arg);
 						++i;
 					}
@@ -224,22 +215,18 @@ public class SourceValidator implements ErrorHandler {
 					if (instances == null) {
 						instances = new Vector();
 					}
-					while (i + 1 < argv.length
-							&& !(arg = argv[i + 1]).startsWith("-")) {
+					while (i + 1 < argv.length && !(arg = argv[i + 1]).startsWith("-")) {
 						instances.add(arg);
 						++i;
 					}
 					continue;
 				}
 				if (arg.equals("-vs")) {
-					if (i + 1 < argv.length
-							&& !(arg = argv[i + 1]).startsWith("-")) {
-						if (arg.equals("sax") || arg.equals("dom")
-								|| arg.equals("stax") || arg.equals("stream")) {
+					if (i + 1 < argv.length && !(arg = argv[i + 1]).startsWith("-")) {
+						if (arg.equals("sax") || arg.equals("dom") || arg.equals("stax") || arg.equals("stream")) {
 							validationSource = arg;
 						} else {
-							System.err.println("error: unknown source type ("
-									+ arg + ").");
+							System.err.println("error: unknown source type (" + arg + ").");
 						}
 					}
 					continue;
@@ -265,7 +252,7 @@ public class SourceValidator implements ErrorHandler {
 					continue;
 				}
 				if (option.equals("h")) {
-					printUsage();
+					SourceValidator.printUsage();
 					continue;
 				}
 				System.err.println("error: unknown option (" + option + ").");
@@ -282,51 +269,40 @@ public class SourceValidator implements ErrorHandler {
 			factory.setErrorHandler(sourceValidator);
 
 			try {
-				factory.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID,
-						schemaFullChecking);
+				factory.setFeature(SourceValidator.SCHEMA_FULL_CHECKING_FEATURE_ID, schemaFullChecking);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: SchemaFactory does not recognize feature ("
-								+ SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
+				System.err.println("warning: SchemaFactory does not recognize feature ("
+						+ SourceValidator.SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: SchemaFactory does not support feature ("
-								+ SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
+				System.err.println("warning: SchemaFactory does not support feature ("
+						+ SourceValidator.SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
 			}
 			try {
-				factory.setFeature(HONOUR_ALL_SCHEMA_LOCATIONS_ID,
-						honourAllSchemaLocations);
+				factory.setFeature(SourceValidator.HONOUR_ALL_SCHEMA_LOCATIONS_ID, honourAllSchemaLocations);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: SchemaFactory does not recognize feature ("
-								+ HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
+				System.err.println("warning: SchemaFactory does not recognize feature ("
+						+ SourceValidator.HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: SchemaFactory does not support feature ("
-								+ HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
+				System.err.println("warning: SchemaFactory does not support feature ("
+						+ SourceValidator.HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
 			}
 			try {
-				factory.setFeature(VALIDATE_ANNOTATIONS_ID, validateAnnotations);
+				factory.setFeature(SourceValidator.VALIDATE_ANNOTATIONS_ID, validateAnnotations);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: SchemaFactory does not recognize feature ("
-								+ VALIDATE_ANNOTATIONS_ID + ")");
+				System.err.println("warning: SchemaFactory does not recognize feature ("
+						+ SourceValidator.VALIDATE_ANNOTATIONS_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: SchemaFactory does not support feature ("
-								+ VALIDATE_ANNOTATIONS_ID + ")");
+				System.err.println("warning: SchemaFactory does not support feature ("
+						+ SourceValidator.VALIDATE_ANNOTATIONS_ID + ")");
 			}
 			try {
-				factory.setFeature(GENERATE_SYNTHETIC_ANNOTATIONS_ID,
-						generateSyntheticAnnotations);
+				factory.setFeature(SourceValidator.GENERATE_SYNTHETIC_ANNOTATIONS_ID, generateSyntheticAnnotations);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: SchemaFactory does not recognize feature ("
-								+ GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
+				System.err.println("warning: SchemaFactory does not recognize feature ("
+						+ SourceValidator.GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: SchemaFactory does not support feature ("
-								+ GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
+				System.err.println("warning: SchemaFactory does not support feature ("
+						+ SourceValidator.GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
 			}
 
 			// Build Schema from sources
@@ -347,52 +323,40 @@ public class SourceValidator implements ErrorHandler {
 			validator.setErrorHandler(sourceValidator);
 
 			try {
-				validator.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID,
-						schemaFullChecking);
+				validator.setFeature(SourceValidator.SCHEMA_FULL_CHECKING_FEATURE_ID, schemaFullChecking);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: Validator does not recognize feature ("
-								+ SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
+				System.err.println("warning: Validator does not recognize feature ("
+						+ SourceValidator.SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: Validator does not support feature ("
-								+ SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
+				System.err.println("warning: Validator does not support feature ("
+						+ SourceValidator.SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
 			}
 			try {
-				validator.setFeature(HONOUR_ALL_SCHEMA_LOCATIONS_ID,
-						honourAllSchemaLocations);
+				validator.setFeature(SourceValidator.HONOUR_ALL_SCHEMA_LOCATIONS_ID, honourAllSchemaLocations);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: Validator does not recognize feature ("
-								+ HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
+				System.err.println("warning: Validator does not recognize feature ("
+						+ SourceValidator.HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: Validator does not support feature ("
-								+ HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
+				System.err.println("warning: Validator does not support feature ("
+						+ SourceValidator.HONOUR_ALL_SCHEMA_LOCATIONS_ID + ")");
 			}
 			try {
-				validator.setFeature(VALIDATE_ANNOTATIONS_ID,
-						validateAnnotations);
+				validator.setFeature(SourceValidator.VALIDATE_ANNOTATIONS_ID, validateAnnotations);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: Validator does not recognize feature ("
-								+ VALIDATE_ANNOTATIONS_ID + ")");
+				System.err.println("warning: Validator does not recognize feature ("
+						+ SourceValidator.VALIDATE_ANNOTATIONS_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: Validator does not support feature ("
-								+ VALIDATE_ANNOTATIONS_ID + ")");
+				System.err.println("warning: Validator does not support feature ("
+						+ SourceValidator.VALIDATE_ANNOTATIONS_ID + ")");
 			}
 			try {
-				validator.setFeature(GENERATE_SYNTHETIC_ANNOTATIONS_ID,
-						generateSyntheticAnnotations);
+				validator.setFeature(SourceValidator.GENERATE_SYNTHETIC_ANNOTATIONS_ID, generateSyntheticAnnotations);
 			} catch (SAXNotRecognizedException e) {
-				System.err
-						.println("warning: Validator does not recognize feature ("
-								+ GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
+				System.err.println("warning: Validator does not recognize feature ("
+						+ SourceValidator.GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
 			} catch (SAXNotSupportedException e) {
-				System.err
-						.println("warning: Validator does not support feature ("
-								+ GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
+				System.err.println("warning: Validator does not support feature ("
+						+ SourceValidator.GENERATE_SYNTHETIC_ANNOTATIONS_ID + ")");
 			}
 
 			// Validate instance documents
@@ -404,15 +368,12 @@ public class SourceValidator implements ErrorHandler {
 					reader.setErrorHandler(sourceValidator);
 					for (int j = 0; j < length; ++j) {
 						String systemId = (String) instances.elementAt(j);
-						SAXSource source = new SAXSource(reader,
-								new InputSource(systemId));
-						sourceValidator.validate(validator, source, systemId,
-								repetition, memoryUsage);
+						SAXSource source = new SAXSource(reader, new InputSource(systemId));
+						sourceValidator.validate(validator, source, systemId, repetition, memoryUsage);
 					}
 				} else if (validationSource.equals("dom")) {
 					// DOMSource
-					DocumentBuilderFactory dbf = DocumentBuilderFactory
-							.newInstance();
+					DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 					dbf.setNamespaceAware(true);
 					DocumentBuilder db = dbf.newDocumentBuilder();
 					db.setErrorHandler(sourceValidator);
@@ -421,8 +382,7 @@ public class SourceValidator implements ErrorHandler {
 						Document doc = db.parse(systemId);
 						DOMSource source = new DOMSource(doc);
 						source.setSystemId(systemId);
-						sourceValidator.validate(validator, source, systemId,
-								repetition, memoryUsage);
+						sourceValidator.validate(validator, source, systemId, repetition, memoryUsage);
 					}
 				} else if (validationSource.equals("stax")) {
 					// StAXSource
@@ -430,30 +390,27 @@ public class SourceValidator implements ErrorHandler {
 					try {
 						// Enable reporting of column and line numbers in
 						// XMLStreamReaders which support it.
-						xif.setProperty(IS_SUPPORTING_LOCATION_COORDINATES,
-								Boolean.TRUE);
+						xif.setProperty(SourceValidator.IS_SUPPORTING_LOCATION_COORDINATES, Boolean.TRUE);
 					} catch (IllegalArgumentException e) {
+						// Do nothing
 					}
 					for (int j = 0; j < length; ++j) {
 						String systemId = (String) instances.elementAt(j);
-						sourceValidator.validate(validator, xif, systemId,
-								repetition, memoryUsage);
+						sourceValidator.validate(validator, xif, systemId, repetition, memoryUsage);
 					}
 				} else {
 					// StreamSource
 					for (int j = 0; j < length; ++j) {
 						String systemId = (String) instances.elementAt(j);
 						StreamSource source = new StreamSource(systemId);
-						sourceValidator.validate(validator, source, systemId,
-								repetition, memoryUsage);
+						sourceValidator.validate(validator, source, systemId, repetition, memoryUsage);
 					}
 				}
 			}
 		} catch (SAXParseException e) {
 			// ignore
 		} catch (Exception e) {
-			System.err.println("error: Parse error occurred - "
-					+ e.getMessage());
+			System.err.println("error: Parse error occurred - " + e.getMessage());
 			if (e instanceof SAXException) {
 				Exception nested = ((SAXException) e).getException();
 				if (nested != null) {
@@ -478,59 +435,42 @@ public class SourceValidator implements ErrorHandler {
 		System.err.println("  -l name     Select schema language by name.");
 		System.err.println("  -x number   Select number of repetitions.");
 		System.err.println("  -a uri ...  Provide a list of schema documents");
-		System.err
-				.println("  -i uri ...  Provide a list of instance documents to validate");
-		System.err
-				.println("  -vs source  Select validation source (sax|dom|stax|stream)");
+		System.err.println("  -i uri ...  Provide a list of instance documents to validate");
+		System.err.println("  -vs source  Select validation source (sax|dom|stax|stream)");
 		System.err.println("  -f  | -F    Turn on/off Schema full checking.");
-		System.err
-				.println("              NOTE: Not supported by all schema factories and validators.");
-		System.err
-				.println("  -hs | -HS   Turn on/off honouring of all schema locations.");
-		System.err
-				.println("              NOTE: Not supported by all schema factories and validators.");
-		System.err
-				.println("  -va | -VA   Turn on/off validation of schema annotations.");
-		System.err
-				.println("              NOTE: Not supported by all schema factories and validators.");
-		System.err
-				.println("  -ga | -GA   Turn on/off generation of synthetic schema annotations.");
-		System.err
-				.println("              NOTE: Not supported by all schema factories and validators.");
+		System.err.println("              NOTE: Not supported by all schema factories and validators.");
+		System.err.println("  -hs | -HS   Turn on/off honouring of all schema locations.");
+		System.err.println("              NOTE: Not supported by all schema factories and validators.");
+		System.err.println("  -va | -VA   Turn on/off validation of schema annotations.");
+		System.err.println("              NOTE: Not supported by all schema factories and validators.");
+		System.err.println("  -ga | -GA   Turn on/off generation of synthetic schema annotations.");
+		System.err.println("              NOTE: Not supported by all schema factories and validators.");
 		System.err.println("  -m  | -M    Turn on/off memory usage report");
 		System.err.println("  -xsd11      Turn on XSD 1.1 support.");
 		System.err.println("  -h          This help screen.");
 
 		System.err.println();
 		System.err.println("defaults:");
-		System.err.println("  Schema language:                 "
-				+ DEFAULT_SCHEMA_LANGUAGE);
-		System.err.println("  Repetition:                      "
-				+ DEFAULT_REPETITION);
-		System.err.println("  Validation source:               "
-				+ DEFAULT_VALIDATION_SOURCE);
+		System.err.println("  Schema language:                 " + SourceValidator.DEFAULT_SCHEMA_LANGUAGE);
+		System.err.println("  Repetition:                      " + SourceValidator.DEFAULT_REPETITION);
+		System.err.println("  Validation source:               " + SourceValidator.DEFAULT_VALIDATION_SOURCE);
 		System.err.print("  Schema full checking:            ");
-		System.err.println(DEFAULT_SCHEMA_FULL_CHECKING ? "on" : "off");
+		System.err.println(SourceValidator.DEFAULT_SCHEMA_FULL_CHECKING ? "on" : "off");
 		System.err.print("  Honour all schema locations:     ");
-		System.err.println(DEFAULT_HONOUR_ALL_SCHEMA_LOCATIONS ? "on" : "off");
+		System.err.println(SourceValidator.DEFAULT_HONOUR_ALL_SCHEMA_LOCATIONS ? "on" : "off");
 		System.err.print("  Validate annotations:            ");
-		System.err.println(DEFAULT_VALIDATE_ANNOTATIONS ? "on" : "off");
+		System.err.println(SourceValidator.DEFAULT_VALIDATE_ANNOTATIONS ? "on" : "off");
 		System.err.print("  Generate synthetic annotations:  ");
-		System.err.println(DEFAULT_GENERATE_SYNTHETIC_ANNOTATIONS ? "on"
-				: "off");
+		System.err.println(SourceValidator.DEFAULT_GENERATE_SYNTHETIC_ANNOTATIONS ? "on" : "off");
 		System.err.print("  Memory:                          ");
-		System.err.println(DEFAULT_MEMORY_USAGE ? "on" : "off");
+		System.err.println(SourceValidator.DEFAULT_MEMORY_USAGE ? "on" : "off");
 
 		System.err.println();
 		System.err.println("notes:");
-		System.err
-				.println("  The speed and memory results from this program should NOT be used as the");
-		System.err
-				.println("  basis of parser performance comparison! Real analytical methods should be");
-		System.err
-				.println("  used. For better results, perform multiple document validations within the");
-		System.err
-				.println("  same virtual machine to remove class loading from parse time and memory usage.");
+		System.err.println("  The speed and memory results from this program should NOT be used as the");
+		System.err.println("  basis of parser performance comparison! Real analytical methods should be");
+		System.err.println("  used. For better results, perform multiple document validations within the");
+		System.err.println("  same virtual machine to remove class loading from parse time and memory usage.");
 
 	} // printUsage()
 
@@ -547,7 +487,7 @@ public class SourceValidator implements ErrorHandler {
 	/** Error. */
 	@Override
 	public void error(SAXParseException ex) throws SAXException {
-		printError("Error", ex);
+		this.printError("Error", ex);
 	} // error(SAXParseException)
 
 	//
@@ -557,11 +497,12 @@ public class SourceValidator implements ErrorHandler {
 	/** Fatal error. */
 	@Override
 	public void fatalError(SAXParseException ex) throws SAXException {
-		printError("Fatal Error", ex);
+		this.printError("Fatal Error", ex);
 		throw ex;
 	} // fatalError(SAXParseException)
 
 	/** Prints the error message. */
+	@SuppressWarnings("static-method")
 	protected void printError(String type, SAXParseException ex) {
 
 		System.err.print("[");
@@ -570,8 +511,9 @@ public class SourceValidator implements ErrorHandler {
 		String systemId = ex.getSystemId();
 		if (systemId != null) {
 			int index = systemId.lastIndexOf('/');
-			if (index != -1)
+			if (index != -1) {
 				systemId = systemId.substring(index + 1);
+			}
 			System.err.print(systemId);
 		}
 		System.err.print(':');
@@ -586,8 +528,8 @@ public class SourceValidator implements ErrorHandler {
 	} // printError(String,SAXParseException)
 
 	/** Prints the results. */
-	public void printResults(PrintWriter out, String uri, long time,
-			long memory, int repetition) {
+	@SuppressWarnings("static-method")
+	public void printResults(PrintWriter out, String uri, long time, long memory, int repetition) {
 
 		// filename.xml: 631 ms
 		out.print(uri);
@@ -616,8 +558,7 @@ public class SourceValidator implements ErrorHandler {
 	// Protected methods
 	//
 
-	public void validate(Validator validator, Source source, String systemId,
-			int repetitions, boolean memoryUsage) {
+	public void validate(Validator validator, Source source, String systemId, int repetitions, boolean memoryUsage) {
 		try {
 			long timeBefore = System.currentTimeMillis();
 			long memoryBefore = Runtime.getRuntime().freeMemory();
@@ -628,22 +569,21 @@ public class SourceValidator implements ErrorHandler {
 			long timeAfter = System.currentTimeMillis();
 
 			long time = timeAfter - timeBefore;
-			long memory = memoryUsage ? memoryBefore - memoryAfter
-					: Long.MIN_VALUE;
-			printResults(fOut, systemId, time, memory, repetitions);
+			long memory = memoryUsage ? memoryBefore - memoryAfter : Long.MIN_VALUE;
+			this.printResults(this.fOut, systemId, time, memory, repetitions);
 		} catch (SAXParseException e) {
 			// ignore
 		} catch (Exception e) {
-			System.err.println("error: Parse error occurred - "
-					+ e.getMessage());
+			System.err.println("error: Parse error occurred - " + e.getMessage());
 			Exception se = e;
 			if (e instanceof SAXException) {
 				se = ((SAXException) e).getException();
 			}
-			if (se != null)
+			if (se != null) {
 				se.printStackTrace(System.err);
-			else
+			} else {
 				e.printStackTrace(System.err);
+			}
 
 		}
 	} // validate(Validator,Source,String,int,boolean)
@@ -652,8 +592,11 @@ public class SourceValidator implements ErrorHandler {
 	// MAIN
 	//
 
-	public void validate(Validator validator, XMLInputFactory xif,
-			String systemId, int repetitions, boolean memoryUsage) {
+	public void validate(Validator validator,
+			XMLInputFactory xif,
+			String systemId,
+			int repetitions,
+			boolean memoryUsage) {
 		try {
 			Source source = new StreamSource(systemId);
 			long timeBefore = System.currentTimeMillis();
@@ -667,22 +610,21 @@ public class SourceValidator implements ErrorHandler {
 			long timeAfter = System.currentTimeMillis();
 
 			long time = timeAfter - timeBefore;
-			long memory = memoryUsage ? memoryBefore - memoryAfter
-					: Long.MIN_VALUE;
-			printResults(fOut, systemId, time, memory, repetitions);
+			long memory = memoryUsage ? memoryBefore - memoryAfter : Long.MIN_VALUE;
+			this.printResults(this.fOut, systemId, time, memory, repetitions);
 		} catch (SAXParseException e) {
 			// ignore
 		} catch (Exception e) {
-			System.err.println("error: Parse error occurred - "
-					+ e.getMessage());
+			System.err.println("error: Parse error occurred - " + e.getMessage());
 			Exception se = e;
 			if (e instanceof SAXException) {
 				se = ((SAXException) e).getException();
 			}
-			if (se != null)
+			if (se != null) {
 				se.printStackTrace(System.err);
-			else
+			} else {
 				e.printStackTrace(System.err);
+			}
 
 		}
 	} // validate(Validator,XMLInputFactory,String,int,boolean)
@@ -694,7 +636,7 @@ public class SourceValidator implements ErrorHandler {
 	/** Warning. */
 	@Override
 	public void warning(SAXParseException ex) throws SAXException {
-		printError("Warning", ex);
+		this.printError("Warning", ex);
 	} // warning(SAXParseException)
 
 } // class SourceValidator

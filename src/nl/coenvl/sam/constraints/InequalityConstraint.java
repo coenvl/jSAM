@@ -1,6 +1,6 @@
 /**
  * File CostMatrixConstraint.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -19,9 +19,7 @@
  */
 package nl.coenvl.sam.constraints;
 
-import java.util.Map;
-import java.util.UUID;
-
+import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.Variable;
 
 /**
@@ -50,46 +48,46 @@ public class InequalityConstraint<T extends Variable<V>, V> extends BinaryConstr
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * nl.coenvl.sam.constraints.Constraint#getCost(nl.coenvl.sam.variables.
-	 * Variable)
+	 *
+	 * @see nl.coenvl.sam.constraints.Constraint#getCost(nl.coenvl.sam.variables. Variable)
 	 */
 	@Override
 	public double getCost(T targetVariable) {
 		super.assertVariableIsInvolved(targetVariable);
 		CompareCounter.compare();
 
-		if (this.var1.getValue() == this.var2.getValue())
+		if (this.var1.getValue().equals(this.var2.getValue())) {
 			return this.cost;
+		}
 
 		return 0;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * nl.coenvl.sam.constraints.Constraint#getCostIf(nl.coenvl.sam.variables.
-	 * Variable, java.util.Map)
+	 *
+	 * @see nl.coenvl.sam.constraints.Constraint#getCostIf(nl.coenvl.sam.variables. Variable, java.util.Map)
 	 */
 	@Override
-	public double getCostIf(T targetVariable, Map<UUID, V> values) {
+	public double getCostIf(T targetVariable, AssignmentMap<V> values) {
 		super.assertVariableIsInvolved(targetVariable);
 		CompareCounter.compare();
-
-		if (values.get(var1.getID()) == values.get(var2.getID()))
+		if (values.containsAssignment(this.var1) && values.containsAssignment(this.var2)
+				&& values.getAssignment(this.var1).equals(values.getAssignment(this.var2))) {
 			return this.cost;
+		}
 
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.constraints.Constraint#getExternalCost()
 	 */
 	@Override
 	public double getExternalCost() {
-		return var1.getValue().equals(var2.getValue()) ? 2 * cost : 0;
+		return this.var1.getValue().equals(this.var2.getValue()) ? 2 * this.cost : 0;
 	}
 
 }

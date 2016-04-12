@@ -1,6 +1,6 @@
 /**
- * File ACLSUBSolver.java
- * 
+ * File ACLSSolver.java
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2015 TNO
@@ -19,19 +19,10 @@
  */
 package nl.coenvl.sam.solvers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-
 import nl.coenvl.sam.agents.Agent;
-import nl.coenvl.sam.agents.LocalCommunicatingAgent;
-import nl.coenvl.sam.costfunctions.CostFunction;
-import nl.coenvl.sam.exceptions.InvalidValueException;
-import nl.coenvl.sam.exceptions.VariableNotSetException;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.problemcontexts.LocalProblemContext;
-import nl.coenvl.sam.variables.IntegerVariable;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
  * ACLSSolver
@@ -40,189 +31,30 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 11 dec. 2015
  */
-public class ACLSUBSolver implements IterativeSolver {
+public class ACLSUBSolver<V> extends ACLSSolver<V> {
 
-	private static final String UPDATE_VALUE = "ACLSUB:UpdateValue";
-	private static final String PROPOSED_UPDATE = "ACLSUB:ProposedUpdateValue";
-	private static final String IMPACT_MESSAGE = "ACLSUB:ProposalImpact";
-	private static final double UPDATE_PROBABILITY = 0.5;
-
-	private final LocalCommunicatingAgent parent;
-	private final CostFunction myCostFunction;
-	private final IntegerVariable myVariable;
-
-	private LocalProblemContext<Integer> myProblemContext;
-	private Integer myProposal;
-	private HashMap<Agent, Integer> neighborValues;
-	private HashMap<Agent, Double> impactCosts;
-	
-	public ACLSUBSolver(LocalCommunicatingAgent agent, CostFunction costfunction) {
-		this.parent = agent;
-		this.myCostFunction = costfunction;
-		this.myVariable = (IntegerVariable) this.parent.getVariable();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.coenvl.sam.solvers.Solver#init()
+	/**
+	 * @param agent
 	 */
-	@Override
-	public synchronized void init() {
-		this.myProblemContext = new LocalProblemContext<Integer>(this.parent);
-		this.neighborValues = new HashMap<Agent, Integer>();
-		this.impactCosts = new HashMap<Agent, Double>();
-		this.myVariable.setValue(this.myVariable.getRandomValue());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
-	 */
-	@Override
-	public synchronized void push(Message m) {
-		final Agent source = (Agent) m.getContent("source");
-		
-		if (m.getType().equals(ACLSUBSolver.UPDATE_VALUE)) {
-			final Integer value = (Integer) m.getContent("value");
-			this.neighborValues.put(source, value);
-
-			if (this.neighborValues.size() == parent.getNeighborhood().size()) {
-				// Clear any message that will come the NEXT iteration
-				this.impactCosts.clear();
-				this.proposeAssignment();
-			}
-		} else if (m.getType().equals(ACLSUBSolver.PROPOSED_UPDATE)) {
-			replyWithLocalCost(m);
-		} else if (m.getType().equals(ACLSUBSolver.IMPACT_MESSAGE)) {
-			
-			if (myProposal != null) {
-				final Double impact = (Double) m.getContent("costImpact");
-				
-				this.impactCosts.put(source, impact);
-	
-				if (this.impactCosts.size() == parent.getNeighborhood().size()) {
-					// Clear any message that will come the NEXT iteration
-					this.neighborValues.clear();
-					this.decideAssignment();
-				}
-			}
-			
-		}
+	public ACLSUBSolver(Agent<DiscreteVariable<V>, V> agent) {
+		super(agent);
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	private void proposeAssignment() {
-		// Compute local reductions
-		this.myProblemContext.setAssignment(neighborValues);		
-		this.myProblemContext.setValue(this.myVariable.getValue());
-		//double currentCost = this.myCostFunction.evaluate(this.myProblemContext);
+	@Override
+	protected void proposeAssignment() {
+		// As simple as this
+		this.myProposal = this.myVariable.getRandomValue().toString();
 
-		this.myProposal = this.myVariable.getRandomValue();
-		
 		// Send the proposal to all neighbors
-		Message updateMsg = new HashMessage(ACLSUBSolver.PROPOSED_UPDATE);
+		Message updateMsg = new HashMessage(ACLSSolver.PROPOSED_UPDATE);
 
-		updateMsg.addContent("source", this.parent);
-		updateMsg.addContent("proposal", myProposal);
+		updateMsg.put("source", this.myVariable.getID());
+		updateMsg.put("proposal", this.myProposal);
 
-		for (Agent n : this.parent.getNeighborhood())
-			n.push(updateMsg);
-	}
-	
-	/**
-	 * @param m
-	 */
-	private void replyWithLocalCost(Message m) {
-		// Compute current cost
-		final Agent neighbor = (Agent) m.getContent("source");
-		final Integer proposal = (Integer) m.getContent("proposal");
-		Double impact;
-		
-		if (proposal == null) {
-			impact = 0.;
-		} else {
-			LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(parent);
-			temp.setAssignment(myProblemContext.getAssignment());
-			
-			temp.setValue(this.myVariable.getValue());
-			double currentCost = this.myCostFunction.evaluate(temp);
-			
-			// Compute cost after update
-			temp.setValue(neighbor, proposal);
-			impact = this.myCostFunction.evaluate(temp) - currentCost;
-		}
-		
-		// And send back impact such that negative impact means improvement
-		Message impactMsg = new HashMessage(ACLSUBSolver.IMPACT_MESSAGE);
-
-		impactMsg.addContent("source", this.parent);
-		impactMsg.addContent("costImpact", new Double(impact));
-		neighbor.push(impactMsg);
-	}
-
-	/**
-	 * 
-	 */
-	private void decideAssignment() {
-		LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(parent);
-		temp.setAssignment(myProblemContext.getAssignment());
-		
-		try {
-			temp.setValue(this.myVariable.getValue());
-		} catch (VariableNotSetException e) {
-			throw new RuntimeException("Unexpected unset variable at this point", e);
-		}
-		double currentCost = this.myCostFunction.evaluate(temp);
-		
-		temp.setValue(myProposal);
-		
-		double totalImpact = this.myCostFunction.evaluate(temp) - currentCost;
-		
-		for (Double impact : this.impactCosts.values())
-			totalImpact += impact;
-		
-		if (totalImpact < 0 && (new Random()).nextDouble() < UPDATE_PROBABILITY)
-			try {
-				this.myVariable.setValue(myProposal);
-			} catch (InvalidValueException e) {
-				throw new RuntimeException("Unexpected Exception", e);
-			}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
-	 */
-	@Override
-	public synchronized void tick() {
-		try {
-			Message updateMsg = new HashMessage(ACLSUBSolver.UPDATE_VALUE);
-
-			updateMsg.addContent("source", this.parent);
-			updateMsg.addContent("value", this.myVariable.getValue());
-
-			for (Agent n : this.parent.getNeighborhood())
-				n.push(updateMsg);
-
-		} catch (VariableNotSetException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.coenvl.sam.solvers.Solver#reset()
-	 */
-	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-
+		super.sendToNeighbors(updateMsg);
 	}
 
 }

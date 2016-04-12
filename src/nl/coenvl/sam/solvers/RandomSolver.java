@@ -1,6 +1,6 @@
 /**
  * File RandomSolver.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -21,7 +21,7 @@ package nl.coenvl.sam.solvers;
 
 import nl.coenvl.sam.agents.Agent;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.variables.DiscreteVariable;
+import nl.coenvl.sam.variables.Variable;
 
 /**
  * RandomSolver
@@ -30,15 +30,17 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @version 0.1
  * @since 12 feb. 2016
  */
-public class RandomSolver<T extends DiscreteVariable<V>, V> implements Solver<T,V> {
+public class RandomSolver<T> implements Solver {
 
-	private final T myVariable;
-	
-	public RandomSolver(Agent<T, V> agent) {
+	private final Variable<T> myVariable;
+
+	public RandomSolver(Agent<? extends Variable<T>, T> agent) {
 		this.myVariable = agent.getVariable();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.Solver#init()
 	 */
 	@Override
@@ -46,7 +48,9 @@ public class RandomSolver<T extends DiscreteVariable<V>, V> implements Solver<T,
 		this.myVariable.setValue(this.myVariable.getRandomValue());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
 	 */
 	@Override
@@ -54,7 +58,9 @@ public class RandomSolver<T extends DiscreteVariable<V>, V> implements Solver<T,
 		// Nothing to do here
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.Solver#reset()
 	 */
 	@Override

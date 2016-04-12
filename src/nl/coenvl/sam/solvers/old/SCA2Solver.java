@@ -1,5 +1,5 @@
 /**
- * File CFLSolver.java
+ * File SCA2Solver.java
  *
  * Copyright 2014 Coen van Leeuwen
  *
@@ -8,15 +8,15 @@
  * You may obtain a copy of the License at
  *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
-package nl.coenvl.sam.solvers;
+package nl.coenvl.sam.solvers.old;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,17 +24,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import nl.coenvl.sam.agents.Agent;
-import nl.coenvl.sam.agents.LocalCommunicatingAgent;
-import nl.coenvl.sam.costfunctions.CostFunction;
 import nl.coenvl.sam.exceptions.InvalidValueException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.problemcontexts.LocalProblemContext;
+import nl.coenvl.sam.solvers.IterativeSolver;
 import nl.coenvl.sam.variables.IntegerVariable;
 
 /**
- * TickCFLSolver
+ * SCA2Solver
  *
  * @author leeuwencjv
  * @version 0.1
@@ -52,7 +50,9 @@ public class SCA2Solver implements IterativeSolver {
 	 *
 	 */
 	public enum State {
-		Value, Offer, AcceptReject
+		Value,
+		Offer,
+		AcceptReject
 	}
 
 	private static final double OFFER_PROBABILITY = 0.5; // (Q in paper)
@@ -137,7 +137,7 @@ public class SCA2Solver implements IterativeSolver {
 	public void tick() {
 		switch (this.algoState) {
 		case Offer:
-			sendOffer();
+			this.sendOffer();
 			this.algoState = State.AcceptReject;
 			break;
 
@@ -148,10 +148,11 @@ public class SCA2Solver implements IterativeSolver {
 
 		default:
 		case Value:
-			if (!this.committed)
-				pickBestLocalValue();
+			if (!this.committed) {
+				this.pickBestLocalValue();
+			}
 
-			sendValue();
+			this.sendValue();
 			this.committed = false;
 			this.algoState = State.Offer;
 			break;
@@ -163,12 +164,12 @@ public class SCA2Solver implements IterativeSolver {
 		try {
 			Message updateMsg = new HashMessage(SCA2Solver.UPDATE_VALUE);
 
-			updateMsg
-					.addContent("value", this.myVariable.getValue().intValue());
+			updateMsg.addContent("value", this.myVariable.getValue().intValue());
 			updateMsg.addContent("source", this.parent);
 
-			for (Agent n : this.parent.getNeighborhood())
+			for (Agent n : this.parent.getNeighborhood()) {
 				n.push(updateMsg);
+			}
 
 		} catch (VariableNotSetException e) {
 			e.printStackTrace();
@@ -176,7 +177,7 @@ public class SCA2Solver implements IterativeSolver {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@SuppressWarnings("null")
 	private void sendOffer() {
@@ -184,10 +185,8 @@ public class SCA2Solver implements IterativeSolver {
 		if (Math.random() > SCA2Solver.OFFER_PROBABILITY) {
 
 			// Select a random neighbor
-			int r = (int) Math.ceil(Math.random()
-					* this.parent.getNeighborhood().size());
-			Iterator<Agent> neighborSelector = this.parent.getNeighborhood()
-					.iterator();
+			int r = (int) Math.ceil(Math.random() * this.parent.getNeighborhood().size());
+			Iterator<Agent> neighborSelector = this.parent.getNeighborhood().iterator();
 
 			Agent neighbor = null;
 			while (r > 0 && neighborSelector.hasNext()) {
@@ -206,28 +205,27 @@ public class SCA2Solver implements IterativeSolver {
 				e.printStackTrace();
 			}
 
-			LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(
-					this.parent);
+			LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(this.parent);
 			@SuppressWarnings("unchecked")
-			HashMap<Agent, Integer> assignment = (HashMap<Agent, Integer>) this.myProblemContext
-					.getAssignment().clone();
+			HashMap<Agent, Integer> assignment =
+					(HashMap<Agent, Integer>) this.myProblemContext.getAssignment().clone();
 			temp.setAssignment(assignment);
 
-			double before = this.myCostFunction.evaluate(myProblemContext);
+			double before = this.myCostFunction.evaluate(this.myProblemContext);
 
 			for (Integer i : this.myVariable) {
 				temp.setValue(i);
 				for (Integer j : this.myVariable) {
 					temp.setValue(neighbor, j);
 					double val = this.myCostFunction.evaluate(temp);
-					if (val < before)
-						offerList
-								.add(new Offer(this.parent, i, j, before - val));
+					if (val < before) {
+						offerList.add(new Offer(this.parent, i, j, before - val));
+					}
 				}
 			}
 
 			// Send the offers to the randomly selected neighbor
-			Message offerMessage = new HashMessage(OFFER);
+			Message offerMessage = new HashMessage(SCA2Solver.OFFER);
 			offerMessage.addContent("source", this.parent);
 			offerMessage.addContent("offers", offerList);
 
@@ -241,18 +239,16 @@ public class SCA2Solver implements IterativeSolver {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void sendAccept() {
 
 		// Only if this Agent did not offer to anyone else...
 		if (!this.isOfferer) {
 
-			LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(
-					this.parent);
+			LocalProblemContext<Integer> temp = new LocalProblemContext<Integer>(this.parent);
 			@SuppressWarnings("unchecked")
-			HashMap<Agent, Integer> cpa = (HashMap<Agent, Integer>) this.myProblemContext
-					.getAssignment().clone();
+			HashMap<Agent, Integer> cpa = (HashMap<Agent, Integer>) this.myProblemContext.getAssignment().clone();
 
 			double bestGain = Double.MIN_VALUE;
 			temp.setAssignment(cpa);
@@ -262,13 +258,11 @@ public class SCA2Solver implements IterativeSolver {
 
 			for (Offer suggestedOffer : this.receivedOffers) {
 				temp.setAssignment(cpa);
-				temp.setValue(suggestedOffer.offerer,
-						suggestedOffer.offererValue);
+				temp.setValue(suggestedOffer.offerer, suggestedOffer.offererValue);
 				temp.setValue(suggestedOffer.receiverValue);
 				double val = this.myCostFunction.evaluate(temp);
 				double localReduction = before - val;
-				double globalReduction = suggestedOffer.offererReduction
-						+ localReduction;
+				double globalReduction = suggestedOffer.offererReduction + localReduction;
 				if (globalReduction > 0 && globalReduction > bestGain) {
 					bestGain = globalReduction;
 					bestOffer = suggestedOffer;
@@ -281,8 +275,8 @@ public class SCA2Solver implements IterativeSolver {
 				accept.addContent("source", this.parent);
 				accept.addContent("offer", bestOffer);
 
-//				System.out.println(this.parent.getName()
-//						+ " accepts offer from " + bestOffer.offerer.getName());
+				// System.out.println(this.parent.getName()
+				// + " accepts offer from " + bestOffer.offerer.getName());
 				bestOffer.offerer.push(accept);
 
 				// Set the value now
@@ -294,7 +288,7 @@ public class SCA2Solver implements IterativeSolver {
 				}
 			}
 		}
-		
+
 		// Clear offers for the next round
 		this.receivedOffers.clear();
 	}
@@ -316,8 +310,7 @@ public class SCA2Solver implements IterativeSolver {
 			for (Integer assignment : this.myVariable) {
 				this.myProblemContext.setValue(assignment);
 
-				double localCost = this.myCostFunction
-						.evaluate(this.myProblemContext);
+				double localCost = this.myCostFunction.evaluate(this.myProblemContext);
 
 				if (localCost < bestCost) {
 					bestCost = localCost;
@@ -349,8 +342,7 @@ public class SCA2Solver implements IterativeSolver {
 
 		// public Double reiceverReduction;
 
-		public Offer(Agent offerer, Integer offererValue,
-				Integer receiverValue, Double offererReduction) {
+		public Offer(Agent offerer, Integer offererValue, Integer receiverValue, Double offererReduction) {
 			this.offerer = offerer;
 			this.offererValue = offererValue;
 			this.receiverValue = receiverValue;

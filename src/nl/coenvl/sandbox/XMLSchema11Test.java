@@ -2,7 +2,7 @@
  * File XMLSchema11Test.java
  *
  * This file is part of the jSAM project.
- * 
+ *
  * Copyright 2014 Coen van Leeuwen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -10,13 +10,13 @@
  * You may obtain a copy of the License at
  *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package nl.coenvl.sandbox;
 
@@ -31,20 +31,19 @@ import org.xml.sax.SAXParseException;
 
 /**
  * XMLSchema11Test
- * 
+ *
  * In package nl.coenvl.sandbox
- * 
+ *
  * @author leeuwencjv
  * @version 0.1
  * @since 4 feb. 2014
- * 
+ *
  */
 public class XMLSchema11Test implements ErrorHandler {
 
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out
-					.println("Usage: java -jar XMLSchema11Test.jar xmlfile xsdscheme");
+			System.out.println("Usage: java -jar XMLSchema11Test.jar xmlfile xsdscheme");
 			System.exit(1);
 		}
 
@@ -60,27 +59,31 @@ public class XMLSchema11Test implements ErrorHandler {
 
 	@Override
 	public void error(SAXParseException exception) throws SAXException {
-		error++;
+		this.error++;
 		System.out.println(exception.getSystemId() + ":"
-				+ exception.getLineNumber() + ":" + exception.getColumnNumber()
-				+ ":" + exception.getMessage());
+				+ exception.getLineNumber()
+				+ ":"
+				+ exception.getColumnNumber()
+				+ ":"
+				+ exception.getMessage());
 	}
 
 	@Override
 	public void fatalError(SAXParseException exception) throws SAXException {
-		error++;
+		this.error++;
 		System.out.println(exception.getSystemId() + ":"
-				+ exception.getLineNumber() + ":" + exception.getColumnNumber()
-				+ ":" + exception.getMessage());
+				+ exception.getLineNumber()
+				+ ":"
+				+ exception.getColumnNumber()
+				+ ":"
+				+ exception.getMessage());
 	}
 
 	public int validate(String xmlfile, String schemapath) {
 		try {
-			System.setProperty(
-					"javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema/v1.1",
+			System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema/v1.1",
 					"org.apache.xerces.jaxp.validation.XMLSchema11Factory");
-			SchemaFactory sf = SchemaFactory
-					.newInstance("http://www.w3.org/2001/XMLSchema/v1.1");
+			SchemaFactory sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema/v1.1");
 			Schema s = sf.newSchema(new StreamSource(schemapath));
 			Validator v = s.newValidator();
 			v.setErrorHandler(this);
@@ -89,14 +92,17 @@ public class XMLSchema11Test implements ErrorHandler {
 			e.printStackTrace();
 			return 1;
 		}
-		return error;
+		return this.error;
 	}
 
 	@Override
 	public void warning(SAXParseException exception) throws SAXException {
-		error++;
+		this.error++;
 		System.out.println(exception.getSystemId() + ":"
-				+ exception.getLineNumber() + ":" + exception.getColumnNumber()
-				+ ":" + exception.getMessage());
+				+ exception.getLineNumber()
+				+ ":"
+				+ exception.getColumnNumber()
+				+ ":"
+				+ exception.getMessage());
 	}
 }

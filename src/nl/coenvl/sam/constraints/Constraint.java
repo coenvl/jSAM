@@ -1,6 +1,6 @@
 /**
  * File Constraint.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -19,10 +19,10 @@
  */
 package nl.coenvl.sam.constraints;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.Variable;
 
 /**
@@ -36,15 +36,14 @@ public interface Constraint<T extends Variable<V>, V> {
 
 	/**
 	 * Return a set of ids of the variables that are involved in this constraint
-	 * 
+	 *
 	 * @return
 	 */
 	public Set<UUID> getVariableIds();
 
 	/**
-	 * Returns the costs for any involved variable. May be the same for all
-	 * involved variables, or may be different.
-	 * 
+	 * Returns the costs for any involved variable. May be the same for all involved variables, or may be different.
+	 *
 	 * @param targetVariable
 	 *            The variable for which to return the current cost
 	 * @return A double indicating the cost of this constraint
@@ -52,42 +51,23 @@ public interface Constraint<T extends Variable<V>, V> {
 	public double getCost(T targetVariable);
 
 	/**
-	 * Returns the costs for any involved variable assuming the involved
-	 * variables are set to the values as provided instead of taking the actual
-	 * current values.
-	 * 
-	 * @param targetVariable
+	 * Returns the costs for any involved variable assuming the involved variables are set to the values as provided
+	 * instead of taking the actual current values.
+	 *
+	 * @param variable
 	 *            The variable for which to return the current cost
-	 * @param values
-	 *            The a Map of key value pairs, in which the keys are the
-	 *            involved variables (or a superset thereof), and the values are
-	 *            the corresponding variable values.
-	 * @return A double indicating the cost of this constraint in the case that
-	 *         the variables are set as in the values Map.
+	 * @param valueMap
+	 *            The a Map of key value pairs, in which the keys are the ids of the involved variables (or a superset
+	 *            thereof), and the values are the corresponding variable values.
+	 * @return A double indicating the cost of this constraint in the case that the variables are set as in the values
+	 *         Map.
 	 */
-	// public double getCostIf(T targetVariable, Map<T, V> values);
+	public double getCostIf(T variable, AssignmentMap<V> valueMap);
 
 	/**
-	 * Returns the costs for any involved variable assuming the involved
-	 * variables are set to the values as provided instead of taking the actual
-	 * current values.
-	 * 
-	 * @param targetVariable
-	 *            The variable for which to return the current cost
-	 * @param values
-	 *            The a Map of key value pairs, in which the keys are the ids of
-	 *            the involved variables (or a superset thereof), and the values
-	 *            are the corresponding variable values.
-	 * @return A double indicating the cost of this constraint in the case that
-	 *         the variables are set as in the values Map.
-	 */
-	public double getCostIf(T targetVariable, Map<UUID, V> values);
-
-	/**
-	 * This function is to be used only from OUTSIDE of the simulation. It does
-	 * not increase the CompareCounter, and it sums the costs of all involved
-	 * variables.
-	 * 
+	 * This function is to be used only from OUTSIDE of the simulation. It does not increase the CompareCounter, and it
+	 * sums the costs of all involved variables.
+	 *
 	 * @return
 	 */
 	public double getExternalCost();

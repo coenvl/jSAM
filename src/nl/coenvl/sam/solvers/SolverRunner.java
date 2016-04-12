@@ -8,33 +8,31 @@
  * You may obtain a copy of the License at
  *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package nl.coenvl.sam.solvers;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.variables.Variable;
 
 /**
  * SolverRunner
- * 
+ *
  * Wrapper for around a solver to make it run asynchronously
- * 
+ *
  * @author leeuwencjv
  * @version 0.1
  * @since 4 apr. 2014
- * 
+ *
  */
-@SuppressWarnings("synthetic-access")
-public class SolverRunner<T extends Variable<V>,V> implements Solver<T, V> {
+public class SolverRunner implements Solver {
 
 	private class Runner implements Runnable {
 
@@ -42,19 +40,21 @@ public class SolverRunner<T extends Variable<V>,V> implements Solver<T, V> {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
 		public void run() {
 			this.running = true;
 
-			mySolver.init();
+			SolverRunner.this.mySolver.init();
 
 			try {
 				while (this.running) {
-					Message m = queue.take();
-					mySolver.push(m);
+					Message m = SolverRunner.this.queue.take();
+					synchronized (this) {
+						SolverRunner.this.mySolver.push(m);
+					}
 				}
 			} catch (InterruptedException e) {
 				// Do nothing... we are simply reset
@@ -67,7 +67,7 @@ public class SolverRunner<T extends Variable<V>,V> implements Solver<T, V> {
 	private static int solverRunnerCounter = 0;
 
 	private Runner myRunner;
-	private volatile Solver<T,V> mySolver;
+	private volatile Solver mySolver;
 	private Thread myThread;
 	private LinkedBlockingQueue<Message> queue;
 
@@ -76,36 +76,36 @@ public class SolverRunner<T extends Variable<V>,V> implements Solver<T, V> {
 	/**
 	 * @param greedySolver
 	 */
-	public SolverRunner(Solver<T,V> solver) {
-		this.queue = new LinkedBlockingQueue<Message>();
+	public SolverRunner(Solver solver) {
+		this.queue = new LinkedBlockingQueue<>();
 		this.mySolver = solver;
-		this.threadName = "SolverRunnerThread-" + solverRunnerCounter++;
+		this.threadName = "SolverRunnerThread-" + SolverRunner.solverRunnerCounter++;
 	}
 
-	public SolverRunner(Solver<T,V> s, String threadName) {
-		this.queue = new LinkedBlockingQueue<Message>();
+	public SolverRunner(Solver s, String threadName) {
+		this.queue = new LinkedBlockingQueue<>();
 		this.mySolver = s;
 		this.threadName = threadName;
-		solverRunnerCounter++;
+		SolverRunner.solverRunnerCounter++;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see nl.coenvl.sam.Solver#init()
 	 */
-	
+
 	@Override
 	public void init() {
 		this.myRunner = new Runner();
-		this.myThread = new Thread(null, myRunner, threadName);
+		this.myThread = new Thread(null, this.myRunner, this.threadName);
 		// this.myThread = new Thread(this.myRunner);
 		this.myThread.start();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see nl.coenvl.sam.Solver#push(nl.coenvl.sam.Message)
 	 */
 	@Override
@@ -115,23 +115,24 @@ public class SolverRunner<T extends Variable<V>,V> implements Solver<T, V> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see nl.coenvl.sam.Solver#reset()
 	 */
 	@Override
 	public void reset() {
-		if (this.myRunner != null)
+		if (this.myRunner != null) {
 			this.myRunner.running = false;
-		
+		}
+
 		if (this.myThread != null) {
 			this.myThread.interrupt();
-		
+
 			try {
 				this.myThread.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
+
 			this.myThread = null;
 		}
 		this.mySolver.reset();

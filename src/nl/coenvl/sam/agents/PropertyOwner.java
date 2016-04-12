@@ -1,6 +1,6 @@
 /**
  * File PropertyOwner.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -32,9 +32,9 @@ import nl.coenvl.sam.exceptions.PropertyNotSetException;
 public interface PropertyOwner {
 
 	public boolean has(String key);
-	
+
 	public Object get(String key) throws PropertyNotSetException;
-	
+
 	public void set(String key, Object val) throws InvalidPropertyException;
-	
+
 }

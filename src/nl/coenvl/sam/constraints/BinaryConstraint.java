@@ -1,6 +1,6 @@
 /**
  * File BinaryConstraint.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -36,28 +36,31 @@ import nl.coenvl.sam.variables.Variable;
 public abstract class BinaryConstraint<T extends Variable<V>, V> implements Constraint<T, V> {
 
 	protected final T var1;
-	
+
 	protected final T var2;
-	
+
 	public BinaryConstraint(T var1, T var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.constraints.Constraint#getVariables()
 	 */
 	@Override
 	public Set<UUID> getVariableIds() {
-		Set<UUID> ret = new HashSet<UUID>();
-		ret.add(var1.getID());
-		ret.add(var2.getID());
+		Set<UUID> ret = new HashSet<>();
+		ret.add(this.var1.getID());
+		ret.add(this.var2.getID());
 		return ret;
 	}
 
 	protected void assertVariableIsInvolved(T var) {
-		if (!var.equals(var1) && !var.equals(var2))
+		if (!var.equals(this.var1) && !var.equals(this.var2)) {
 			throw new VariableNotInvolvedException("Variable " + var + " is not involved in the constraint");
+		}
 	}
 
 }

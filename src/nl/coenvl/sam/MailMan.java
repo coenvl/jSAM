@@ -1,6 +1,6 @@
 /**
  * File MailMan.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -36,47 +36,56 @@ import nl.coenvl.sam.variables.Variable;
  */
 public final class MailMan {
 
-	private static Map<UUID, Agent<?,?>> ownerMap = new HashMap<UUID, Agent<?,?>>();
-
-	private static HashMap<String, Integer> messageCounterMap = new HashMap<String, Integer>();
-
+	private static final Map<UUID, Agent<?, ?>> ownerMap = new HashMap<>();
+	private static final Map<String, Integer> messageCounterMap = new HashMap<>();
 	private static int sentMessages = 0;
-	
+
 	private MailMan() {
 		// Private constructor
 	}
-	
-	/**
-	 * @param var
-	 * @param abstractAgent
-	 */
+
 	public static void registerOwner(Variable<?> var, Agent<?, ?> agent) {
-		ownerMap.put(var.getID(), agent);
+		MailMan.register(var.getID(), agent);
+	}
+
+	public static void register(UUID address, Agent<?, ?> agent) {
+		MailMan.ownerMap.put(address, agent);
 	}
 
 	public static void sendMessage(UUID id, Message m) {
-		if (!messageCounterMap.containsKey(m.getType()))
-			messageCounterMap.put(m.getType(), 1);
-		else
-			messageCounterMap.put(m.getType(),
-					messageCounterMap.get(m.getType()) + 1);
+		if (!MailMan.messageCounterMap.containsKey(m.getType())) {
+			MailMan.messageCounterMap.put(m.getType(), 1);
+		} else {
+			MailMan.messageCounterMap.put(m.getType(), MailMan.messageCounterMap.get(m.getType()) + 1);
+		}
 
 		MailMan.sentMessages++;
 
-		ownerMap.get(id).push(m);
+		MailMan.ownerMap.get(id).push(m);
 	}
-	
+
+	public static void broadCast(Message msg) {
+		for (UUID id : MailMan.ownerMap.keySet()) {
+			MailMan.sendMessage(id, msg);
+		}
+	}
+
 	public static Map<String, Integer> getSentMessages() {
-		return messageCounterMap;
+		return MailMan.messageCounterMap;
 	}
 
 	public static int getTotalSentMessages() {
-		return sentMessages;
+		return MailMan.sentMessages;
 	}
 
-	public static void resetMessageCount() {
-		messageCounterMap.clear();
-		sentMessages = 0;
+	public static void reset() {
+		for (Agent<?, ?> a : MailMan.ownerMap.values()) {
+			a.reset();
+		}
+
+		MailMan.ownerMap.clear();
+		MailMan.messageCounterMap.clear();
+		MailMan.sentMessages = 0;
 	}
-	
+
 }

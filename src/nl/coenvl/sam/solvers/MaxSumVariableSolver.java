@@ -1,6 +1,6 @@
 /**
  * File MaxSumVariableSolver.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -21,53 +21,58 @@ package nl.coenvl.sam.solvers;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-import nl.coenvl.sam.agents.Agent;
-import nl.coenvl.sam.agents.LocalCommunicatingAgent;
+import nl.coenvl.sam.MailMan;
+import nl.coenvl.sam.agents.VariableAgent;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.variables.CostMap;
 import nl.coenvl.sam.variables.IntegerVariable;
 
 /**
- * MaxSsumVariableSolver
+ * MaxSumVariableSolver
  *
  * @author leeuwencjv
  * @version 0.1
  * @since 22 jan. 2016
  */
-public class MaxSumVariableSolver implements IterativeSolver, BiPartiteGraphSolver {
+public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Integer>
+		implements IterativeSolver, BiPartiteGraphSolver {
 
-	private final LocalCommunicatingAgent parent;
-	private final IntegerVariable var;
-	
-	private Map<Agent, Map<Integer, Double> > receivedCosts;
-	
-	public MaxSumVariableSolver(LocalCommunicatingAgent parent) {
-		this.parent = parent;
-		this.var = (IntegerVariable) parent.getVariable();
-		this.receivedCosts = new HashMap<Agent, Map<Integer, Double> >();
+	private final Map<UUID, CostMap<Integer>> receivedCosts;
+
+	public MaxSumVariableSolver(VariableAgent<IntegerVariable, Integer> agent) {
+		super(agent);
+		this.receivedCosts = new HashMap<>();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.Solver#init()
 	 */
 	@Override
 	public void init() {
 		// Do nothing?
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized void push(Message m) {
-		Agent neighbor = (Agent) m.getContent("source");
-		Map<Integer, Double> costMap = (Map<Integer, Double>) m.getContent("costMap");
+		UUID neighbor = m.getUUID("source");
+		@SuppressWarnings("unchecked")
+		CostMap<Integer> costMap = (CostMap<Integer>) m.getMap("costMap");
 		this.receivedCosts.put(neighbor, costMap);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.Solver#reset()
 	 */
 	@Override
@@ -75,66 +80,82 @@ public class MaxSumVariableSolver implements IterativeSolver, BiPartiteGraphSolv
 		this.receivedCosts.clear();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
 	 */
 	@Override
-	public synchronized void tick() {		
+	public synchronized void tick() {
 		// Target represents function node f
-		for (Agent target : this.parent.getNeighborhood()) {
-			
-			// For all values of variable
-			Map<Integer, Double> costMap = new HashMap<Integer, Double>();
-			double totalCost = 0;
-			
-			for (Integer value : this.var) {
-				double valueCost = 0;
-				
-				// The sum of costs for this value it received from all function neighbors apart from f in iteration i − 1.
-				for (Agent neighbor : this.parent.getNeighborhood())
-					if (neighbor != target) {
-						if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(value))
-							valueCost += this.receivedCosts.get(neighbor).get(value);
-					}
-				
-				totalCost += valueCost;
-				costMap.put(value, valueCost);
-			}
-			
-			// Normalize to avoid increasingly large values
-			double avg = totalCost / costMap.size();
-			for (Integer value : this.var)
-				costMap.put(value, costMap.get(value) - avg);
-						
-			Message msg = new HashMessage("VAR2FUN");
-			msg.addContent("source", this.parent);
-			msg.addContent("costMap", costMap);
-			
-			target.push(msg);
+		for (UUID target : this.parent.getConstraintIds()) {
+			Message v2f = this.var2funMessage(target);
+
+			MailMan.sendMessage(target, v2f);
 		}
-		
-		// And like an afterthought, pick lowest value
+
+		this.setMinimizingValue();
+		this.receivedCosts.clear();
+	}
+
+	protected Message var2funMessage(UUID target) {
+		// For all values of variable
+		CostMap<Integer> costMap = new CostMap<>();
+		double totalCost = 0;
+
+		for (Integer value : this.myVariable) {
+			double valueCost = 0;
+
+			// The sum of costs for this value it received from all function neighbors apart from f in iteration i −
+			// 1.
+			for (UUID neighbor : this.parent.getConstraintIds()) {
+				if (neighbor != target) {
+					if (this.receivedCosts.containsKey(neighbor)
+							&& this.receivedCosts.get(neighbor).containsKey(value)) {
+						valueCost += this.receivedCosts.get(neighbor).get(value);
+					}
+				}
+			}
+
+			totalCost += valueCost;
+			costMap.put(value, valueCost);
+		}
+
+		// Normalize to avoid increasingly large values
+		double avg = totalCost / costMap.size();
+		for (Integer value : this.myVariable) {
+			costMap.put(value, costMap.get(value) - avg);
+		}
+
+		Message msg = new HashMessage("VAR2FUN");
+		msg.put("source", this.myVariable.getID());
+		msg.put("costMap", costMap);
+		return msg;
+	}
+
+	protected void setMinimizingValue() {
 		double minCost = Double.MAX_VALUE;
 		Integer bestAssignment = null;
-		
-		for (Integer value : this.var) {
+
+		for (Integer value : this.myVariable) {
 			double valueCost = 0;
-			for (Agent neighbor : this.parent.getNeighborhood()) {
-				if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(value))
+			for (UUID neighbor : this.parent.getConstraintIds()) {
+				if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(value)) {
 					valueCost += this.receivedCosts.get(neighbor).get(value);
+				}
 			}
-			
+
 			if (valueCost < minCost) {
 				minCost = valueCost;
 				bestAssignment = value;
 			}
 		}
-		this.var.setValue(bestAssignment);
-		
-		this.receivedCosts.clear();
+		this.myVariable.setValue(bestAssignment);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.solvers.BiPartiteGraphSolver#getCounterPart()
 	 */
 	@Override

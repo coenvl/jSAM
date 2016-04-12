@@ -1,6 +1,6 @@
 /**
  * File DSASolver.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2014 Coen van Leeuwen
@@ -19,16 +19,14 @@
  */
 package nl.coenvl.sam.solvers;
 
-import java.util.HashMap;
-import java.util.Random;
 import java.util.UUID;
-import java.util.Vector;
 
-import nl.coenvl.sam.MailMan;
-import nl.coenvl.sam.agents.SolverAgent;
+import nl.coenvl.sam.agents.Agent;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.DiscreteVariable;
+import nl.coenvl.sam.variables.RandomAccessVector;
 
 /**
  * DSASolver
@@ -38,85 +36,78 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @since 11 dec. 2014
  *
  */
-public class DSASolver<T extends DiscreteVariable<V>, V extends Number> implements IterativeSolver<T,V> {
+public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
 
 	public static final double CHANGE_TO_EQUAL_PROB = 0.5;
-
-	public static final double CHANGE_TO_IMPROVE_PROB = 1;
-
+	public static final double CHANGE_TO_IMPROVE_PROB = 0.5;
 	public static final String UPDATE_VALUE = "DSASolver:Value";
-	
 	public static final String KEY_VARID = "varID";
-	
 	public static final String KEY_VARVALUE = "value";
 
-	private final T myVar;
-
-	private final SolverAgent<T, V> parent;
-	
-	private HashMap<UUID, V> context;
+	private AssignmentMap<V> context;
 
 	/**
 	 * @param dsaAgent
 	 * @param costfun
 	 */
-	public DSASolver(SolverAgent<T, V> parent) {
-		this.parent = parent;
-		this.myVar = this.parent.getVariable();
-		this.context = new HashMap<UUID, V>();
+	public DSASolver(Agent<DiscreteVariable<V>, V> agent) {
+		super(agent);
+		this.context = new AssignmentMap<>();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.anon.cocoa.solvers.Solver#init()
 	 */
 	@Override
 	public synchronized void init() {
-		updateMyValue(myVar.getRandomValue());
+		this.updateMyValue(this.myVariable.getRandomValue());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.anon.cocoa.solvers.Solver#push(org.anon.cocoa.messages.Message)
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public synchronized void push(Message m) {
 		if (m.getType().equals(DSASolver.UPDATE_VALUE)) {
-			UUID varId = UUID.fromString(m.getString(KEY_VARID));
-			V newValue = (V) m.getNumber(KEY_VARVALUE);
+			UUID varId = m.getUUID(DSASolver.KEY_VARID);
+
+			@SuppressWarnings("unchecked")
+			V newValue = (V) m.getInteger(DSASolver.KEY_VARVALUE);
+
 			this.context.put(varId, newValue);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.anon.cocoa.solvers.Solver#reset()
 	 */
 	@Override
 	public void reset() {
-		this.context = new HashMap<UUID, V>();
-		this.myVar.clear();
+		this.context = new AssignmentMap<>();
+		this.myVariable.clear();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	public synchronized void tick() {
 		double bestCost = Double.MAX_VALUE;
-		Vector<V> bestAssignment = new Vector<V>();
 
-		context.put(this.myVar.getID(), this.myVar.getValue());
-		double oldCost = this.parent.getLocalCostIf(context);
-		
-		for (V value : this.myVar) {
-			context.put(this.myVar.getID(), value);
+		RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
+		this.context.setAssignment(this.myVariable, this.myVariable.getValue());
+		double oldCost = this.parent.getLocalCostIf(this.context);
 
-			double localCost = this.parent.getLocalCostIf(context);
+		for (V value : this.myVariable) {
+			this.context.setAssignment(this.myVariable, value);
+
+			double localCost = this.parent.getLocalCostIf(this.context);
 
 			if (localCost < bestCost) {
 				bestCost = localCost;
@@ -128,42 +119,37 @@ public class DSASolver<T extends DiscreteVariable<V>, V extends Number> implemen
 			}
 		}
 
-		if (bestCost > oldCost)
+		if (bestCost > oldCost) {
 			return;
-
-		if (bestCost == oldCost
-				&& Math.random() > DSASolver.CHANGE_TO_EQUAL_PROB)
-			return;
-
-		if (bestCost < oldCost
-				&& Math.random() > DSASolver.CHANGE_TO_IMPROVE_PROB)
-			return;
-
-		// Chose any of the "best" assignments
-		V assign;
-		if (bestAssignment.size() > 1) {
-			int i = (new Random()).nextInt(bestAssignment.size());
-			assign = bestAssignment.elementAt(i);
-		} else {
-			assign = bestAssignment.elementAt(0);
 		}
 
-		if (assign != this.myVar.getValue())
-			updateMyValue(assign);
+		if (bestCost == oldCost && Math.random() > DSASolver.CHANGE_TO_EQUAL_PROB) {
+			return;
+		}
+
+		if (bestCost < oldCost && Math.random() > DSASolver.CHANGE_TO_IMPROVE_PROB) {
+			return;
+		}
+
+		// Chose any of the "best" assignments
+		V assign = bestAssignment.randomElement();
+
+		if (assign != this.myVariable.getValue()) {
+			this.updateMyValue(assign);
+		}
 	}
 
 	/**
 	 * @param assign
 	 */
 	private void updateMyValue(V assign) {
-		this.myVar.setValue(assign);
+		this.myVariable.setValue(assign);
 
 		HashMessage nextMessage = new HashMessage(DSASolver.UPDATE_VALUE);
-		nextMessage.addString(KEY_VARID, this.myVar.getID().toString());
-		nextMessage.addNumber(KEY_VARVALUE, assign.intValue());
+		nextMessage.put(DSASolver.KEY_VARID, this.myVariable.getID());
+		nextMessage.put(DSASolver.KEY_VARVALUE, assign);
 
-		for (UUID id : this.parent.getConstraintIds())
-			MailMan.sendMessage(id, nextMessage);
+		this.sendToNeighbors(nextMessage);
 	}
 
 }

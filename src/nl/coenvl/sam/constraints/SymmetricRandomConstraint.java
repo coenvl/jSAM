@@ -1,6 +1,6 @@
 /**
  * File SymmetricRandomConstraint.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -28,13 +28,13 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @version 0.1
  * @since 4 mrt. 2016
  */
-public class SymmetricRandomConstraint<T extends DiscreteVariable<V>, V> extends CostMatrixConstraint<T, V> {
+public class SymmetricRandomConstraint<V> extends CostMatrixConstraint<V> {
 
 	/**
 	 * @param var1
 	 * @param var2
 	 */
-	public SymmetricRandomConstraint(T var1, T var2) {
+	public SymmetricRandomConstraint(DiscreteVariable<V> var1, DiscreteVariable<V> var2) {
 		super(var1, var2, RandomConstraint.randomMatrix(var1.getRange(), var2.getRange()));
 	}
 

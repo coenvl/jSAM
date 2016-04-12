@@ -1,6 +1,6 @@
 /**
  * File VariableNotInvolvedException.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -29,7 +29,7 @@ package nl.coenvl.sam.exceptions;
 public class VariableNotInvolvedException extends RuntimeException {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 5657616732601999531L;
 
@@ -39,5 +39,5 @@ public class VariableNotInvolvedException extends RuntimeException {
 	public VariableNotInvolvedException(String msg) {
 		super(msg);
 	}
-	
+
 }

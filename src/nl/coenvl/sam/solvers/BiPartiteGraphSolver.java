@@ -1,6 +1,6 @@
 /**
  * File BiPartiteGraphSolver.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2016 TNO
@@ -29,5 +29,5 @@ package nl.coenvl.sam.solvers;
 public interface BiPartiteGraphSolver {
 
 	public Class<? extends BiPartiteGraphSolver> getCounterPart();
-	
+
 }

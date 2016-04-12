@@ -1,6 +1,6 @@
 /**
  * File InvalidPropertyException.java
- * 
+ *
  * This file is part of the jSAM project.
  *
  * Copyright 2015 TNO
@@ -30,12 +30,12 @@ package nl.coenvl.sam.exceptions;
 public class InvalidPropertyException extends Exception {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6343963390990723752L;
 
 	public InvalidPropertyException(String msg) {
 		super(msg);
 	}
-	
+
 }
