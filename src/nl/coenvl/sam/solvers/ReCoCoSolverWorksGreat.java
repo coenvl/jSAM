@@ -41,17 +41,18 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @since 11 apr. 2014
  *
  */
-public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
+public class ReCoCoSolverWorksGreat<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
 
-	protected static final String ASSIGN_VAR = "CoCoSolver:PickAVar";
-	protected static final String COST_MSG = "CoCoSolver:CostOfAssignments";
-	protected static final String INQUIRE_MSG = "CoCoSolver:InquireAssignment";
+	private static final String ASSIGN_VAR = "ReCoCoSolver:PickAVar";
+	private static final String COST_MSG = "ReCoCoSolver:CostOfAssignments";
+	private static final String INQUIRE_MSG = "ReCoCoSolver:InquireAssignment";
 
 	private List<CostMap<V>> receivedMaps;
-	protected AssignmentMap<V> context;
-	protected boolean started;
+	private AssignmentMap<V> context;
+	private boolean started;
+	private boolean isRoot;
 
-	public CoCoSolver(Agent<DiscreteVariable<V>, V> parent) {
+	public ReCoCoSolverWorksGreat(Agent<DiscreteVariable<V>, V> parent) {
 		super(parent);
 		this.started = false;
 	}
@@ -60,7 +61,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 * Send an activation message (ASSIGN_VAR) to the non-active neighbors
 	 */
 	private void activateNeighbors() {
-		HashMessage nextMessage = new HashMessage(CoCoSolver.ASSIGN_VAR);
+		HashMessage nextMessage = new HashMessage(ReCoCoSolverWorksGreat.ASSIGN_VAR);
 		nextMessage.put("cpa", this.context);
 		nextMessage.put("source", this.myVariable.getID());
 
@@ -75,6 +76,18 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	@Override
 	public void init() {
 		this.context = new AssignmentMap<>();
+	}
+
+	@Override
+	public synchronized void tick() {
+		this.started = false;
+		if (this.isRoot) {
+			this.sendInquireMsgs();
+		}
+	}
+
+	public synchronized void setRoot() {
+		this.isRoot = true;
 	}
 
 	/**
@@ -126,7 +139,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 *
 	 * @param m
 	 */
-	protected void processCostMessage(Message m) {
+	private void processCostMessage(Message m) {
 		@SuppressWarnings("unchecked")
 		CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
 		this.receivedMaps.add(costMap);
@@ -151,18 +164,14 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 			this.context.putAll(cpa);
 		}
 
-		if (m.getType().equals(CoCoSolver.ASSIGN_VAR)) {
+		if (m.getType().equals(ReCoCoSolverWorksGreat.ASSIGN_VAR)) {
 			if (!this.started) {
 				this.sendInquireMsgs();
 			}
-		} else if (m.getType().equals(CoCoSolver.INQUIRE_MSG)) {
+		} else if (m.getType().equals(ReCoCoSolverWorksGreat.INQUIRE_MSG)) {
 			this.respond(m);
-		} else if (m.getType().equals(CoCoSolver.COST_MSG)) {
-			if (!this.myVariable.isSet()) {
-				this.processCostMessage(m);
-			} else {
-				System.err.println("This never ought to happen!");
-			}
+		} else if (m.getType().equals(ReCoCoSolverWorksGreat.COST_MSG)) {
+			this.processCostMessage(m);
 		} else {
 			System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
 			return;
@@ -187,7 +196,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 *
 	 * @param m
 	 */
-	protected void respond(Message m) {
+	private void respond(Message m) {
 		CostMap<V> costMap = new CostMap<>();
 
 		UUID source = m.getUUID("source");
@@ -219,19 +228,19 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 		}
 
 		// Respond to source
-		Message response = new HashMessage(CoCoSolver.COST_MSG);
+		Message response = new HashMessage(ReCoCoSolverWorksGreat.COST_MSG);
 		response.put("costMap", costMap);
 		response.put("cpa", this.context);
 
 		MailMan.sendMessage(source, response);
 	}
 
-	protected void sendInquireMsgs() {
+	private void sendInquireMsgs() {
 		// Create a map for storing incoming costmap messages
 		this.started = true;
 		this.receivedMaps = new ArrayList<>();
 
-		Message m = new HashMessage(CoCoSolver.INQUIRE_MSG);
+		Message m = new HashMessage(ReCoCoSolverWorksGreat.INQUIRE_MSG);
 		m.put("cpa", this.context);
 		m.put("source", this.myVariable.getID());
 

@@ -50,10 +50,10 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		IDLE
 	}
 
-	private static final String ASSIGN_VAR = "UniqueFirstCooperativeSolver:PickAVar";
-	private static final String COST_MSG = "UniqueFirstCooperativeSolver:CostOfAssignments";
-	private static final String CURRENT_STATE = "UniqueFirstCooperativeSolver:StateChanged";
-	private static final String INQUIRE_MSG = "UniqueFirstCooperativeSolver:InquireAssignment";
+	private static final String ASSIGN_VAR = "CoCoASolver:PickAVar";
+	private static final String COST_MSG = "CoCoASolver:CostOfAssignments";
+	private static final String CURRENT_STATE = "CoCoASolver:StateChanged";
+	private static final String INQUIRE_MSG = "CoCoASolver:InquireAssignment";
 
 	private final AssignmentMap<State> neighborStates;
 
@@ -105,6 +105,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 			this.respond(m);
 		} else if (m.getType().equals(CoCoASolver.COST_MSG)) {
 			if (this.currentState != State.ACTIVE) {
+				System.err.println("This never ought to happen!");
 				return;
 			}
 

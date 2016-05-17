@@ -184,7 +184,7 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
 		 * Private constructor for transpose function.
 		 */
 		private CostMatrix() {
-			this.matrix = new HashMap<V, Map<V, Double>>();
+			this.matrix = new HashMap<>();
 		}
 
 		public double getCost(V value1, V value2) {
