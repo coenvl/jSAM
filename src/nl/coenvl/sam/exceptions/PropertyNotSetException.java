@@ -27,7 +27,7 @@ package nl.coenvl.sam.exceptions;
  * @since 3 jul. 2015
  *
  */
-public class PropertyNotSetException extends Exception {
+public class PropertyNotSetException extends RuntimeException {
 
 	/**
 	 *

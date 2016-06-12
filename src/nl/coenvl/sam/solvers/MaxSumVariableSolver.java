@@ -38,7 +38,7 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @since 22 jan. 2016
  */
 public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Integer>
-		implements IterativeSolver, BiPartiteGraphSolver {
+		implements Solver, BiPartiteGraphSolver {
 
 	private final Map<UUID, CostMap<Integer>> receivedCosts;
 
@@ -64,7 +64,10 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 	 */
 	@Override
 	public synchronized void push(Message m) {
-		UUID neighbor = m.getUUID("source");
+		// TODO: This will give errors if the messages are not meant for this solver. This will be the case in hybrid
+		// solvers.
+
+		UUID neighbor = m.getSource();
 		@SuppressWarnings("unchecked")
 		CostMap<Integer> costMap = (CostMap<Integer>) m.getMap("costMap");
 		this.receivedCosts.put(neighbor, costMap);
@@ -127,8 +130,7 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 			costMap.put(value, costMap.get(value) - avg);
 		}
 
-		Message msg = new HashMessage("VAR2FUN");
-		msg.put("source", this.myVariable.getID());
+		Message msg = new HashMessage(this.myVariable.getID(), "VAR2FUN");
 		msg.put("costMap", costMap);
 		return msg;
 	}

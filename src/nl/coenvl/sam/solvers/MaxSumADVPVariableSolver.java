@@ -42,6 +42,8 @@ public class MaxSumADVPVariableSolver extends MaxSumADVariableSolver {
 
 	public MaxSumADVPVariableSolver(VariableAgent<IntegerVariable, Integer> agent) {
 		super(agent);
+		this.switchCount = 0;
+		this.doVP = false;
 	}
 
 	/*
@@ -52,8 +54,6 @@ public class MaxSumADVPVariableSolver extends MaxSumADVariableSolver {
 	@Override
 	public synchronized void init() {
 		super.init();
-		this.switchCount = 0;
-		this.doVP = false;
 	}
 
 	/*
@@ -64,7 +64,7 @@ public class MaxSumADVPVariableSolver extends MaxSumADVariableSolver {
 	@Override
 	public synchronized void tick() {
 		this.iterCount++;
-		if (this.iterCount % MaxSumADVariableSolver.REVERSE_AFTER_ITERS == 0) {
+		if ((this.iterCount % MaxSumADVariableSolver.REVERSE_AFTER_ITERS) == 0) {
 			this.direction = !this.direction;
 			this.switchCount++;
 			this.doVP = (this.switchCount >= MaxSumADVPVariableSolver.START_VP_AFTER_SWITCHES);
@@ -96,5 +96,12 @@ public class MaxSumADVPVariableSolver extends MaxSumADVariableSolver {
 	@Override
 	public Class<? extends BiPartiteGraphSolver> getCounterPart() {
 		return MaxSumADVPFunctionSolver.class;
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		this.switchCount = 0;
+		this.doVP = false;
 	}
 }

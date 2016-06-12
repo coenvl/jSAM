@@ -49,9 +49,8 @@ public class ACLSUBSolver<V> extends ACLSSolver<V> {
 		this.myProposal = this.myVariable.getRandomValue().toString();
 
 		// Send the proposal to all neighbors
-		Message updateMsg = new HashMessage(ACLSSolver.PROPOSED_UPDATE);
+		Message updateMsg = new HashMessage(this.myVariable.getID(), ACLSSolver.PROPOSED_UPDATE);
 
-		updateMsg.put("source", this.myVariable.getID());
 		updateMsg.put("proposal", this.myProposal);
 
 		super.sendToNeighbors(updateMsg);

@@ -36,7 +36,7 @@ import nl.coenvl.sam.variables.Variable;
  */
 public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> {
 
-	private Solver mySolver;
+	private SolverRunner mySolver;
 
 	/**
 	 * @param name
@@ -69,6 +69,16 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> {
 	/*
 	 * (non-Javadoc)
 	 *
+	 * @see nl.coenvl.sam.solvers.Solver#tick()
+	 */
+	@Override
+	public void tick() {
+		this.mySolver.tick();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.Agent#reset()
 	 */
 	@Override
@@ -86,8 +96,14 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> {
 			this.mySolver = new SolverRunner(solver);
 		} else {
 			// System.err.println("Warning: You are using a synchronous solver!");
-			this.mySolver = solver;
+			// this.mySolver = solver;
+			throw new RuntimeException("Playtime is over");
 		}
+	}
+
+	@Override
+	public boolean isFinished() {
+		return this.mySolver.emptyQueue();
 	}
 
 }

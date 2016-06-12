@@ -42,6 +42,8 @@ public class MaxSumADVariableSolver extends MaxSumVariableSolver {
 
 	public MaxSumADVariableSolver(VariableAgent<IntegerVariable, Integer> agent) {
 		super(agent);
+		this.iterCount = 0;
+		this.direction = true;
 	}
 
 	/*
@@ -51,8 +53,7 @@ public class MaxSumADVariableSolver extends MaxSumVariableSolver {
 	 */
 	@Override
 	public synchronized void init() {
-		this.iterCount = 0;
-		this.direction = true;
+		// Do nothing
 	}
 
 	/*
@@ -63,7 +64,7 @@ public class MaxSumADVariableSolver extends MaxSumVariableSolver {
 	@Override
 	public synchronized void tick() {
 		this.iterCount++;
-		if (this.iterCount % MaxSumADVariableSolver.REVERSE_AFTER_ITERS == 0) {
+		if ((this.iterCount % MaxSumADVariableSolver.REVERSE_AFTER_ITERS) == 0) {
 			this.direction = !this.direction;
 		}
 

@@ -61,6 +61,9 @@ public class FBSolver<V> implements Solver {
 	public FBSolver(LinkedAgent<? extends DiscreteVariable<V>, V> agent) {
 		this.parent = agent;
 		this.myVariable = this.parent.getVariable();
+		this.upperBound = Double.MAX_VALUE;
+		this.exploredValues = new ArrayList<>();
+		this.context = new AssignmentMap<>();
 	}
 
 	/**
@@ -79,13 +82,13 @@ public class FBSolver<V> implements Solver {
 			pa.setAssignment(this.myVariable, iterAssignment);
 			double iterCost = this.pastCost + this.parent.getLocalCostIf(pa);
 
-			if (iterCost < paCost && iterCost < this.upperBound) {
+			if ((iterCost < paCost) && (iterCost < this.upperBound)) {
 				paCost = iterCost;
 				assignment = iterAssignment;
 			}
 		}
 
-		if (assignment == null || paCost >= this.upperBound) {
+		if ((assignment == null) || (paCost >= this.upperBound)) {
 			// No new solution found backtrack...
 			this.backtrack();
 		} else {
@@ -97,7 +100,7 @@ public class FBSolver<V> implements Solver {
 			// Forward the current assignment to the next child, or broadcast
 			// new solution if there is none
 			if (this.parent.next() == null) {
-				Message msg = new HashMessage(FBSolver.NEW_SOLUTION);
+				Message msg = new HashMessage(this.myVariable.getID(), FBSolver.NEW_SOLUTION);
 				msg.put("pa", this.context);
 				msg.put("paCost", paCost);
 				MailMan.broadCast(msg);
@@ -107,7 +110,7 @@ public class FBSolver<V> implements Solver {
 
 				this.backtrack();
 			} else {
-				Message msg = new HashMessage(FBSolver.CPA_MSG);
+				Message msg = new HashMessage(this.myVariable.getID(), FBSolver.CPA_MSG);
 
 				msg.put("pa", this.context);
 				msg.put("paCost", paCost);
@@ -122,9 +125,9 @@ public class FBSolver<V> implements Solver {
 	 */
 	private void backtrack() {
 		if (this.parent.prev() == null) {
-			MailMan.broadCast(new HashMessage(FBSolver.TERMINATE));
+			MailMan.broadCast(new HashMessage(this.myVariable.getID(), FBSolver.TERMINATE));
 		} else {
-			MailMan.sendMessage(this.parent.prev(), new HashMessage(FBSolver.CPA_MSG));
+			MailMan.sendMessage(this.parent.prev(), new HashMessage(this.myVariable.getID(), FBSolver.CPA_MSG));
 		}
 	}
 
@@ -135,10 +138,6 @@ public class FBSolver<V> implements Solver {
 	 */
 	@Override
 	public void init() {
-		this.upperBound = Double.MAX_VALUE;
-		this.exploredValues = new ArrayList<>();
-		this.context = new AssignmentMap<>();
-
 		if (this.parent.prev() == null) {
 			this.assign_CPA();
 		}
@@ -199,7 +198,20 @@ public class FBSolver<V> implements Solver {
 	 */
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
+		this.myVariable.clear();
+		this.upperBound = Double.MAX_VALUE;
+		this.exploredValues.clear();
+		this.context.clear();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see nl.coenvl.sam.solvers.Solver#tick()
+	 */
+	@Override
+	public void tick() {
+		// Do nothing
 	}
 
 }

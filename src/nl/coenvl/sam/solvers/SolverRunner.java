@@ -47,8 +47,6 @@ public class SolverRunner implements Solver {
 		public void run() {
 			this.running = true;
 
-			SolverRunner.this.mySolver.init();
-
 			try {
 				while (this.running) {
 					Message m = SolverRunner.this.queue.take();
@@ -89,6 +87,13 @@ public class SolverRunner implements Solver {
 		SolverRunner.solverRunnerCounter++;
 	}
 
+	public void startThread() {
+		this.myRunner = new Runner();
+		this.myThread = new Thread(null, this.myRunner, this.threadName);
+		// this.myThread = new Thread(this.myRunner);
+		this.myThread.start();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -97,10 +102,7 @@ public class SolverRunner implements Solver {
 
 	@Override
 	public void init() {
-		this.myRunner = new Runner();
-		this.myThread = new Thread(null, this.myRunner, this.threadName);
-		// this.myThread = new Thread(this.myRunner);
-		this.myThread.start();
+		this.mySolver.init();
 	}
 
 	/*
@@ -111,6 +113,16 @@ public class SolverRunner implements Solver {
 	@Override
 	public void push(Message m) {
 		this.queue.add(m);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see nl.coenvl.sam.solvers.Solver#tick()
+	 */
+	@Override
+	public void tick() {
+		this.mySolver.tick();
 	}
 
 	/*
@@ -137,5 +149,12 @@ public class SolverRunner implements Solver {
 		}
 		this.mySolver.reset();
 		this.queue.clear();
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean emptyQueue() {
+		return this.queue.isEmpty();
 	}
 }

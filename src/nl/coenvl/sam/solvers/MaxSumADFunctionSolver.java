@@ -42,6 +42,8 @@ public class MaxSumADFunctionSolver extends MaxSumFunctionSolver {
 
 	public MaxSumADFunctionSolver(ConstraintAgent<IntegerVariable, Integer> agent) {
 		super(agent);
+		this.iterCount = 0;
+		this.direction = true;
 	}
 
 	/*
@@ -51,8 +53,7 @@ public class MaxSumADFunctionSolver extends MaxSumFunctionSolver {
 	 */
 	@Override
 	public synchronized void init() {
-		this.iterCount = 0;
-		this.direction = true;
+		// Do nothing
 	}
 
 	/*
@@ -65,7 +66,7 @@ public class MaxSumADFunctionSolver extends MaxSumFunctionSolver {
 	@Override
 	public synchronized void tick() {
 		this.iterCount++;
-		if (this.iterCount % MaxSumADFunctionSolver.REVERSE_AFTER_ITERS == 0) {
+		if ((this.iterCount % MaxSumADFunctionSolver.REVERSE_AFTER_ITERS) == 0) {
 			this.direction = !this.direction;
 		}
 
@@ -92,6 +93,13 @@ public class MaxSumADFunctionSolver extends MaxSumFunctionSolver {
 	@Override
 	public Class<? extends BiPartiteGraphSolver> getCounterPart() {
 		return MaxSumADVariableSolver.class;
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		this.iterCount = 0;
+		this.direction = true;
 	}
 
 }

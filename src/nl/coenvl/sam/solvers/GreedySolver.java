@@ -81,7 +81,7 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
 		this.myVariable.setValue(assign);
 		this.context.setAssignment(this.myVariable, assign);
 
-		HashMessage nextMessage = new HashMessage(GreedySolver.ASSIGN_VAR);
+		HashMessage nextMessage = new HashMessage(this.myVariable.getID(), GreedySolver.ASSIGN_VAR);
 		nextMessage.put("cpa", this.context);
 
 		// Maybe it would be better if I would send the update message 1 by 1.
@@ -110,7 +110,7 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
 
 			this.pickVar(pa);
 		} else {
-			System.err.println("Unexpected message of type " + m.getType());
+			// System.err.println("Unexpected message of type " + m.getType());
 			return;
 		}
 	}
@@ -122,7 +122,18 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
 	 */
 	@Override
 	public void reset() {
-		this.myVariable.clear();
+		super.reset();
+		this.context.clear();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see nl.coenvl.sam.solvers.Solver#tick()
+	 */
+	@Override
+	public void tick() {
+		// Do nothing
 	}
 
 }

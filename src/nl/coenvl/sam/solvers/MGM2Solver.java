@@ -46,7 +46,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @since 2 april 2015
  *
  */
-public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> implements IterativeSolver {
+public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> implements Solver {
 
 	/*
 	 * Note: For now I cannot make it generic since GSON won't properly encode the Offer lists.
@@ -89,24 +89,21 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 
 	public MGM2Solver(Agent<IntegerVariable, Integer> agent) {
 		super(agent);
-	}
 
-	@Override
-	public synchronized void init() {
 		this.algoState = State.Value;
 		this.myProblemContext = new AssignmentMap<>();
 		this.receivedOffers = new LinkedList<>();
 		this.neighborGains = new AssignmentMap<>();
+	}
 
-		// So that it will not try to pick a local best at first
-		this.committedOffer = null;
-		this.isOfferer = false;
+	@Override
+	public synchronized void init() {
 		this.myVariable.setValue(this.myVariable.getRandomValue());
 	}
 
 	@Override
 	public synchronized void push(Message m) {
-		final UUID source = m.getUUID("source");
+		final UUID source = m.getSource();
 
 		if (m.getType().equals(MGM2Solver.UPDATE_VALUE)) {
 			final Integer value = m.getInteger("value");
@@ -160,7 +157,7 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 			this.committedOffer = null;
 
 		} else {
-			throw new RuntimeException("Unexpected message: " + m.getType());
+			// throw new RuntimeException("Unexpected message: " + m.getType());
 		}
 	}
 
@@ -200,10 +197,8 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 	 * This function is exactly the same as MGMSolver.sendValue()
 	 */
 	private void sendValue() {
-		final Message updateMsg = new HashMessage(MGM2Solver.UPDATE_VALUE);
-
+		final Message updateMsg = new HashMessage(this.myVariable.getID(), MGM2Solver.UPDATE_VALUE);
 		updateMsg.put("value", this.myVariable.getValue());
-		updateMsg.put("source", this.myVariable.getID());
 
 		this.sendToNeighbors(updateMsg);
 	}
@@ -215,6 +210,7 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 	private void sendOffer() {
 		// First determine whether we will offer or receive
 		if (Math.random() > MGM2Solver.OFFER_PROBABILITY) {
+			this.isOfferer = true;
 
 			// Select a random neighbor
 			RandomAccessVector<UUID> list = new RandomAccessVector<>();
@@ -243,13 +239,10 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 			}
 
 			// Send the offers to the randomly selected neighbor
-			Message offerMessage = new HashMessage(MGM2Solver.OFFER);
-			offerMessage.put("source", this.myVariable.getID());
+			Message offerMessage = new HashMessage(this.myVariable.getID(), MGM2Solver.OFFER);
 			offerMessage.put("offers", offerList);
 
 			MailMan.sendMessage(neighbor, offerMessage);
-
-			this.isOfferer = true;
 		} else {
 			this.isOfferer = false;
 		}
@@ -281,7 +274,7 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 				suggestedOffer.receiverReduction = before - val;
 				double globalReduction =
 						MGM2Solver.computeGlobalGain(suggestedOffer.offererReduction, suggestedOffer.receiverReduction);
-				if (globalReduction > 0 && globalReduction > bestGain) {
+				if ((globalReduction > 0) && (globalReduction > bestGain)) {
 					bestGain = globalReduction;
 					bestOffer = suggestedOffer;
 				}
@@ -289,8 +282,7 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 
 			// Send accept if there is a global reduction
 			if (bestOffer != null) {
-				Message accept = new HashMessage(MGM2Solver.ACCEPT);
-				accept.put("source", this.myVariable.getID());
+				Message accept = new HashMessage(this.myVariable.getID(), MGM2Solver.ACCEPT);
 				accept.put("offer", bestOffer.toJson());
 
 				// System.out.println(this.parent.getName() + " accepts offer from " + bestOffer.offerer.getName());
@@ -309,8 +301,8 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 
 	private void sendGain() {
 		// System.out.println(this.parent.getName() + " sending gain messages");
-		Message gainMessage = new HashMessage(MGM2Solver.GAIN);
-		gainMessage.put("source", this.myVariable.getID());
+		Message gainMessage = new HashMessage(this.myVariable.getID(), MGM2Solver.GAIN);
+
 		if (this.committedOffer != null) {
 
 			this.bestLocalReduction = MGM2Solver.computeGlobalGain(this.committedOffer.offererReduction,
@@ -368,8 +360,8 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 				if (this.bestLocalReduction > bestNeighborReduction) {
 					this.myVariable.setValue(this.bestLocalAssignment);
 				}
-				if (this.bestLocalReduction == bestNeighborReduction
-						&& this.myVariable.getID().compareTo(bestNeighbor) < 0) {
+				if ((this.bestLocalReduction == bestNeighborReduction)
+						&& (this.myVariable.getID().compareTo(bestNeighbor) < 0)) {
 					this.myVariable.setValue(this.bestLocalAssignment);
 				}
 			} catch (InvalidValueException e) {
@@ -388,16 +380,13 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 
 			Double bestNeighborReduction = Double.MIN_VALUE;
 			for (UUID id : this.parent.getConstraintIds()) {
-				if (id != partner && this.neighborGains.get(id) > bestNeighborReduction) {
+				if ((id != partner) && (this.neighborGains.get(id) > bestNeighborReduction)) {
 					bestNeighborReduction = this.neighborGains.get(id);
 				}
 			}
 
 			if (this.bestLocalReduction > bestNeighborReduction) {
-				Message goMessage = new HashMessage(MGM2Solver.GO);
-				// This is not strictly necessary, but do it for assertion later on
-				goMessage.put("source", this.myVariable.getID());
-				// System.out.println(this.parent.getName() + " GO with partner " + partner.getName());
+				Message goMessage = new HashMessage(this.myVariable.getID(), MGM2Solver.GO);
 				MailMan.sendMessage(partner, goMessage);
 			}
 
@@ -410,10 +399,15 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 	@Override
 	public void reset() {
 		this.myVariable.clear();
+
+		this.algoState = State.Value;
+		this.myProblemContext.clear();
+		this.receivedOffers.clear();
+		this.neighborGains.clear();
 	}
 
 	private static double computeGlobalGain(double localGain, double remoteGain) {
-		return localGain + remoteGain - Math.abs(localGain - remoteGain);
+		return (localGain + remoteGain) - Math.abs(localGain - remoteGain);
 	}
 
 	public static Offer fromJson(String str) {

@@ -43,26 +43,28 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  */
 public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
 
+	public static final String ROOTNAME_PROPERTY = "isRoot";
+
 	protected static final String ASSIGN_VAR = "CoCoSolver:PickAVar";
 	protected static final String COST_MSG = "CoCoSolver:CostOfAssignments";
 	protected static final String INQUIRE_MSG = "CoCoSolver:InquireAssignment";
 
-	private List<CostMap<V>> receivedMaps;
+	protected List<CostMap<V>> receivedMaps;
 	protected AssignmentMap<V> context;
 	protected boolean started;
 
 	public CoCoSolver(Agent<DiscreteVariable<V>, V> parent) {
 		super(parent);
 		this.started = false;
+		this.context = new AssignmentMap<>();
 	}
 
 	/**
 	 * Send an activation message (ASSIGN_VAR) to the non-active neighbors
 	 */
-	private void activateNeighbors() {
-		HashMessage nextMessage = new HashMessage(CoCoSolver.ASSIGN_VAR);
+	protected void activateNeighbors() {
+		HashMessage nextMessage = new HashMessage(this.myVariable.getID(), CoCoSolver.ASSIGN_VAR);
 		nextMessage.put("cpa", this.context);
-		nextMessage.put("source", this.myVariable.getID());
 
 		this.sendToNeighbors(nextMessage);
 	}
@@ -74,14 +76,16 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 */
 	@Override
 	public void init() {
-		this.context = new AssignmentMap<>();
+		if (this.isRoot()) {
+			this.push(new HashMessage(null, CoCoSolver.ASSIGN_VAR));
+		}
 	}
 
 	/**
 	 * This function is called when all cost messages have arrived and I can now make a decision on how to assign the
 	 * variable
 	 */
-	private void pickValue() {
+	protected void pickValue() {
 		// Gather all of the results and get the best assignment for me
 		double bestCost = Double.MAX_VALUE;
 		RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
@@ -164,7 +168,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 				System.err.println("This never ought to happen!");
 			}
 		} else {
-			System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
+			// System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
 			return;
 		}
 	}
@@ -176,10 +180,11 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 */
 	@Override
 	public void reset() {
+		super.reset();
 		this.started = false;
 		this.myVariable.clear();
+		this.context.clear();
 		this.receivedMaps = null;
-		this.context = null;
 	}
 
 	/**
@@ -190,7 +195,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	protected void respond(Message m) {
 		CostMap<V> costMap = new CostMap<>();
 
-		UUID source = m.getUUID("source");
+		UUID source = m.getSource();
 		AssignmentMap<V> pa = this.context.clone(); // Should by now already include the CPA of the source
 
 		// Build the cost map making the strong assumption that I have the same
@@ -219,7 +224,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 		}
 
 		// Respond to source
-		Message response = new HashMessage(CoCoSolver.COST_MSG);
+		Message response = new HashMessage(this.myVariable.getID(), CoCoSolver.COST_MSG);
 		response.put("costMap", costMap);
 		response.put("cpa", this.context);
 
@@ -231,11 +236,24 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 		this.started = true;
 		this.receivedMaps = new ArrayList<>();
 
-		Message m = new HashMessage(CoCoSolver.INQUIRE_MSG);
+		Message m = new HashMessage(this.myVariable.getID(), CoCoSolver.INQUIRE_MSG);
 		m.put("cpa", this.context);
-		m.put("source", this.myVariable.getID());
 
 		this.sendToNeighbors(m);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see nl.coenvl.sam.solvers.Solver#tick()
+	 */
+	@Override
+	public void tick() {
+		// Do nothing
+	}
+
+	protected boolean isRoot() {
+		return this.parent.has(CoCoSolver.ROOTNAME_PROPERTY) && (Boolean) this.parent.get(CoCoSolver.ROOTNAME_PROPERTY);
 	}
 
 }

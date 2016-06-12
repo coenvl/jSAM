@@ -37,9 +37,11 @@ public interface Message extends Map<String, String> {
 
 	public String getType();
 
+	public UUID getSource();
+
 	public void put(String key, Object value);
 
-	public UUID getUUID(String key);
+	// public UUID getUUID(String key);
 
 	public Integer getInteger(String key);
 

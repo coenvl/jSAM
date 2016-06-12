@@ -36,12 +36,11 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @since 11 dec. 2014
  *
  */
-public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
+public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
 
 	public static final double CHANGE_TO_EQUAL_PROB = 0.5;
 	public static final double CHANGE_TO_IMPROVE_PROB = 0.5;
 	public static final String UPDATE_VALUE = "DSASolver:Value";
-	public static final String KEY_VARID = "varID";
 	public static final String KEY_VARVALUE = "value";
 
 	private AssignmentMap<V> context;
@@ -73,7 +72,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 	@Override
 	public synchronized void push(Message m) {
 		if (m.getType().equals(DSASolver.UPDATE_VALUE)) {
-			UUID varId = m.getUUID(DSASolver.KEY_VARID);
+			UUID varId = m.getSource();
 
 			@SuppressWarnings("unchecked")
 			V newValue = (V) m.getInteger(DSASolver.KEY_VARVALUE);
@@ -89,8 +88,8 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 	 */
 	@Override
 	public void reset() {
-		this.context = new AssignmentMap<>();
-		this.myVariable.clear();
+		super.reset();
+		this.context.clear();
 	}
 
 	/**
@@ -123,11 +122,11 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 			return;
 		}
 
-		if (bestCost == oldCost && Math.random() > DSASolver.CHANGE_TO_EQUAL_PROB) {
+		if ((bestCost == oldCost) && (Math.random() > DSASolver.CHANGE_TO_EQUAL_PROB)) {
 			return;
 		}
 
-		if (bestCost < oldCost && Math.random() > DSASolver.CHANGE_TO_IMPROVE_PROB) {
+		if ((bestCost < oldCost) && (Math.random() > DSASolver.CHANGE_TO_IMPROVE_PROB)) {
 			return;
 		}
 
@@ -145,8 +144,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 	private void updateMyValue(V assign) {
 		this.myVariable.setValue(assign);
 
-		HashMessage nextMessage = new HashMessage(DSASolver.UPDATE_VALUE);
-		nextMessage.put(DSASolver.KEY_VARID, this.myVariable.getID());
+		HashMessage nextMessage = new HashMessage(this.myVariable.getID(), DSASolver.UPDATE_VALUE);
 		nextMessage.put(DSASolver.KEY_VARVALUE, assign);
 
 		this.sendToNeighbors(nextMessage);

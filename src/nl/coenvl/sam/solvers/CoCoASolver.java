@@ -50,14 +50,16 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		IDLE
 	}
 
+	public static final String ROOTNAME_PROPERTY = "isRoot";
+
 	private static final String ASSIGN_VAR = "CoCoASolver:PickAVar";
 	private static final String COST_MSG = "CoCoASolver:CostOfAssignments";
 	private static final String CURRENT_STATE = "CoCoASolver:StateChanged";
 	private static final String INQUIRE_MSG = "CoCoASolver:InquireAssignment";
 
 	private final AssignmentMap<State> neighborStates;
+	private final AssignmentMap<V> context;
 
-	private volatile AssignmentMap<V> context;
 	private volatile State currentState;
 	private volatile List<CostMap<V>> receivedMaps;
 
@@ -66,6 +68,9 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 	public CoCoASolver(Agent<DiscreteVariable<V>, V> agent) {
 		super(agent);
 		this.neighborStates = new AssignmentMap<>();
+		this.context = new AssignmentMap<>();
+		this.currentState = State.IDLE;
+		this.uniquenessBound = 1;
 	}
 
 	/*
@@ -75,10 +80,9 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 	 */
 	@Override
 	public void init() {
-		this.currentState = State.IDLE;
-		this.neighborStates.clear();
-		this.context = new AssignmentMap<>();
-		this.uniquenessBound = 1;
+		if (this.isRoot()) {
+			this.push(new HashMessage(null, CoCoASolver.ASSIGN_VAR));
+		}
 	}
 
 	/*
@@ -97,7 +101,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 
 		if (m.getType().equals(CoCoASolver.ASSIGN_VAR)) {
 			// Check if we are not currently busy or on hold, start
-			if (this.currentState == State.IDLE || this.currentState == State.HOLD) {
+			if ((this.currentState == State.IDLE) || (this.currentState == State.HOLD)) {
 				this.updateLocalState(State.ACTIVE);
 				this.sendInquireMsgs();
 			}
@@ -113,7 +117,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		} else if (m.getType().equals(CoCoASolver.CURRENT_STATE)) {
 			this.updateRemoteState(m);
 		} else {
-			System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
+			// System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
 			return;
 		}
 	}
@@ -125,10 +129,11 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 	 */
 	@Override
 	public void reset() {
-		this.myVariable.clear();
+		super.reset();
 		this.neighborStates.clear();
+		this.context.clear();
+
 		this.receivedMaps = null;
-		this.context = null;
 		this.currentState = State.IDLE;
 	}
 
@@ -136,9 +141,8 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		// Create a map for storing incoming costmap messages
 		this.receivedMaps = new ArrayList<>();
 
-		Message m = new HashMessage(CoCoASolver.INQUIRE_MSG);
+		Message m = new HashMessage(this.myVariable.getID(), CoCoASolver.INQUIRE_MSG);
 		m.put("cpa", this.context);
-		m.put("source", this.myVariable.getID());
 
 		this.sendToNeighbors(m);
 	}
@@ -151,7 +155,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 	private synchronized void respond(Message m) {
 		CostMap<V> costMap = new CostMap<>();
 
-		UUID source = m.getUUID("source");
+		UUID source = m.getSource();
 		AssignmentMap<V> pa = this.context.clone(); // Should by now already include the CPA of the source
 
 		// Build the cost map making the strong assumption that I have the same
@@ -180,7 +184,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		}
 
 		// Respond to source
-		Message response = new HashMessage(CoCoASolver.COST_MSG);
+		Message response = new HashMessage(this.myVariable.getID(), CoCoASolver.COST_MSG);
 		response.put("costMap", costMap);
 		response.put("cpa", this.context);
 
@@ -262,8 +266,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 	private void updateLocalState(State newState) {
 		this.currentState = newState;
 
-		Message updateMessage = new HashMessage(CoCoASolver.CURRENT_STATE);
-		updateMessage.put("source", this.myVariable.getID());
+		Message updateMessage = new HashMessage(this.myVariable.getID(), CoCoASolver.CURRENT_STATE);
 		updateMessage.put("state", newState.name());
 		updateMessage.put("cpa", this.context);
 
@@ -271,21 +274,21 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 	}
 
 	private void updateRemoteState(Message m) {
-		UUID source = m.getUUID("source");
+		UUID source = m.getSource();
 		State newState = State.valueOf(m.get("state"));
 		this.neighborStates.put(source, newState);
 
-		if (newState == State.HOLD && this.currentState == State.HOLD && this.getActiveNeighbors() < 1) {
+		if ((newState == State.HOLD) && (this.currentState == State.HOLD) && (this.getActiveNeighbors() < 1)) {
 			this.receivedMaps.clear();
 			this.uniquenessBound++;
 			// System.err.println("Increasing the uniqueness bound!");
 			this.updateLocalState(State.ACTIVE); // break the deadlock
 			this.sendInquireMsgs();
-		} else if (newState == State.DONE && this.currentState == State.HOLD) {
+		} else if ((newState == State.DONE) && (this.currentState == State.HOLD)) {
 			this.receivedMaps.clear();
 			this.updateLocalState(State.ACTIVE);
 			this.sendInquireMsgs();
-		} else if (newState == State.DONE && this.currentState == State.DONE) {
+		} else if ((newState == State.DONE) && (this.currentState == State.DONE)) {
 			this.activateNeighbors();
 		}
 
@@ -295,15 +298,14 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 	 * Send an activation message (ASSIGN_VAR) to the non-active neighbors
 	 */
 	private void activateNeighbors() {
-		HashMessage nextMessage = new HashMessage(CoCoASolver.ASSIGN_VAR);
+		HashMessage nextMessage = new HashMessage(this.myVariable.getID(), CoCoASolver.ASSIGN_VAR);
 		nextMessage.put("cpa", this.context);
-		nextMessage.put("source", this.myVariable.getID());
 
 		// Iterate over the set until we found a non-activated neighbor
 		for (UUID neighborid : this.parent.getConstraintIds()) {
 			// neighbor.push(nextMessage);
-			if (!this.neighborStates.containsKey(neighborid) || (this.neighborStates.get(neighborid) != State.ACTIVE
-					&& this.neighborStates.get(neighborid) != State.DONE)) {
+			if (!this.neighborStates.containsKey(neighborid) || ((this.neighborStates.get(neighborid) != State.ACTIVE)
+					&& (this.neighborStates.get(neighborid) != State.DONE))) {
 				MailMan.sendMessage(neighborid, nextMessage);
 				return;
 			}
@@ -325,6 +327,20 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		}
 
 		return activeNeighbors;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see nl.coenvl.sam.solvers.Solver#tick()
+	 */
+	@Override
+	public void tick() {
+		// Do nothing
+	}
+
+	protected boolean isRoot() {
+		return this.parent.has(CoCoSolver.ROOTNAME_PROPERTY) && (Boolean) this.parent.get(CoCoSolver.ROOTNAME_PROPERTY);
 	}
 
 }

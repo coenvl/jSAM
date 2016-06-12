@@ -55,4 +55,7 @@ public abstract class AbstractSolver<T extends Variable<V>, V> {
 		return this.parent.getConstraintIds().size();
 	}
 
+	protected void reset() {
+		this.myVariable.clear();
+	}
 }

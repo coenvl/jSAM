@@ -56,7 +56,7 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
 		super.push(m);
 
 		if (m.containsKey("value")) {
-			this.knownValues.put(m.getUUID("source"), m.getInteger("value"));
+			this.knownValues.put(m.getSource(), m.getInteger("value"));
 		}
 	}
 
@@ -68,7 +68,7 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
 	@Override
 	public void reset() {
 		super.reset();
-		this.receivedCosts.clear();
+		this.knownValues.clear();
 	}
 
 	/*
@@ -81,7 +81,7 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
 	@Override
 	public synchronized void tick() {
 		this.iterCount++;
-		if (this.iterCount % MaxSumADFunctionSolver.REVERSE_AFTER_ITERS == 0) {
+		if ((this.iterCount % MaxSumADFunctionSolver.REVERSE_AFTER_ITERS) == 0) {
 			this.direction = !this.direction;
 		}
 
@@ -146,8 +146,7 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
 				costMap.put(value, minCost);
 			}
 
-			Message msg = new HashMessage("FUN2VAR");
-			msg.put("source", this.constraintAgent.getID());
+			Message msg = new HashMessage(this.constraintAgent.getID(), "FUN2VAR");
 			msg.put("costMap", costMap);
 			MailMan.sendMessage(target, msg);
 		}

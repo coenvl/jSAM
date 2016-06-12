@@ -41,7 +41,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @since 11 apr. 2014
  *
  */
-public class ReCoCoSolverWorksGreat<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
+public class ReCoCoSolverWorksGreat<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
 
 	private static final String ASSIGN_VAR = "ReCoCoSolver:PickAVar";
 	private static final String COST_MSG = "ReCoCoSolver:CostOfAssignments";
@@ -55,6 +55,7 @@ public class ReCoCoSolverWorksGreat<V> extends AbstractSolver<DiscreteVariable<V
 	public ReCoCoSolverWorksGreat(Agent<DiscreteVariable<V>, V> parent) {
 		super(parent);
 		this.started = false;
+		this.context = new AssignmentMap<>();
 	}
 
 	/**
@@ -75,7 +76,7 @@ public class ReCoCoSolverWorksGreat<V> extends AbstractSolver<DiscreteVariable<V
 	 */
 	@Override
 	public void init() {
-		this.context = new AssignmentMap<>();
+		// Do nothing
 	}
 
 	@Override
@@ -173,7 +174,7 @@ public class ReCoCoSolverWorksGreat<V> extends AbstractSolver<DiscreteVariable<V
 		} else if (m.getType().equals(ReCoCoSolverWorksGreat.COST_MSG)) {
 			this.processCostMessage(m);
 		} else {
-			System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
+			// System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
 			return;
 		}
 	}

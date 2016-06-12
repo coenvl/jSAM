@@ -58,11 +58,6 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 		super(agent);
 		this.neighborImpacts = new CostMap<>();
 		this.constraintChanges = new HashMap<>();
-	}
-
-	@Override
-	public synchronized void init() {
-		super.init();
 		this.algoState = State.SENDVALUE;
 	}
 
@@ -71,7 +66,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 		super.push(m);
 
 		if (m.getType().equals(MCSMGMSolver.IMPACT_VALUE)) {
-			this.neighborImpacts.put(m.getUUID("source"), m.getDouble("delta"));
+			this.neighborImpacts.put(m.getSource(), m.getDouble("delta"));
 		}
 	}
 
@@ -127,8 +122,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 			}
 
 			// Inform the neighbors
-			HashMessage m = new HashMessage(MCSMGMSolver.IMPACT_VALUE);
-			m.put("source", this.myVariable.getID());
+			HashMessage m = new HashMessage(this.myVariable.getID(), MCSMGMSolver.IMPACT_VALUE);
 
 			// Only add delta if we want to propagate back our cost
 			if (delta > 0) {
@@ -197,9 +191,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 		this.bestLocalReduction = before - bestCost;
 		this.bestLocalAssignment = bestAssignment;
 
-		Message lrMsg = new HashMessage(MGMSolver.LOCAL_REDUCTION);
-
-		lrMsg.put("source", this.myVariable.getID());
+		Message lrMsg = new HashMessage(this.myVariable.getID(), MGMSolver.LOCAL_REDUCTION);
 		lrMsg.put("LR", this.bestLocalReduction);
 
 		this.sendToNeighbors(lrMsg);
@@ -210,6 +202,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 		super.reset();
 		this.neighborImpacts.clear();
 		this.constraintChanges.clear();
+		this.algoState = State.SENDVALUE;
 	}
 
 	private class ConstraintKey {
@@ -232,9 +225,9 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + ((this.hisValue == null) ? 0 : this.hisValue.hashCode());
-			result = prime * result + ((this.myValue == null) ? 0 : this.myValue.hashCode());
-			result = prime * result + ((this.neighbor == null) ? 0 : this.neighbor.hashCode());
+			result = (prime * result) + ((this.hisValue == null) ? 0 : this.hisValue.hashCode());
+			result = (prime * result) + ((this.myValue == null) ? 0 : this.myValue.hashCode());
+			result = (prime * result) + ((this.neighbor == null) ? 0 : this.neighbor.hashCode());
 			return result;
 		}
 

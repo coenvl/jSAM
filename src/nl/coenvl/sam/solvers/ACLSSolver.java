@@ -38,7 +38,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @version 0.1
  * @since 11 dec. 2015
  */
-public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
+public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
 
 	protected enum State {
 		SENDVALUE,
@@ -60,6 +60,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 		super(agent);
 		this.myProblemContext = new AssignmentMap<>();
 		this.impactCosts = new CostMap<>();
+		this.currentState = State.SENDVALUE;
 	}
 
 	/*
@@ -69,7 +70,6 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 */
 	@Override
 	public synchronized void init() {
-		this.currentState = State.SENDVALUE;
 		this.myVariable.setValue(this.myVariable.getRandomValue());
 	}
 
@@ -80,7 +80,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 */
 	@Override
 	public synchronized void push(Message m) {
-		final UUID source = m.getUUID("source");
+		final UUID source = m.getSource();
 
 		if (m.getType().equals(ACLSSolver.UPDATE_VALUE)) {
 			@SuppressWarnings("unchecked")
@@ -121,9 +121,8 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 
 	private void sendValue() {
 		this.impactCosts.clear();
-		Message updateMsg = new HashMessage(ACLSSolver.UPDATE_VALUE);
+		Message updateMsg = new HashMessage(this.myVariable.getID(), ACLSSolver.UPDATE_VALUE);
 
-		updateMsg.put("source", this.myVariable.getID());
 		updateMsg.put("value", this.myVariable.getValue());
 
 		super.sendToNeighbors(updateMsg);
@@ -156,7 +155,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 		}
 
 		// Send the proposal to all neighbors
-		Message updateMsg = new HashMessage(ACLSSolver.PROPOSED_UPDATE);
+		Message updateMsg = new HashMessage(this.myVariable.getID(), ACLSSolver.PROPOSED_UPDATE);
 
 		updateMsg.put("source", this.myVariable.getID());
 		updateMsg.put("proposal", this.myProposal);
@@ -169,7 +168,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 */
 	private void replyWithLocalCost(Message m) {
 		// Compute current cost
-		final UUID neighbor = m.getUUID("source");
+		final UUID neighbor = m.getSource();
 		final String proposal = m.get("proposal");
 		double impact;
 
@@ -190,8 +189,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 		}
 
 		// And send back impact such that negative impact means improvement
-		Message impactMsg = new HashMessage(ACLSSolver.IMPACT_MESSAGE);
-		impactMsg.put("source", this.myVariable.getID());
+		Message impactMsg = new HashMessage(this.myVariable.getID(), ACLSSolver.IMPACT_MESSAGE);
 		impactMsg.put("costImpact", impact);
 		MailMan.sendMessage(neighbor, impactMsg);
 	}
@@ -219,7 +217,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 			totalImpact += impact;
 		}
 
-		if (totalImpact < 0 && (new Random()).nextDouble() < ACLSSolver.UPDATE_PROBABILITY) {
+		if ((totalImpact < 0) && ((new Random()).nextDouble() < ACLSSolver.UPDATE_PROBABILITY)) {
 			this.myVariable.setValue(proposedValue);
 		}
 	}
@@ -231,8 +229,11 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 	 */
 	@Override
 	public void reset() {
+		super.reset();
 		this.myProblemContext.clear();
 		this.impactCosts.clear();
+		this.currentState = State.SENDVALUE;
+		this.myProposal = null;
 	}
 
 }

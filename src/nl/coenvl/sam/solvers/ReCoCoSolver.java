@@ -33,9 +33,7 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @since 11 apr. 2014
  *
  */
-public class ReCoCoSolver<V> extends CoCoSolver<V> implements IterativeSolver {
-
-	private boolean isRoot;
+public class ReCoCoSolver<V> extends CoCoSolver<V> {
 
 	public ReCoCoSolver(Agent<DiscreteVariable<V>, V> parent) {
 		super(parent);
@@ -44,13 +42,9 @@ public class ReCoCoSolver<V> extends CoCoSolver<V> implements IterativeSolver {
 	@Override
 	public synchronized void tick() {
 		this.started = false;
-		if (this.isRoot) {
+		if (this.isRoot()) {
 			this.sendInquireMsgs();
 		}
-	}
-
-	public synchronized void setRoot() {
-		this.isRoot = true;
 	}
 
 	/*
@@ -75,7 +69,7 @@ public class ReCoCoSolver<V> extends CoCoSolver<V> implements IterativeSolver {
 		} else if (m.getType().equals(CoCoSolver.COST_MSG)) {
 			this.processCostMessage(m);
 		} else {
-			System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
+			// System.err.println(this.getClass().getName() + ": Unexpected message of type " + m.getType());
 			return;
 		}
 	}

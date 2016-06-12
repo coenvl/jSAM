@@ -34,7 +34,7 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @since 17 okt. 2014
  *
  */
-public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
+public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
 
 	private enum State {
 		SENDVALUE,
@@ -57,17 +57,17 @@ public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 		super(agent);
 		this.myProblemContext = new AssignmentMap<>();
 		this.neighborReduction = new AssignmentMap<>();
+		this.algoState = State.SENDVALUE;
 	}
 
 	@Override
 	public void init() {
-		this.algoState = State.SENDVALUE;
 		this.myVariable.setValue(this.myVariable.getRandomValue());
 	}
 
 	@Override
 	public synchronized void push(Message m) {
-		final UUID source = m.getUUID("source");
+		final UUID source = m.getSource();
 
 		if (m.getType().equals(MGMSolver.UPDATE_VALUE)) {
 			@SuppressWarnings("unchecked")
@@ -100,10 +100,8 @@ public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 	}
 
 	protected void sendValue() {
-		final Message updateMsg = new HashMessage(MGMSolver.UPDATE_VALUE);
-
+		final Message updateMsg = new HashMessage(this.myVariable.getID(), MGMSolver.UPDATE_VALUE);
 		updateMsg.put("value", this.myVariable.getValue());
-		updateMsg.put("source", this.myVariable.getID());
 
 		this.sendToNeighbors(updateMsg);
 	}
@@ -135,9 +133,7 @@ public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 		this.bestLocalReduction = before - bestCost;
 		this.bestLocalAssignment = bestAssignment;
 
-		final Message lrMsg = new HashMessage(MGMSolver.LOCAL_REDUCTION);
-
-		lrMsg.put("source", this.myVariable.getID());
+		final Message lrMsg = new HashMessage(this.myVariable.getID(), MGMSolver.LOCAL_REDUCTION);
 		lrMsg.put("LR", this.bestLocalReduction);
 
 		this.sendToNeighbors(lrMsg);
@@ -159,7 +155,8 @@ public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 		if (this.bestLocalReduction > bestNeighborReduction) {
 			this.myVariable.setValue(this.bestLocalAssignment);
 		}
-		if (this.bestLocalReduction == bestNeighborReduction && this.myVariable.getID().compareTo(bestNeighbor) < 0) {
+		if ((this.bestLocalReduction == bestNeighborReduction)
+				&& (this.myVariable.getID().compareTo(bestNeighbor) < 0)) {
 			this.myVariable.setValue(this.bestLocalAssignment);
 		}
 	}
@@ -169,6 +166,7 @@ public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 		this.myVariable.clear();
 		this.myProblemContext.clear();
 		this.neighborReduction.clear();
+		this.algoState = State.SENDVALUE;
 	}
 
 }

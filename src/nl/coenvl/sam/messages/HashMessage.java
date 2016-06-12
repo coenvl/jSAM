@@ -40,10 +40,13 @@ public final class HashMessage extends HashMap<String, String> implements Messag
 	 */
 	private static final long serialVersionUID = 6306118222585166399L;
 
-	private String type;
+	private final String type;
 
-	public HashMessage(String type) {
+	private final UUID source;
+
+	public HashMessage(UUID source, String type) {
 		super();
+		this.source = source;
 		this.type = type;
 	}
 
@@ -52,9 +55,14 @@ public final class HashMessage extends HashMap<String, String> implements Messag
 		super.put(key, value.toString());
 	}
 
+	// @Override
+	// public UUID getUUID(String key) {
+	// return UUID.fromString(super.get(key));
+	// }
+
 	@Override
-	public UUID getUUID(String key) {
-		return UUID.fromString(super.get(key));
+	public UUID getSource() {
+		return this.source;
 	}
 
 	@Override
@@ -74,7 +82,7 @@ public final class HashMessage extends HashMap<String, String> implements Messag
 
 	@Override
 	public HashMessage clone() {
-		HashMessage clone = new HashMessage(this.type);
+		HashMessage clone = new HashMessage(this.source, this.type);
 		clone.putAll(this);
 		return clone;
 	}

@@ -45,7 +45,7 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	private final String name;
 	private final BiPartiteConstraint<T, V> myConstraint;
 
-	Solver mySolver;
+	private SolverRunner mySolver;
 
 	/**
 	 * @param name
@@ -82,6 +82,16 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	/*
 	 * (non-Javadoc)
 	 *
+	 * @see nl.coenvl.sam.solvers.Solver#tick()
+	 */
+	@Override
+	public void tick() {
+		this.mySolver.tick();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see nl.coenvl.sam.Agent#reset()
 	 */
 	@Override
@@ -93,13 +103,9 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 		this.mySolver = new SolverRunner(solver);
 	}
 
-	public final void setSolver(Solver solver, boolean asynchronous) {
-		if (asynchronous) {
-			this.mySolver = new SolverRunner(solver);
-		} else {
-			// System.err.println("Warning: You are using a synchronous solver!");
-			this.mySolver = solver;
-		}
+	@Override
+	public boolean isFinished() {
+		return this.mySolver.emptyQueue();
 	}
 
 	public T getVariable(UUID id) {
