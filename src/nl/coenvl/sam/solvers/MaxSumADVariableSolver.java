@@ -49,16 +49,6 @@ public class MaxSumADVariableSolver extends MaxSumVariableSolver {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see nl.coenvl.sam.solvers.Solver#init()
-	 */
-	@Override
-	public synchronized void init() {
-		// Do nothing
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
 	 * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
 	 */
 	@Override

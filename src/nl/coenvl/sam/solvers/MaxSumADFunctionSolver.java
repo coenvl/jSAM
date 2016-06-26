@@ -47,16 +47,6 @@ public class MaxSumADFunctionSolver extends MaxSumFunctionSolver {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#init()
-	 */
-	@Override
-	public synchronized void init() {
-		// Do nothing
-	}
-
-	/*
 	 * A message sent from a function-node f to a variable-node x in iteration i includes for each possible value d \in
 	 * Dx the minimal cost of any combination of assignments to the variables involved in f apart from x and the
 	 * assignment of value d to variable x.

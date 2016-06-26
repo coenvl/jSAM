@@ -329,16 +329,6 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		return activeNeighbors;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#tick()
-	 */
-	@Override
-	public void tick() {
-		// Do nothing
-	}
-
 	protected boolean isRoot() {
 		return this.parent.has(CoCoSolver.ROOTNAME_PROPERTY) && (Boolean) this.parent.get(CoCoSolver.ROOTNAME_PROPERTY);
 	}

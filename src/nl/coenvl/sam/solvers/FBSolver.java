@@ -204,14 +204,4 @@ public class FBSolver<V> implements Solver {
 		this.context.clear();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#tick()
-	 */
-	@Override
-	public void tick() {
-		// Do nothing
-	}
-
 }

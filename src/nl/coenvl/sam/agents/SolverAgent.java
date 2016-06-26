@@ -21,20 +21,21 @@
 package nl.coenvl.sam.agents;
 
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.solvers.IterativeSolver;
 import nl.coenvl.sam.solvers.Solver;
 import nl.coenvl.sam.solvers.SolverRunner;
 import nl.coenvl.sam.variables.Variable;
 
 /**
- * In another layer of hierarchy the AbstractSolverAgent provides the functionality that any agent has that contains a
- * solver. The function of this class is to hide the Solving functionality from the rest of the agent.
+ * In another layer of hierarchy the SolverAgent provides the functionality that any agent has that contains a solver.
+ * The function of this class is to hide the Solving functionality from the rest of the agent.
  *
  * @author leeuwencjv
  * @version 0.1
  * @since 11 apr. 2014
  *
  */
-public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> {
+public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> implements IterativeSolver {
 
 	private SolverRunner mySolver;
 
@@ -53,6 +54,7 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> {
 	 */
 	@Override
 	public final synchronized void init() {
+		this.mySolver.startThread();
 		this.mySolver.init();
 	}
 

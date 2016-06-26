@@ -46,7 +46,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @since 2 april 2015
  *
  */
-public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> implements Solver {
+public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> implements IterativeSolver {
 
 	/*
 	 * Note: For now I cannot make it generic since GSON won't properly encode the Offer lists.

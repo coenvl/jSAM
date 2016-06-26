@@ -126,14 +126,4 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
 		this.context.clear();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#tick()
-	 */
-	@Override
-	public void tick() {
-		// Do nothing
-	}
-
 }

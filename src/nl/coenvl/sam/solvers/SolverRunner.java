@@ -32,7 +32,7 @@ import nl.coenvl.sam.messages.Message;
  * @since 4 apr. 2014
  *
  */
-public class SolverRunner implements Solver {
+public class SolverRunner implements IterativeSolver {
 
 	private class Runner implements Runnable {
 
@@ -122,7 +122,9 @@ public class SolverRunner implements Solver {
 	 */
 	@Override
 	public void tick() {
-		this.mySolver.tick();
+		if (this.mySolver instanceof IterativeSolver) {
+			((IterativeSolver) this.mySolver).tick();
+		}
 	}
 
 	/*

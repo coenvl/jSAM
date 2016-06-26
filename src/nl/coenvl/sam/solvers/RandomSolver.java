@@ -68,14 +68,4 @@ public class RandomSolver<T> implements Solver {
 		this.myVariable.clear();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#tick()
-	 */
-	@Override
-	public void tick() {
-		// Does nothing
-	}
-
 }

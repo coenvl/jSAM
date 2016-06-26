@@ -38,7 +38,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @version 0.1
  * @since 11 dec. 2015
  */
-public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
+public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
 
 	protected enum State {
 		SENDVALUE,

@@ -27,7 +27,7 @@ import nl.coenvl.sam.constraints.BiPartiteConstraint;
 import nl.coenvl.sam.constraints.Constraint;
 import nl.coenvl.sam.exceptions.VariableNotInvolvedException;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.solvers.Solver;
+import nl.coenvl.sam.solvers.IterativeSolver;
 import nl.coenvl.sam.solvers.SolverRunner;
 import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.Variable;
@@ -39,7 +39,8 @@ import nl.coenvl.sam.variables.Variable;
  * @version 0.1
  * @since 8 apr. 2016
  */
-public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyOwner implements Agent<T, V> {
+public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyOwner
+		implements Agent<T, V>, IterativeSolver {
 
 	private final UUID address;
 	private final String name;
@@ -66,6 +67,7 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	 */
 	@Override
 	public final synchronized void init() {
+		this.mySolver.startThread();
 		this.mySolver.init();
 	}
 
@@ -99,7 +101,7 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 		this.mySolver.reset();
 	}
 
-	public final void setSolver(Solver solver) {
+	public final void setSolver(IterativeSolver solver) {
 		this.mySolver = new SolverRunner(solver);
 	}
 

@@ -33,7 +33,7 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @since 11 apr. 2014
  *
  */
-public class ReCoCoSolver<V> extends CoCoSolver<V> {
+public class ReCoCoSolver<V> extends CoCoSolver<V> implements IterativeSolver {
 
 	public ReCoCoSolver(Agent<DiscreteVariable<V>, V> parent) {
 		super(parent);

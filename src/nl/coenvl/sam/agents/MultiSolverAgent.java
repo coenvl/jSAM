@@ -21,6 +21,7 @@
 package nl.coenvl.sam.agents;
 
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.solvers.IterativeSolver;
 import nl.coenvl.sam.solvers.Solver;
 import nl.coenvl.sam.solvers.SolverRunner;
 import nl.coenvl.sam.variables.Variable;
@@ -34,7 +35,7 @@ import nl.coenvl.sam.variables.Variable;
  * @version 0.1
  * @since 10 jun. 2016
  */
-public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> {
+public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> implements IterativeSolver {
 
 	private SolverRunner initSolver;
 	private SolverRunner iterativeSolver;
@@ -127,7 +128,7 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
 		this.initSolver = new SolverRunner(solver);
 	}
 
-	public final void setIterativeSolver(Solver solver) {
+	public final void setIterativeSolver(IterativeSolver solver) {
 		this.iterativeSolver = new SolverRunner(solver);
 	}
 

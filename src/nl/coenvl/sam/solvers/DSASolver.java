@@ -36,7 +36,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @since 11 dec. 2014
  *
  */
-public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
+public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
 
 	public static final double CHANGE_TO_EQUAL_PROB = 0.5;
 	public static final double CHANGE_TO_IMPROVE_PROB = 0.5;

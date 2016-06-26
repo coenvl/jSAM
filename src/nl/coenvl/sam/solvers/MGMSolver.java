@@ -34,7 +34,7 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @since 17 okt. 2014
  *
  */
-public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
+public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
 
 	private enum State {
 		SENDVALUE,

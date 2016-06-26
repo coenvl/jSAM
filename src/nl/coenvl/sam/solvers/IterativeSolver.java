@@ -18,8 +18,6 @@
  */
 package nl.coenvl.sam.solvers;
 
-import nl.coenvl.sam.messages.Message;
-
 /**
  * Solver
  *
@@ -28,21 +26,8 @@ import nl.coenvl.sam.messages.Message;
  * @since 19 mrt. 2014
  *
  */
-public interface Solver {
+public interface IterativeSolver extends Solver {
 
-	/**
-	 * If the solver sets the variable as part of it's initialization it should occur in this function. Depending on the
-	 * implementation it may or may not do this. It is imperative that everything OTHER than this should not be part of
-	 * this function, because it may not be called if this algorithm is not considered an "initialization" algorithm
-	 */
-	public void init();
-
-	public void push(Message m);
-
-	/**
-	 * A call to the reset function should reset the solver to the state how it was exactly after it was constructed.
-	 * All fields should be initialized, and calling it immediately after construction should yield no effect.
-	 */
-	public void reset();
+	public void tick();
 
 }
