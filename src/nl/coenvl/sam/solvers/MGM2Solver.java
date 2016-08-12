@@ -214,7 +214,7 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 
 			// Select a random neighbor
 			RandomAccessVector<UUID> list = new RandomAccessVector<>();
-			list.addAll(this.parent.getConstraintIds());
+			list.addAll(this.parent.getConstrainedVariableIds());
 			UUID neighbor = list.randomElement();
 
 			assert (neighbor != null);
@@ -347,7 +347,7 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 
 			Double bestNeighborReduction = Double.MIN_VALUE;
 			UUID bestNeighbor = null;
-			for (UUID id : this.parent.getConstraintIds()) {
+			for (UUID id : this.parent.getConstrainedVariableIds()) {
 				if (this.neighborGains.get(id) > bestNeighborReduction) {
 					bestNeighborReduction = this.neighborGains.get(id);
 					bestNeighbor = id;
@@ -379,7 +379,7 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
 			}
 
 			Double bestNeighborReduction = Double.MIN_VALUE;
-			for (UUID id : this.parent.getConstraintIds()) {
+			for (UUID id : this.parent.getConstrainedVariableIds()) {
 				if ((id != partner) && (this.neighborGains.get(id) > bestNeighborReduction)) {
 					bestNeighborReduction = this.neighborGains.get(id);
 				}

@@ -61,7 +61,7 @@ public class MaxSumADVPVariableSolver extends MaxSumADVariableSolver {
 		}
 
 		// Target represents function node f
-		for (UUID target : this.parent.getConstraintIds()) {
+		for (UUID target : this.variableAgent.getFunctionAdresses()) {
 			if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
 				continue;
 			}

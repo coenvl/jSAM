@@ -302,7 +302,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 		nextMessage.put("cpa", this.context);
 
 		// Iterate over the set until we found a non-activated neighbor
-		for (UUID neighborid : this.parent.getConstraintIds()) {
+		for (UUID neighborid : this.parent.getConstrainedVariableIds()) {
 			// neighbor.push(nextMessage);
 			if (!this.neighborStates.containsKey(neighborid) || ((this.neighborStates.get(neighborid) != State.ACTIVE)
 					&& (this.neighborStates.get(neighborid) != State.DONE))) {

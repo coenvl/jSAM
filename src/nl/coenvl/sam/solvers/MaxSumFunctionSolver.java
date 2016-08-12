@@ -68,12 +68,12 @@ public class MaxSumFunctionSolver extends AbstractSolver<IntegerVariable, Intege
 	 */
 	@Override
 	public synchronized void push(Message m) {
-		// if (m.containsKey("costMap")) {
-		UUID neighbor = m.getSource();
-		@SuppressWarnings("unchecked")
-		CostMap<Integer> costMap = (CostMap<Integer>) m.getMap("costMap");
-		this.receivedCosts.put(neighbor, costMap);
-		// }
+		if (m.getType().equals("VAR2FUN")) {
+			UUID neighbor = m.getSource();
+			@SuppressWarnings("unchecked")
+			CostMap<Integer> costMap = (CostMap<Integer>) m.getMap("costMap");
+			this.receivedCosts.put(neighbor, costMap);
+		}
 	}
 
 	/*
@@ -98,7 +98,7 @@ public class MaxSumFunctionSolver extends AbstractSolver<IntegerVariable, Intege
 		// Only works for binary constraints
 		assert (super.numNeighbors() == 2);
 
-		for (UUID target : this.parent.getConstraintIds()) {
+		for (UUID target : this.parent.getConstrainedVariableIds()) {
 			Message f2v = this.fun2varmessage(target);
 			MailMan.sendMessage(target, f2v);
 		}
@@ -111,12 +111,12 @@ public class MaxSumFunctionSolver extends AbstractSolver<IntegerVariable, Intege
 
 		// For all values of variable
 		CostMap<Integer> costMap = new CostMap<>();
-		for (Integer value : this.constraintAgent.getVariable(target)) {
+		for (Integer value : this.constraintAgent.getVariableWithID(target)) {
 			temp.put(target, value);
 
 			double minCost = Double.MAX_VALUE;
 			// Now we know there is only one other neighbor, so iterate for him
-			for (UUID other : this.parent.getConstraintIds()) {
+			for (UUID other : this.parent.getConstrainedVariableIds()) {
 				if (other == target) {
 					continue;
 				}
@@ -126,7 +126,7 @@ public class MaxSumFunctionSolver extends AbstractSolver<IntegerVariable, Intege
 							"The min cost could not be lowered already, more than one agent in constraint?");
 				}
 
-				for (Integer val2 : this.constraintAgent.getVariable(other)) {
+				for (Integer val2 : this.constraintAgent.getVariableWithID(other)) {
 					temp.put(other, val2);
 					double cost = this.parent.getLocalCostIf(temp);
 

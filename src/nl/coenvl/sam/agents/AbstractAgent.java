@@ -118,7 +118,7 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
 	}
 
 	@Override
-	public Set<UUID> getConstraintIds() {
+	public Set<UUID> getConstrainedVariableIds() {
 		final Set<UUID> set = new HashSet<>();
 
 		for (final Constraint<T, V> c : this.constraints) {

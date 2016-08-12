@@ -93,14 +93,31 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
 		CompareCounter.compare();
 
 		// Per default if the valueMap does not contain both values, the cost is zero
-		if (values == null || !values.containsAssignment(this.var1) || !values.containsAssignment(this.var2)) {
+		if ((values == null) || !values.containsAssignment(targetVariable)) { // ||
+																				// !values.containsAssignment(this.var1)
+																				// ||
+																				// !values.containsAssignment(this.var2))
+																				// {
 			return 0;
 		}
 
+		if (!values.containsAssignment(targetVariable)) {
+			throw new VariableNotInvolvedException("Undefined behavior if target variable is not in valuemap");
+		}
+
+		V value1 = values.getAssignment(this.var1);
+		V value2 = values.getAssignment(this.var2);
+
 		if (targetVariable.equals(this.var1)) {
-			return this.costMatrix1.getCost(values.getAssignment(this.var1), values.getAssignment(this.var2));
+			if (value2 == null) {
+				return this.costMatrix1.meanValueFor(value1);
+			}
+			return this.costMatrix1.getCost(value1, value2);
 		} else if (targetVariable.equals(this.var2)) {
-			return this.costMatrix2.getCost(values.getAssignment(this.var2), values.getAssignment(this.var1));
+			if (value1 == null) {
+				return this.costMatrix2.meanValueFor(value2);
+			}
+			return this.costMatrix2.getCost(value2, value1);
 		} else {
 			throw new VariableNotInvolvedException("Invalid target variable " + targetVariable);
 		}
@@ -159,6 +176,18 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
 				this.matrix.put(val1, xMap);
 				idx1++;
 			}
+		}
+
+		/**
+		 * @param value1
+		 * @return
+		 */
+		public double meanValueFor(V value1) {
+			double sum = 0;
+			for (Double val : this.matrix.get(value1).values()) {
+				sum += val;
+			}
+			return sum / this.matrix.get(value1).size();
 		}
 
 		/**

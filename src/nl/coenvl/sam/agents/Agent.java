@@ -50,7 +50,7 @@ public interface Agent<T extends Variable<V>, V> extends PropertyOwner, Solver {
 
 	public double getLocalCostIf(AssignmentMap<V> valueMap);
 
-	public Set<UUID> getConstraintIds();
+	public Set<UUID> getConstrainedVariableIds();
 
 	public boolean isFinished();
 

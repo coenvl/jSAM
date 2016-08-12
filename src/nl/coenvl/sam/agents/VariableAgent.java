@@ -32,7 +32,7 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  * @version 0.1
  * @since 8 apr. 2016
  */
-public class VariableAgent<T extends DiscreteVariable<V>, V> extends SolverAgent<T, V> {
+public class VariableAgent<T extends DiscreteVariable<V>, V> extends MultiSolverAgent<T, V> {
 
 	private final Set<UUID> functionAddresses;
 
@@ -45,8 +45,7 @@ public class VariableAgent<T extends DiscreteVariable<V>, V> extends SolverAgent
 		this.functionAddresses = new HashSet<>();
 	}
 
-	@Override
-	public Set<UUID> getConstraintIds() {
+	public Set<UUID> getFunctionAdresses() {
 		return this.functionAddresses;
 	}
 

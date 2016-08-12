@@ -145,7 +145,7 @@ public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 	protected void pickValue() {
 		Double bestNeighborReduction = Double.MIN_VALUE;
 		UUID bestNeighbor = null;
-		for (UUID id : this.parent.getConstraintIds()) {
+		for (UUID id : this.parent.getConstrainedVariableIds()) {
 			if (this.neighborReduction.get(id) > bestNeighborReduction) {
 				bestNeighborReduction = this.neighborReduction.get(id);
 				bestNeighbor = id;

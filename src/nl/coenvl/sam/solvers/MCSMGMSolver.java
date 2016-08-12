@@ -101,7 +101,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 	 */
 	private void sendImpact() {
 
-		for (UUID target : this.parent.getConstraintIds()) {
+		for (UUID target : this.parent.getConstrainedVariableIds()) {
 			AssignmentMap<V> pa = new AssignmentMap<>();
 			pa.setAssignment(this.myVariable, this.myVariable.getValue());
 			pa.put(target, this.myProblemContext.get(target));
@@ -146,7 +146,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 		double before = this.parent.getLocalCostIf(this.myProblemContext);
 
 		// First process all the received impact messages
-		for (UUID a : this.parent.getConstraintIds()) {
+		for (UUID a : this.parent.getConstrainedVariableIds()) {
 			// Can we indeed assume that myProblemContext is still up to date?
 			ConstraintKey key = new ConstraintKey(a, this.myVariable.getValue(), this.myProblemContext.get(a));
 
@@ -169,7 +169,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
 			double localCost = 0;
 
 			// for (Agent a : this.parent.getNeighborhood()) {
-			for (UUID a : this.parent.getConstraintIds()) {
+			for (UUID a : this.parent.getConstrainedVariableIds()) {
 				ConstraintKey key = new ConstraintKey(a, assignment, temp.get(a));
 				if (this.constraintChanges.containsKey(key)) {
 					// Add remote cost of neighbor)

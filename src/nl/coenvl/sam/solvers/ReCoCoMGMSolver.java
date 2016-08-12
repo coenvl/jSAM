@@ -117,7 +117,7 @@ public class ReCoCoMGMSolver<V> extends ReCoCoSolver<V> {
 
 		Double bestNeighborReduction = 0.0; // -Double.MAX_VALUE;
 		UUID bestNeighbor = null;
-		for (UUID id : this.parent.getConstraintIds()) {
+		for (UUID id : this.parent.getConstrainedVariableIds()) {
 			double nReduction = this.neighborReductions.get(id);
 			if (nReduction > bestNeighborReduction) {
 				bestNeighborReduction = this.neighborReductions.get(id);

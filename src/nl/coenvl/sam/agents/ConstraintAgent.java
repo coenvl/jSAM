@@ -23,9 +23,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import nl.coenvl.sam.MailMan;
-import nl.coenvl.sam.constraints.BiPartiteConstraint;
 import nl.coenvl.sam.constraints.Constraint;
+import nl.coenvl.sam.exceptions.InvalidValueException;
 import nl.coenvl.sam.exceptions.VariableNotInvolvedException;
+import nl.coenvl.sam.exceptions.VariableNotSetException;
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.solvers.IterativeSolver;
 import nl.coenvl.sam.solvers.SolverRunner;
@@ -44,7 +45,9 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 
 	private final UUID address;
 	private final String name;
-	private final BiPartiteConstraint<T, V> myConstraint;
+	private final Constraint<T, V> myConstraint;
+	private final T var1;
+	private final T var2;
 
 	private SolverRunner mySolver;
 
@@ -52,10 +55,12 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	 * @param name
 	 * @param var
 	 */
-	public ConstraintAgent(String name, BiPartiteConstraint<T, V> constraint) {
+	public ConstraintAgent(String name, Constraint<T, V> constraint, T var1, T var2) {
 		super();
 		this.name = name;
 		this.myConstraint = constraint;
+		this.var1 = var1;
+		this.var2 = var2;
 		this.address = UUID.randomUUID();
 		MailMan.register(this.address, this);
 	}
@@ -110,11 +115,11 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 		return this.mySolver.emptyQueue();
 	}
 
-	public T getVariable(UUID id) {
-		if (this.myConstraint.getFrom().getID().equals(id)) {
-			return this.myConstraint.getFrom();
-		} else if (this.myConstraint.getTo().getID().equals(id)) {
-			return this.myConstraint.getTo();
+	public T getVariableWithID(UUID id) {
+		if (this.var1.getID().equals(id)) {
+			return this.var1;
+		} else if (this.var2.getID().equals(id)) {
+			return this.var2;
 		} else {
 			throw new VariableNotInvolvedException("Variable not part of Constraint!");
 		}
@@ -143,7 +148,7 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	 * @see nl.coenvl.sam.agents.Agent#getConstraintIds()
 	 */
 	@Override
-	public Set<UUID> getConstraintIds() {
+	public Set<UUID> getConstrainedVariableIds() {
 		return this.myConstraint.getVariableIds();
 	}
 
@@ -154,8 +159,7 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	 */
 	@Override
 	public double getLocalCost() {
-		return this.myConstraint.getCost(this.myConstraint.getFrom())
-				+ this.myConstraint.getCost(this.myConstraint.getTo());
+		return this.myConstraint.getCost(this.var1) + this.myConstraint.getCost(this.var2);
 	}
 
 	/*
@@ -165,8 +169,7 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	 */
 	@Override
 	public double getLocalCostIf(AssignmentMap<V> valueMap) {
-		return this.myConstraint.getCostIf(this.myConstraint.getFrom(), valueMap)
-				+ this.myConstraint.getCostIf(this.myConstraint.getTo(), valueMap);
+		return this.myConstraint.getCostIf(this.var1, valueMap) + this.myConstraint.getCostIf(this.var2, valueMap);
 	}
 
 	/*
@@ -174,9 +177,62 @@ public class ConstraintAgent<T extends Variable<V>, V> extends AbstractPropertyO
 	 *
 	 * @see nl.coenvl.sam.agents.Agent#getVariable()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public T getVariable() {
-		return null;
+		return (T) new Variable<V>() {
+
+			@Override
+			public void clear() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public Variable<V> clone() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public V getLowerBound() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public String getName() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public V getRandomValue() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public V getUpperBound() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public V getValue() throws VariableNotSetException {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public boolean isSet() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public Variable<V> setValue(V value) throws InvalidValueException {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+			@Override
+			public UUID getID() {
+				throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
+			}
+
+		};
 		// throw new UnsupportedOperationException("Cannot get the variable of ConstraintAgent");
 	}
 

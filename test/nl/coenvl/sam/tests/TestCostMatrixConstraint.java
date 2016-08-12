@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import nl.coenvl.sam.constraints.CostMatrixConstraint;
 import nl.coenvl.sam.constraints.InequalityConstraint;
+import nl.coenvl.sam.constraints.PreferentialEqualityConstraint;
 import nl.coenvl.sam.constraints.RandomConstraint;
 import nl.coenvl.sam.constraints.SemiRandomConstraint;
 import nl.coenvl.sam.constraints.SymmetricRandomConstraint;
@@ -207,6 +208,58 @@ public class TestCostMatrixConstraint {
 
 			Assert.assertEquals(cost, ic.getCostIf(var1, valueMap), 0);
 			Assert.assertEquals(cost, ic.getCostIf(var2, valueMap), 0);
+		}
+	}
+
+	@Test
+	public void testPreferentialEqualityConstraint() throws InvalidDomainException {
+		DiscreteVariable<Integer> var1 = new IntegerVariable(0, 5);
+		DiscreteVariable<Integer> var2 = new IntegerVariable(0, 5);
+
+		double ineqCost = 1000;
+		double[] pref1 = new double[var1.getRange()];
+		double[] pref2 = new double[var2.getRange()];
+
+		for (int i = 0; i < pref1.length; i++) {
+			pref1[i] = Math.random();
+			pref2[i] = Math.random();
+		}
+
+		PreferentialEqualityConstraint<Integer> ic =
+				new PreferentialEqualityConstraint<>(var1, var2, pref1, pref2, ineqCost);
+
+		for (Integer v1 : var1) {
+			for (Integer v2 : var2) {
+				var1.setValue(v1);
+				var2.setValue(v2);
+
+				if (v1 == v2) {
+					Assert.assertEquals(pref1[v1], ic.getCost(var1), 0.0);
+					Assert.assertEquals(pref2[v1], ic.getCost(var2), 0.0);
+					Assert.assertEquals(pref1[v1] + pref2[v2], ic.getExternalCost(), 0.0);
+				} else {
+					Assert.assertEquals(ineqCost, ic.getCost(var1), 0.0);
+					Assert.assertEquals(ineqCost, ic.getCost(var2), 0.0);
+					Assert.assertEquals(2 * ineqCost, ic.getExternalCost(), 0.0);
+				}
+			}
+		}
+
+		// Test getCostIf
+		AssignmentMap<Integer> valueMap = new AssignmentMap<>();
+		for (Integer v1 : var1) {
+			valueMap.setAssignment(var1, v1);
+			for (Integer v2 : var2) {
+				valueMap.setAssignment(var2, v2); // These are invalid values, but is allowed by inequalityConstraint
+
+				if (v1 == v2) {
+					Assert.assertEquals(pref1[v1], ic.getCostIf(var1, valueMap), 0.0);
+					Assert.assertEquals(pref2[v1], ic.getCostIf(var2, valueMap), 0.0);
+				} else {
+					Assert.assertEquals(ineqCost, ic.getCostIf(var1, valueMap), 0.0);
+					Assert.assertEquals(ineqCost, ic.getCostIf(var2, valueMap), 0.0);
+				}
+			}
 		}
 	}
 

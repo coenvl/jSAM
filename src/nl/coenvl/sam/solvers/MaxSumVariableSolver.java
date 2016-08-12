@@ -41,9 +41,11 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 		implements IterativeSolver, BiPartiteGraphSolver {
 
 	private final Map<UUID, CostMap<Integer>> receivedCosts;
+	protected final VariableAgent<IntegerVariable, Integer> variableAgent;
 
 	public MaxSumVariableSolver(VariableAgent<IntegerVariable, Integer> agent) {
 		super(agent);
+		this.variableAgent = agent;
 		this.receivedCosts = new HashMap<>();
 	}
 
@@ -65,12 +67,12 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 	@Override
 	public synchronized void push(Message m) {
 
-		// if (m.containsKey("costMap")) {
-		UUID neighbor = m.getSource();
-		@SuppressWarnings("unchecked")
-		CostMap<Integer> costMap = (CostMap<Integer>) m.getMap("costMap");
-		this.receivedCosts.put(neighbor, costMap);
-		// }
+		if (m.getType().equals("FUN2VAR")) {
+			UUID neighbor = m.getSource();
+			@SuppressWarnings("unchecked")
+			CostMap<Integer> costMap = (CostMap<Integer>) m.getMap("costMap");
+			this.receivedCosts.put(neighbor, costMap);
+		}
 
 	}
 
@@ -92,7 +94,7 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 	@Override
 	public synchronized void tick() {
 		// Target represents function node f
-		for (UUID target : this.parent.getConstraintIds()) {
+		for (UUID target : this.variableAgent.getFunctionAdresses()) {
 			Message v2f = this.var2funMessage(target);
 
 			MailMan.sendMessage(target, v2f);
@@ -112,7 +114,7 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 
 			// The sum of costs for this value it received from all function neighbors apart from f in iteration i −
 			// 1.
-			for (UUID neighbor : this.parent.getConstraintIds()) {
+			for (UUID neighbor : this.variableAgent.getFunctionAdresses()) {
 				if (neighbor != target) {
 					if (this.receivedCosts.containsKey(neighbor)
 							&& this.receivedCosts.get(neighbor).containsKey(value)) {
@@ -142,7 +144,7 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 
 		for (Integer value : this.myVariable) {
 			double valueCost = 0;
-			for (UUID neighbor : this.parent.getConstraintIds()) {
+			for (UUID neighbor : this.variableAgent.getFunctionAdresses()) {
 				if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(value)) {
 					valueCost += this.receivedCosts.get(neighbor).get(value);
 				}

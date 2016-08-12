@@ -45,14 +45,14 @@ public abstract class AbstractSolver<T extends Variable<V>, V> {
 	}
 
 	protected void sendToNeighbors(Message m) {
-		Set<UUID> set = this.parent.getConstraintIds();
+		Set<UUID> set = this.parent.getConstrainedVariableIds();
 		for (UUID target : set) {
 			MailMan.sendMessage(target, m);
 		}
 	}
 
 	protected int numNeighbors() {
-		return this.parent.getConstraintIds().size();
+		return this.parent.getConstrainedVariableIds().size();
 	}
 
 	protected void reset() {

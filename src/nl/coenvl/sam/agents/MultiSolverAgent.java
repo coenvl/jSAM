@@ -132,6 +132,14 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
 		this.iterativeSolver = new SolverRunner(solver);
 	}
 
+	public final void setSolver(Solver solver) {
+		if (solver instanceof IterativeSolver) {
+			this.setIterativeSolver((IterativeSolver) solver);
+		} else {
+			this.setInitSolver(solver);
+		}
+	}
+
 	@Override
 	public boolean isFinished() {
 		return this.initSolver.emptyQueue() && this.iterativeSolver.emptyQueue();

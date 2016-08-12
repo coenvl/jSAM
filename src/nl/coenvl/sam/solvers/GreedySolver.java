@@ -51,6 +51,16 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
 	@Override
 	public void init() {
 		// Nothing to do here
+		if (this.isRoot()) {
+			this.pickVar(new AssignmentMap<V>());
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean isRoot() {
+		return this.parent.has(CoCoSolver.ROOTNAME_PROPERTY) && (Boolean) this.parent.get(CoCoSolver.ROOTNAME_PROPERTY);
 	}
 
 	/**

@@ -63,7 +63,7 @@ public class MaxSumADFunctionSolver extends MaxSumFunctionSolver {
 		// Only works for binary constraints
 		assert (super.numNeighbors() == 2);
 
-		for (UUID target : this.parent.getConstraintIds()) {
+		for (UUID target : this.parent.getConstrainedVariableIds()) {
 			if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
 				continue;
 			}

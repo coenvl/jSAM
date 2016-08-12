@@ -88,7 +88,7 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
 		// Only works for binary constraints
 		assert (super.numNeighbors() == 2);
 
-		for (UUID target : this.parent.getConstraintIds()) {
+		for (UUID target : this.parent.getConstrainedVariableIds()) {
 			if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
 				continue;
 			}
@@ -97,12 +97,12 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
 
 			// For all values of variable
 			CostMap<Integer> costMap = new CostMap<>();
-			for (Integer value : this.constraintAgent.getVariable(target)) {
+			for (Integer value : this.constraintAgent.getVariableWithID(target)) {
 				temp.put(target, value);
 
 				double minCost = Double.MAX_VALUE;
 				// Now we know there is only one other neighbor, so iterate for him
-				for (UUID other : this.parent.getConstraintIds()) {
+				for (UUID other : this.parent.getConstrainedVariableIds()) {
 					if (other == target) {
 						continue;
 					}
@@ -127,7 +127,7 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
 							minCost = cost;
 						}
 					} else {
-						for (Integer val2 : this.constraintAgent.getVariable(other)) {
+						for (Integer val2 : this.constraintAgent.getVariableWithID(other)) {
 							temp.put(other, val2);
 							double cost = this.parent.getLocalCostIf(temp);
 
