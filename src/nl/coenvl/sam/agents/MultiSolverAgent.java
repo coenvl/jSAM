@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,112 +37,119 @@ import nl.coenvl.sam.variables.Variable;
  */
 public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> implements IterativeSolver {
 
-	private SolverRunner initSolver;
-	private SolverRunner iterativeSolver;
+    private SolverRunner initSolver;
+    private SolverRunner iterativeSolver;
 
-	/**
-	 * @param name
-	 * @param var
-	 */
-	public MultiSolverAgent(T var, String name) {
-		super(var, name);
-	}
+    /**
+     * @param name
+     * @param var
+     */
+    public MultiSolverAgent(T var, String name) {
+        super(var, name);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.Agent#init()
-	 */
-	@Override
-	public final synchronized void init() {
-		this.startThread();
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.Agent#init()
+     */
+    @Override
+    public final synchronized void init() {
+        this.startThread();
 
-		if (this.initSolver != null) {
-			this.initSolver.init();
-		} else if (this.iterativeSolver != null) {
-			this.iterativeSolver.init();
-		} else {
-			throw new RuntimeException("Either initSolver or IterativeSolver must be set!");
-		}
-	}
+        if (this.initSolver != null) {
+            this.initSolver.init();
+        } else if (this.iterativeSolver != null) {
+            this.iterativeSolver.init();
+        } else {
+            throw new RuntimeException("Either initSolver or IterativeSolver must be set!");
+        }
+    }
 
-	/**
-	 *
-	 */
-	private void startThread() {
-		// Start the runner threads
-		if (this.initSolver != null) {
-			this.initSolver.startThread();
-		}
-		if (this.iterativeSolver != null) {
-			this.iterativeSolver.startThread();
-		}
-	}
+    /**
+     *
+     */
+    private void startThread() {
+        // Start the runner threads
+        if (this.initSolver != null) {
+            this.initSolver.startThread();
+        }
+        if (this.iterativeSolver != null) {
+            this.iterativeSolver.startThread();
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.Agent#push(nl.coenvl.sam.Message)
-	 */
-	@Override
-	public final synchronized void push(Message m) {
-		if (this.initSolver != null) {
-			this.initSolver.push(m);
-		}
-		if (this.iterativeSolver != null) {
-			this.iterativeSolver.push(m);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.Agent#push(nl.coenvl.sam.Message)
+     */
+    @Override
+    public final synchronized void push(Message m) {
+        if (this.initSolver != null) {
+            this.initSolver.push(m);
+        }
+        if (this.iterativeSolver != null) {
+            this.iterativeSolver.push(m);
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#tick()
-	 */
-	@Override
-	public void tick() {
-		if (this.iterativeSolver != null) {
-			this.iterativeSolver.tick();
-		} else {
-			// Do nothing
-		}
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.solvers.Solver#tick()
+     */
+    @Override
+    public void tick() {
+        if (this.iterativeSolver != null) {
+            this.iterativeSolver.tick();
+        } else {
+            // Do nothing
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.Agent#reset()
-	 */
-	@Override
-	public void reset() {
-		super.reset();
-		if (this.initSolver != null) {
-			this.initSolver.reset();
-		}
-		if (this.iterativeSolver != null) {
-			this.iterativeSolver.reset();
-		}
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.Agent#reset()
+     */
+    @Override
+    public void reset() {
+        super.reset();
+        if (this.initSolver != null) {
+            this.initSolver.reset();
+        }
+        if (this.iterativeSolver != null) {
+            this.iterativeSolver.reset();
+        }
+    }
 
-	public final void setInitSolver(Solver solver) {
-		this.initSolver = new SolverRunner(solver);
-	}
+    public final void setInitSolver(Solver solver) {
+        if (solver == null) {
+            this.initSolver = null;
+        } else {
+            this.initSolver = new SolverRunner(solver);
+        }
+    }
 
-	public final void setIterativeSolver(IterativeSolver solver) {
-		this.iterativeSolver = new SolverRunner(solver);
-	}
+    public final void setIterativeSolver(IterativeSolver solver) {
+        if (solver == null) {
+            this.iterativeSolver = null;
+        }
+        this.iterativeSolver = new SolverRunner(solver);
+    }
 
-	public final void setSolver(Solver solver) {
-		if (solver instanceof IterativeSolver) {
-			this.setIterativeSolver((IterativeSolver) solver);
-		} else {
-			this.setInitSolver(solver);
-		}
-	}
+    public final void setSolver(Solver solver) {
+        if (solver instanceof IterativeSolver) {
+            this.setIterativeSolver((IterativeSolver) solver);
+        } else {
+            this.setInitSolver(solver);
+        }
+    }
 
-	@Override
-	public boolean isFinished() {
-		return this.initSolver.emptyQueue() && this.iterativeSolver.emptyQueue();
-	}
+    @Override
+    public boolean isFinished() {
+        return this.initSolver.emptyQueue() && this.iterativeSolver.emptyQueue();
+    }
 
 }
