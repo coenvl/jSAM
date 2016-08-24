@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,91 +41,101 @@ import nl.coenvl.sam.variables.Variable;
  */
 public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPropertyOwner implements Agent<T, V> {
 
-	private final Set<Constraint<T, V>> constraints;
-	private final String name;
-	private final T variable;
+    private final Set<Constraint<T, V>> constraints;
+    private final String name;
+    private final T variable;
 
-	protected AbstractAgent(T var, String name) {
-		super();
-		this.name = name;
-		this.variable = var;
-		this.constraints = new HashSet<>();
-		MailMan.registerOwner(var, this);
-	}
+    protected AbstractAgent(T var, String name) {
+        super();
+        this.name = name;
+        this.variable = var;
+        this.constraints = new HashSet<>();
+        MailMan.registerOwner(var, this);
+    }
 
-	protected AbstractAgent(T var) {
-		this(var, "Anonymous agent");
-	}
+    protected AbstractAgent(T var) {
+        this(var, "Anonymous agent");
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.Agent#getName()
-	 */
-	@Override
-	public final String getName() {
-		return this.name;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.Agent#getName()
+     */
+    @Override
+    public final String getName() {
+        return this.name;
+    }
 
-	@Override
-	public final String toString() {
-		return "" + this.getClass().getSimpleName() + " " + this.name + " (" + this.getVariable() + ")";
-	}
+    @Override
+    public final String toString() {
+        return "" + this.getClass().getSimpleName() + " " + this.name + " (" + this.getVariable() + ")";
+    }
 
-	@Override
-	public final synchronized T getVariable() {
-		return this.variable;
-	}
+    @Override
+    public final synchronized T getVariable() {
+        return this.variable;
+    }
 
-	@Override
-	public void reset() {
-		if (this.variable != null) {
-			this.variable.clear();
-		}
-	}
+    @Override
+    public void reset() {
+        if (this.variable != null) {
+            this.variable.clear();
+        }
+    }
 
-	@Override
-	public void addConstraint(Constraint<T, V> c) {
-		if (!c.getVariableIds().contains(this.variable.getID())) {
-			throw new VariableNotInvolvedException(
-					"The variable of the agent " + this.name + " is not involved in the provided constraint");
-		}
+    @Override
+    public void addConstraint(Constraint<T, V> c) {
+        if (!c.getVariableIds().contains(this.variable.getID())) {
+            throw new VariableNotInvolvedException(
+                    "The variable of the agent " + this.name + " is not involved in the provided constraint");
+        }
 
-		this.constraints.add(c);
-	}
+        this.constraints.add(c);
+    }
 
-	@Override
-	public void removeConstraint(Constraint<T, V> c) {
-		this.constraints.remove(c);
-	}
+    @Override
+    public void removeConstraint(Constraint<T, V> c) {
+        this.constraints.remove(c);
+    }
 
-	@Override
-	public double getLocalCost() {
-		double cost = 0;
-		for (final Constraint<T, V> c : this.constraints) {
-			cost += c.getCost(this.variable);
-		}
-		return cost;
-	}
+    @Override
+    public double getLocalCost() {
+        double cost = 0;
+        for (final Constraint<T, V> c : this.constraints) {
+            cost += c.getCost(this.variable);
+        }
+        return cost;
+    }
 
-	@Override
-	public double getLocalCostIf(AssignmentMap<V> valueMap) {
-		double cost = 0;
-		for (final Constraint<T, V> c : this.constraints) {
-			cost += c.getCostIf(this.variable, valueMap);
-		}
-		return cost;
-	}
+    @Override
+    public double getLocalCostIf(AssignmentMap<V> valueMap) {
+        double cost = 0;
+        for (final Constraint<T, V> c : this.constraints) {
+            cost += c.getCostIf(this.variable, valueMap);
+        }
+        return cost;
+    }
 
-	@Override
-	public Set<UUID> getConstrainedVariableIds() {
-		final Set<UUID> set = new HashSet<>();
+    @Override
+    public Set<UUID> getConstrainedVariableIds() {
+        final Set<UUID> set = new HashSet<>();
 
-		for (final Constraint<T, V> c : this.constraints) {
-			set.addAll(c.getVariableIds());
-		}
-		set.remove(this.variable.getID());
+        for (final Constraint<T, V> c : this.constraints) {
+            set.addAll(c.getVariableIds());
+        }
+        set.remove(this.variable.getID());
 
-		return set;
-	}
+        return set;
+    }
+
+    @Override
+    public Constraint<T, V> getConstraintForAgent(UUID id) {
+        for (final Constraint<T, V> c : this.constraints) {
+            if (c.getVariableIds().contains(id)) {
+                return c;
+            }
+        }
+        return null;
+    }
 }

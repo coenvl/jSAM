@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,20 +38,22 @@ import nl.coenvl.sam.variables.Variable;
  */
 public interface Agent<T extends Variable<V>, V> extends PropertyOwner, Solver {
 
-	public String getName();
+    public String getName();
 
-	public T getVariable();
+    public T getVariable();
 
-	public void addConstraint(Constraint<T, V> c);
+    public void addConstraint(Constraint<T, V> c);
 
-	public void removeConstraint(Constraint<T, V> c);
+    public void removeConstraint(Constraint<T, V> c);
 
-	public double getLocalCost();
+    public double getLocalCost();
 
-	public double getLocalCostIf(AssignmentMap<V> valueMap);
+    public double getLocalCostIf(AssignmentMap<V> valueMap);
 
-	public Set<UUID> getConstrainedVariableIds();
+    public Set<UUID> getConstrainedVariableIds();
 
-	public boolean isFinished();
+    public boolean isFinished();
+
+    public Constraint<T, V> getConstraintForAgent(UUID target);
 
 }
