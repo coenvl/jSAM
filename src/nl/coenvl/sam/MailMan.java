@@ -59,9 +59,14 @@ public final class MailMan {
             MailMan.messageCounterMap.put(m.getType(), MailMan.messageCounterMap.get(m.getType()) + 1);
         }
 
-        MailMan.sentMessages++;
+        Agent<?, ?> owner = MailMan.ownerMap.get(id);
 
-        MailMan.ownerMap.get(id).push(m);
+        if (owner != null) {
+            MailMan.sentMessages++;
+            owner.push(m);
+        } else {
+            // Do nothing
+        }
     }
 
     public static void broadCast(Message msg) {
