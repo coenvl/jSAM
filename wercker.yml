@@ -13,7 +13,7 @@ build:
           gradle test
           
 deploy:
-  box: wercker/default
+  box: coenvl/alpine-git
   steps:
     - add-to-known_hosts:
         hostname: github.com
