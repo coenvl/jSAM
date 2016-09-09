@@ -24,7 +24,7 @@ mkdir -p $DST/lib
 #cp -r test/nl/coenvl/sam/* $DST/test/org/anon/cocoa/.
 #cp -r src/nl/coenvl/sam/* $DST/src/org/anon/cocoa/.
 
-FILES=".classpath .project .gitignore LICENSE README.md createJar.jardesc lib/*.jar"
+FILES=".classpath .project .gitignore LICENSE README.md lib/*.jar"
 
 for f in $FILES; do
 	cp $f $DST/.
