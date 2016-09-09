@@ -1,6 +1,12 @@
 box: qlik/gradle
 build:
     steps:
-        - gradle build
-        - gradle test
+        - script:
+            name: build
+            code: |
+            gradle build
+        - script:
+            name: test
+            code: |
+            gradle test
 
