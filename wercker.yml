@@ -1,12 +1,12 @@
 box: qlik/gradle
 build:
-    steps:
-        - script:
-            name: build
-            code: |
-            gradle build
-        - script:
-            name: test
-            code: |
-            gradle test
+  steps:
+    - script:
+      name: build
+      code: |
+        gradle build
+    - script:
+      name: test
+      code: |
+        gradle test
 
