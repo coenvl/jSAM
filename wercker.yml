@@ -1,4 +1,4 @@
-box: qlik/gradle
+box: niaquinto/gradle
 build:
   steps:
     - script:
@@ -12,4 +12,3 @@ build:
         code: |
           echo "Starting gradle test"
           gradle build test
-
