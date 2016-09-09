@@ -3,5 +3,11 @@ box:
   entrypoint: /bin/bash -c
 build:
   steps:
-    - gradle build
-    - gradle test
+    - script:
+        name: Build java code
+        code: |
+          gradle build
+    - script:
+        name: Run Junit Tests
+        code: |
+          gradle test
