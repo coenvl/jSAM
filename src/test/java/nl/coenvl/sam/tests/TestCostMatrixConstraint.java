@@ -65,7 +65,7 @@ public class TestCostMatrixConstraint {
         Assert.assertEquals(0, scmc.getCostIf(var1, null), 0);
         Assert.assertEquals(0, scmc.getCostIf(var1, valueMap), 0);
         valueMap.setAssignment(var1, 1);
-        Assert.assertEquals(0, scmc.getCostIf(var1, valueMap), 0);
+        Assert.assertEquals((costMat1[1][0] + costMat1[1][1] + costMat1[1][2]) / 3, scmc.getCostIf(var1, valueMap), 0);
         valueMap.setAssignment(var2, 1);
         Assert.assertEquals(costMat1[1][1], scmc.getCostIf(var1, valueMap), 0);
 

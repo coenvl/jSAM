@@ -6,7 +6,7 @@ build:
     - script:
         name: Build java code
         code: |
-          gradle build
+          gradle assemble
     - script:
         name: Run Junit Tests
         code: |
