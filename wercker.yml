@@ -1,4 +1,6 @@
-box: niaquinto/gradle
+box: 
+  id: niaquinto/gradle
+  entrypoint: /bin/bash -c
 build:
   steps:
     - script:
