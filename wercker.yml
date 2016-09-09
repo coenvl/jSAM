@@ -4,6 +4,7 @@ box:
 build:
   steps:
     - script:
-        name: echo nodejs information
+        name: build
         code: |
-          echo "Hello world!"
+          echo "Starting gradle test"
+          gradle build test
