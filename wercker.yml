@@ -2,11 +2,14 @@ box: qlik/gradle
 build:
   steps:
     - script:
+        name: show info
+        code: |
+          echo "Starting display of versions"
+          which gradle
+          gradle -v
+    - script:
         name: build
         code: |
-          gradle build
-    - script:
-        name: test
-        code: |
-          gradle test
+          echo "Starting gradle test"
+          gradle build test
 
