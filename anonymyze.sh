@@ -27,7 +27,7 @@ for f in $FILES; do
 	cp $f $DST/.
 done
 
-head -n -4 README.md > README.md
+head -n -4 $DST/README.md > $DST/README.md
 
 echo "Anonymizing $DST"
 for f in `find $DST -name '*.java'` `find $DST -maxdepth 1 -type f` ; do
