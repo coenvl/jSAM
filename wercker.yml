@@ -1,7 +1,7 @@
-box: 
-  id: niaquinto/gradle
-  entrypoint: /bin/bash -c
 build:
+  box: 
+    id: niaquinto/gradle
+    entrypoint: /bin/bash -c
   steps:
     - script:
         name: Build java code
@@ -11,3 +11,16 @@ build:
         name: Run Junit Tests
         code: |
           gradle test
+          
+deploy:
+  box: wercker/default
+  steps:
+    - add-to-known_hosts:
+        hostname: github.com
+        fingerprint: 21:ab:0a:64:9c:bf:16:7d:26:c5:aa:21:91:b3:a1:ca
+    - add-ssh-key:
+        keyname: anonymous_github
+    - script:
+    	name: Run anonymization script
+    	code: |
+    	  ./anonymyze.sh

@@ -1,11 +1,10 @@
 #!/bin/bash
-
-DST="../jCoCoAnon"
-GIT="anonymousgit:anonc187/jCoCoA.git"
+DST="anonymous"
+GIT="git@github.com:anonc187/jCoCoA.git"
 
 if [ -e "$DST" ]; then
 	echo "Target folder $DST already exists"
-	#exit 1;
+	exit 1;
 fi
 
 # Clone git repository
@@ -14,18 +13,16 @@ git -C $DST config user.name "Anon Y. Mous"
 git -C $DST config user.email anon187c@gmail.com
 
 echo "Cleaning up old repository"
-#rm -rf $DST/*
+rm -rf $DST/*
 
 echo "Copying working folder to $DST"
-mkdir -p $DST/lib
-#mkdir -p $DST/test/org/anon/cocoa/
-#mkdir -p $DST/src/org/anon/cocoa/
+mkdir -p $DST/src/main/java/org/anon/cocoa/
+mkdir -p $DST/src/test/java/org/anon/cocoa/
 
-#cp -r test/nl/coenvl/sam/* $DST/test/org/anon/cocoa/.
-#cp -r src/nl/coenvl/sam/* $DST/src/org/anon/cocoa/.
+cp -r src/main/java/nl/coenvl/sam/* $DST/src/main/java/org/anon/cocoa/.
+cp -r src/test/java/nl/coenvl/sam/* $DST/src/test/java/org/anon/cocoa/.
 
-FILES=".classpath .project .gitignore LICENSE README.md lib/*.jar"
-
+FILES=".classpath .project .gitignore build.gradle LICENSE README.md"
 for f in $FILES; do
 	cp $f $DST/.
 done
@@ -43,7 +40,6 @@ for f in `find $DST -name '*.java'` `find $DST -maxdepth 1 -type f` ; do
 done
 
 echo "Sending commits"
-cd $DST
-git add *
-git commit -m `date +%Y-%m-%d`
-git push origin master
+git -C $DST add -A
+git -C $DST commit -m `date +%Y-%m-%d`
+git -C $DST push origin master
