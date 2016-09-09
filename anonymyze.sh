@@ -22,12 +22,12 @@ mkdir -p $DST/src/test/java/org/anon/cocoa/
 cp -r src/main/java/nl/coenvl/sam/* $DST/src/main/java/org/anon/cocoa/.
 cp -r src/test/java/nl/coenvl/sam/* $DST/src/test/java/org/anon/cocoa/.
 
-FILES=".classpath .project .gitignore build.gradle LICENSE README.md"
+FILES=".classpath .project .gitignore build.gradle LICENSE"
 for f in $FILES; do
 	cp $f $DST/.
 done
 
-head -n -4 $DST/README.md > $DST/README.md
+head -n -4 README.md > $DST/README.md
 
 echo "Anonymizing $DST"
 for f in `find $DST -name '*.java'` `find $DST -maxdepth 1 -type f` ; do
