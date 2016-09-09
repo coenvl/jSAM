@@ -15,9 +15,6 @@ build:
 deploy:
   box: coenvl/alpine-git
   steps:
-    - add-to-known_hosts:
-        hostname: github.com
-        fingerprint: 21:ab:0a:64:9c:bf:16:7d:26:c5:aa:21:91:b3:a1:ca
     - add-ssh-key:
         keyname: anonymous_github
     - script:
