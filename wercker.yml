@@ -21,6 +21,6 @@ deploy:
     - add-ssh-key:
         keyname: anonymous_github
     - script:
-    	name: Run anonymization script
-    	code: |
-    	  ./anonymyze.sh
+        name: Run anonymization script
+        code: |
+          ./anonymyze.sh
