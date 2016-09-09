@@ -3,8 +3,5 @@ box:
   entrypoint: /bin/bash -c
 build:
   steps:
-    - script:
-        name: build
-        code: |
-          echo "Starting gradle test"
-          gradle build test
+    - gradle build
+    - gradle test
