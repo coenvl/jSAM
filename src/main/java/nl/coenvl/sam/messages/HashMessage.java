@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,71 +35,91 @@ import nl.coenvl.sam.variables.PublishableMap;
  */
 public final class HashMessage extends HashMap<String, String> implements Message {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 6306118222585166399L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6306118222585166399L;
 
-	private final String type;
+    private final String type;
 
-	private final UUID source;
+    private final UUID source;
 
-	public HashMessage(UUID source, String type) {
-		super();
-		this.source = source;
-		this.type = type;
-	}
+    public HashMessage(UUID source, String type) {
+        super();
+        this.source = source;
+        this.type = type;
+    }
 
-	@Override
-	public void put(String key, Object value) {
-		super.put(key, value.toString());
-	}
+    @Override
+    public void put(String key, Object value) {
+        super.put(key, value.toString());
+    }
 
-	// @Override
-	// public UUID getUUID(String key) {
-	// return UUID.fromString(super.get(key));
-	// }
+    @Override
+    public void put(String key, Integer value) {
+        super.put(key, value.toString());
+    }
 
-	@Override
-	public UUID getSource() {
-		return this.source;
-	}
+    @Override
+    public void put(String key, Double value) {
+        super.put(key, value.toString());
+    }
 
-	@Override
-	public Integer getInteger(String key) {
-		return Integer.valueOf(super.get(key));
-	}
+    @Override
+    public void put(String key, PublishableMap<?, ?> value) {
+        super.put(key, value.serialize());
+    }
 
-	@Override
-	public Double getDouble(String key) {
-		return Double.valueOf(super.get(key));
-	}
+    // @Override
+    // public void put(String key, Object value) {
+    // super.put(key, value.toString());
+    // }
 
-	@Override
-	public PublishableMap<?, ?> getMap(String key) {
-		return PublishableMap.fromString(super.get(key));
-	}
+    // @Override
+    // public UUID getUUID(String key) {
+    // return UUID.fromString(super.get(key));
+    // }
 
-	@Override
-	public HashMessage clone() {
-		HashMessage clone = new HashMessage(this.source, this.type);
-		clone.putAll(this);
-		return clone;
-	}
+    @Override
+    public UUID getSource() {
+        return this.source;
+    }
 
-	@Override
-	public String getType() {
-		return this.type;
-	}
+    @Override
+    public Integer getInteger(String key) {
+        return Integer.valueOf(super.get(key));
+    }
 
-	@Override
-	public long messageSize() {
-		return 0L;
-	}
+    @Override
+    public Double getDouble(String key) {
+        return Double.valueOf(super.get(key));
+    }
 
-	@Override
-	public String toString() {
-		return "Message of Type " + this.type + "(" + super.toString() + ")";
-	}
+    @Override
+    public PublishableMap<?, ?> getMap(String key) {
+        return PublishableMap.deserialize(super.get(key));
+    }
+
+    @Override
+    public HashMessage clone() {
+        HashMessage clone = new HashMessage(this.source, this.type);
+        clone.putAll(this);
+        return clone;
+    }
+
+    @Override
+    public String getType() {
+        return this.type;
+    }
+
+    @Override
+    public long messageSize() {
+        return 0L;
+    }
+
+    @Override
+    public String toString() {
+        return "Message of Type " + this.type + "(" + super.toString() + ")";
+    }
 
 }

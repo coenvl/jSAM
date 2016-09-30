@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@ import java.util.UUID;
 import nl.coenvl.sam.MailMan;
 import nl.coenvl.sam.agents.VariableAgent;
 import nl.coenvl.sam.messages.Message;
-import nl.coenvl.sam.variables.IntegerVariable;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
  * MaxSumADVariableSolver
@@ -33,52 +33,52 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 22 jan. 2016
  */
-public class MaxSumADVariableSolver extends MaxSumVariableSolver {
+public class MaxSumADVariableSolver<T extends DiscreteVariable<V>, V> extends MaxSumVariableSolver<T, V> {
 
-	protected final static int REVERSE_AFTER_ITERS = 100;
+    protected final static int REVERSE_AFTER_ITERS = 100;
 
-	protected int iterCount;
-	protected boolean direction;
+    protected int iterCount;
+    protected boolean direction;
 
-	public MaxSumADVariableSolver(VariableAgent<IntegerVariable, Integer> agent) {
-		super(agent);
-		this.iterCount = 0;
-		this.direction = true;
-	}
+    public MaxSumADVariableSolver(VariableAgent<T, V> agent) {
+        super(agent);
+        this.iterCount = 0;
+        this.direction = true;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
-	 */
-	@Override
-	public synchronized void tick() {
-		this.iterCount++;
-		if ((this.iterCount % MaxSumADVariableSolver.REVERSE_AFTER_ITERS) == 0) {
-			this.direction = !this.direction;
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
+     */
+    @Override
+    public synchronized void tick() {
+        this.iterCount++;
+        if ((this.iterCount % MaxSumADVariableSolver.REVERSE_AFTER_ITERS) == 0) {
+            this.direction = !this.direction;
+        }
 
-		// Target represents function node f
-		for (UUID target : this.variableAgent.getFunctionAdresses()) {
-			if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
-				continue;
-			}
+        // Target represents function node f
+        for (UUID target : this.variableAgent.getFunctionAdresses()) {
+            if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
+                continue;
+            }
 
-			Message v2f = this.var2funMessage(target);
-			MailMan.sendMessage(target, v2f);
-		}
+            Message v2f = this.var2funMessage(target);
+            MailMan.sendMessage(target, v2f);
+        }
 
-		this.setMinimizingValue();
-		// this.receivedCosts.clear();
-	}
+        this.setMinimizingValue();
+        // this.receivedCosts.clear();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.BiPartiteGraphSolver#getCounterPart()
-	 */
-	@Override
-	public Class<? extends BiPartiteGraphSolver> getCounterPart() {
-		return MaxSumADFunctionSolver.class;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.solvers.BiPartiteGraphSolver#getCounterPart()
+     */
+    @Override
+    public Class<? extends BiPartiteGraphSolver> getCounterPart() {
+        return MaxSumADFunctionSolver.class;
+    }
 }

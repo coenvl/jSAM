@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,131 +37,134 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 22 jan. 2016
  */
-public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver {
+public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver<IntegerVariable, Integer> {
 
-	private final AssignmentMap<Integer> knownValues;
+    // To make this one generic, we have to forward not values, but valueMaps since there are publishables, and discrete
+    // values are not
 
-	public MaxSumADVPFunctionSolver(ConstraintAgent<IntegerVariable, Integer> agent) {
-		super(agent);
-		this.knownValues = new AssignmentMap<>();
-	}
+    private final AssignmentMap<Integer> knownValues;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
-	 */
-	@Override
-	public synchronized void push(Message m) {
-		super.push(m);
+    public MaxSumADVPFunctionSolver(ConstraintAgent<IntegerVariable, Integer> agent) {
+        super(agent);
+        this.knownValues = new AssignmentMap<>();
+    }
 
-		if (m.containsKey("value")) {
-			this.knownValues.put(m.getSource(), m.getInteger("value"));
-		}
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
+     */
+    @Override
+    public synchronized void push(Message m) {
+        super.push(m);
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.Solver#reset()
-	 */
-	@Override
-	public void reset() {
-		super.reset();
-		this.knownValues.clear();
-	}
+        if (m.containsKey("value")) {
+            this.knownValues.put(m.getSource(), m.getInteger("value"));
+        }
+    }
 
-	/*
-	 * A message sent from a function-node f to a variable-node x in iteration i includes for each possible value d \in
-	 * Dx the minimal cost of any combination of assignments to the variables involved in f apart from x and the
-	 * assignment of value d to variable x.
-	 *
-	 * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
-	 */
-	@Override
-	public synchronized void tick() {
-		this.iterCount++;
-		if ((this.iterCount % MaxSumADFunctionSolver.REVERSE_AFTER_ITERS) == 0) {
-			this.direction = !this.direction;
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.solvers.Solver#reset()
+     */
+    @Override
+    public void reset() {
+        super.reset();
+        this.knownValues.clear();
+    }
 
-		// Only works for binary constraints
-		assert (super.numNeighbors() == 2);
+    /*
+     * A message sent from a function-node f to a variable-node x in iteration i includes for each possible value d \in
+     * Dx the minimal cost of any combination of assignments to the variables involved in f apart from x and the
+     * assignment of value d to variable x.
+     *
+     * @see nl.coenvl.sam.solvers.IterativeSolver#tick()
+     */
+    @Override
+    public synchronized void tick() {
+        this.iterCount++;
+        if ((this.iterCount % MaxSumADFunctionSolver.REVERSE_AFTER_ITERS) == 0) {
+            this.direction = !this.direction;
+        }
 
-		for (UUID target : this.parent.getConstrainedVariableIds()) {
-			if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
-				continue;
-			}
+        // Only works for binary constraints
+        assert (super.numNeighbors() == 2);
 
-			AssignmentMap<Integer> temp = new AssignmentMap<>();
+        for (UUID target : this.parent.getConstrainedVariableIds()) {
+            if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
+                continue;
+            }
 
-			// For all values of variable
-			CostMap<Integer> costMap = new CostMap<>();
-			for (Integer value : this.constraintAgent.getVariableWithID(target)) {
-				temp.put(target, value);
+            AssignmentMap<Integer> temp = new AssignmentMap<>();
 
-				double minCost = Double.MAX_VALUE;
-				// Now we know there is only one other neighbor, so iterate for him
-				for (UUID other : this.parent.getConstrainedVariableIds()) {
-					if (other == target) {
-						continue;
-					}
+            // For all values of variable
+            CostMap<Integer> costMap = new CostMap<>();
+            for (Integer value : this.constraintAgent.getVariableWithID(target)) {
+                temp.put(target, value);
 
-					if (minCost < Double.MAX_VALUE) {
-						throw new InvalidValueException(
-								"The min cost could not be lowered already, more than one agent in constraint?");
-					}
+                double minCost = Double.MAX_VALUE;
+                // Now we know there is only one other neighbor, so iterate for him
+                for (UUID other : this.parent.getConstrainedVariableIds()) {
+                    if (other == target) {
+                        continue;
+                    }
 
-					if (this.knownValues.containsKey(other)) {
-						// For VP: Only consider known values
-						Integer val2 = this.knownValues.get(other);
-						temp.put(other, val2);
+                    if (minCost < Double.MAX_VALUE) {
+                        throw new InvalidValueException(
+                                "The min cost could not be lowered already, more than one agent in constraint?");
+                    }
 
-						double cost = this.parent.getLocalCostIf(temp);
-						if (this.receivedCosts.containsKey(other) && this.receivedCosts.get(other).containsKey(val2)) {
-							cost += this.receivedCosts.get(other).get(val2);
-						}
+                    if (this.knownValues.containsKey(other)) {
+                        // For VP: Only consider known values
+                        Integer val2 = this.knownValues.get(other);
+                        temp.put(other, val2);
 
-						// I think this is redundant, because it will always be true
-						if (cost < minCost) {
-							minCost = cost;
-						}
-					} else {
-						for (Integer val2 : this.constraintAgent.getVariableWithID(other)) {
-							temp.put(other, val2);
-							double cost = this.parent.getLocalCostIf(temp);
+                        double cost = this.parent.getLocalCostIf(temp);
+                        if (this.receivedCosts.containsKey(other) && this.receivedCosts.get(other).containsKey(val2)) {
+                            cost += this.receivedCosts.get(other).get(val2);
+                        }
 
-							if (this.receivedCosts.containsKey(other)
-									&& this.receivedCosts.get(other).containsKey(val2)) {
-								cost += this.receivedCosts.get(other).get(val2);
-							}
+                        // I think this is redundant, because it will always be true
+                        if (cost < minCost) {
+                            minCost = cost;
+                        }
+                    } else {
+                        for (Integer val2 : this.constraintAgent.getVariableWithID(other)) {
+                            temp.put(other, val2);
+                            double cost = this.parent.getLocalCostIf(temp);
 
-							if (cost < minCost) {
-								minCost = cost;
-							}
-						}
-					}
-				}
+                            if (this.receivedCosts.containsKey(other)
+                                    && this.receivedCosts.get(other).containsKey(val2)) {
+                                cost += this.receivedCosts.get(other).get(val2);
+                            }
 
-				costMap.put(value, minCost);
-			}
+                            if (cost < minCost) {
+                                minCost = cost;
+                            }
+                        }
+                    }
+                }
 
-			Message msg = new HashMessage(this.constraintAgent.getID(), "FUN2VAR");
-			msg.put("costMap", costMap);
-			MailMan.sendMessage(target, msg);
-		}
+                costMap.put(value, minCost);
+            }
 
-		// this.receivedCosts.clear();
-	}
+            Message msg = new HashMessage(this.constraintAgent.getID(), "FUN2VAR");
+            msg.put("costMap", costMap);
+            MailMan.sendMessage(target, msg);
+        }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.solvers.BiPartiteGraphSolver#getCounterPart()
-	 */
-	@Override
-	public Class<? extends BiPartiteGraphSolver> getCounterPart() {
-		return MaxSumADVPVariableSolver.class;
-	}
+        // this.receivedCosts.clear();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.solvers.BiPartiteGraphSolver#getCounterPart()
+     */
+    @Override
+    public Class<? extends BiPartiteGraphSolver> getCounterPart() {
+        return MaxSumADVPVariableSolver.class;
+    }
 
 }

@@ -28,7 +28,7 @@ import nl.coenvl.sam.agents.VariableAgent;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.variables.CostMap;
-import nl.coenvl.sam.variables.IntegerVariable;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
  * MaxSumVariableSolver
@@ -37,13 +37,13 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 22 jan. 2016
  */
-public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Integer>
+public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends AbstractSolver<T, V>
         implements IterativeSolver, BiPartiteGraphSolver {
 
-    private final Map<UUID, CostMap<Integer>> receivedCosts;
-    protected final VariableAgent<IntegerVariable, Integer> variableAgent;
+    private final Map<UUID, CostMap<V>> receivedCosts;
+    protected final VariableAgent<T, V> variableAgent;
 
-    public MaxSumVariableSolver(VariableAgent<IntegerVariable, Integer> agent) {
+    public MaxSumVariableSolver(VariableAgent<T, V> agent) {
         super(agent);
         this.variableAgent = agent;
         this.receivedCosts = new HashMap<>();
@@ -70,7 +70,7 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
         if (m.getType().equals("FUN2VAR")) {
             UUID neighbor = m.getSource();
             @SuppressWarnings("unchecked")
-            CostMap<Integer> costMap = (CostMap<Integer>) m.getMap("costMap");
+            CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
             this.receivedCosts.put(neighbor, costMap);
         }
 
@@ -106,10 +106,10 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 
     protected Message var2funMessage(UUID target) {
         // For all values of variable
-        CostMap<Integer> costMap = new CostMap<>();
+        CostMap<V> costMap = new CostMap<>();
         double totalCost = 0;
 
-        for (Integer value : this.myVariable) {
+        for (V value : this.myVariable) {
             double valueCost = 0;
 
             // The sum of costs for this value it received from all function neighbors apart from f in iteration i −
@@ -129,7 +129,7 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 
         // Normalize to avoid increasingly large values
         double avg = totalCost / costMap.size();
-        for (Integer value : this.myVariable) {
+        for (V value : this.myVariable) {
             costMap.put(value, costMap.get(value) - avg);
         }
 
@@ -140,9 +140,9 @@ public class MaxSumVariableSolver extends AbstractSolver<IntegerVariable, Intege
 
     protected void setMinimizingValue() {
         double minCost = Double.MAX_VALUE;
-        Integer bestAssignment = null;
+        V bestAssignment = null;
 
-        for (Integer value : this.myVariable) {
+        for (V value : this.myVariable) {
             double valueCost = 0;
             for (UUID neighbor : this.variableAgent.getFunctionAdresses()) {
                 if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(value)) {

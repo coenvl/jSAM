@@ -44,7 +44,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  *
  */
 @SuppressWarnings("static-method")
-public class TestVariable {
+public class TestIntegerVariable {
 
 	private IntegerVariable var;
 
@@ -195,7 +195,7 @@ public class TestVariable {
 		this.var.setValue(5);
 		pc.setAssignment(this.var, this.var.getValue());
 		String str = pc.toString();
-		AssignmentMap<?> dp = (AssignmentMap<?>) PublishableMap.fromString(str);
+		AssignmentMap<?> dp = (AssignmentMap<?>) PublishableMap.deserialize(str);
 		Assert.assertEquals(this.var.getValue(), dp.get(this.var.getID()));
 	}
 }

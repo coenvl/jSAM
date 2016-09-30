@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,116 +38,147 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  */
 public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements IterativeSolver {
 
-	public static final double CHANGE_TO_EQUAL_PROB = 0.5;
-	public static final double CHANGE_TO_IMPROVE_PROB = 0.5;
-	public static final String UPDATE_VALUE = "DSASolver:Value";
-	public static final String KEY_VARVALUE = "value";
+    private enum State {
+        SENDVALUE,
+        PICKVALUE
+    }
 
-	private AssignmentMap<V> context;
+    public static final double CHANGE_TO_EQUAL_PROB = 0.5;
+    public static final double CHANGE_TO_IMPROVE_PROB = 0.5;
 
-	/**
-	 * @param dsaAgent
-	 * @param costfun
-	 */
-	public DSASolver(Agent<DiscreteVariable<V>, V> agent) {
-		super(agent);
-		this.context = new AssignmentMap<>();
-	}
+    public static final String UPDATE_VALUE = "DSASolver:Value";
+    public static final String KEY_VARVALUE = "value";
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.anon.cocoa.solvers.Solver#init()
-	 */
-	@Override
-	public synchronized void init() {
-		this.updateMyValue(this.myVariable.getRandomValue());
-	}
+    private AssignmentMap<V> context;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.anon.cocoa.solvers.Solver#push(org.anon.cocoa.messages.Message)
-	 */
-	@Override
-	public synchronized void push(Message m) {
-		if (m.getType().equals(DSASolver.UPDATE_VALUE)) {
-			UUID varId = m.getSource();
+    private boolean sendUpdate;
 
-			@SuppressWarnings("unchecked")
-			V newValue = (V) m.getInteger(DSASolver.KEY_VARVALUE);
+    private State state;
 
-			this.context.put(varId, newValue);
-		}
-	}
+    /**
+     * @param dsaAgent
+     * @param costfun
+     */
+    public DSASolver(Agent<DiscreteVariable<V>, V> agent) {
+        super(agent);
+        this.context = new AssignmentMap<>();
+        this.state = State.SENDVALUE;
+        this.sendUpdate = true;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.anon.cocoa.solvers.Solver#reset()
-	 */
-	@Override
-	public void reset() {
-		super.reset();
-		this.context.clear();
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.anon.cocoa.solvers.Solver#init()
+     */
+    @Override
+    public synchronized void init() {
+        this.myVariable.setValue(this.myVariable.getRandomValue());
+        this.sendUpdate = true;
+    }
 
-	/**
-	 *
-	 */
-	@Override
-	public synchronized void tick() {
-		double bestCost = Double.MAX_VALUE;
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.anon.cocoa.solvers.Solver#push(org.anon.cocoa.messages.Message)
+     */
+    @Override
+    public synchronized void push(Message m) {
+        if (m.getType().equals(DSASolver.UPDATE_VALUE)) {
+            UUID varId = m.getSource();
 
-		RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
-		this.context.setAssignment(this.myVariable, this.myVariable.getValue());
-		double oldCost = this.parent.getLocalCostIf(this.context);
+            @SuppressWarnings("unchecked")
+            V newValue = (V) m.getInteger(DSASolver.KEY_VARVALUE);
 
-		for (V value : this.myVariable) {
-			this.context.setAssignment(this.myVariable, value);
+            this.context.put(varId, newValue);
+        }
+    }
 
-			double localCost = this.parent.getLocalCostIf(this.context);
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.anon.cocoa.solvers.Solver#reset()
+     */
+    @Override
+    public void reset() {
+        super.reset();
+        this.context.clear();
+    }
 
-			if (localCost < bestCost) {
-				bestCost = localCost;
-				bestAssignment.clear();
-			}
+    /**
+     *
+     */
+    @Override
+    public synchronized void tick() {
+        switch (this.state) {
+        case PICKVALUE:
+            this.pickValue();
+            this.state = State.SENDVALUE;
+            break;
 
-			if (localCost <= bestCost) {
-				bestAssignment.add(value);
-			}
-		}
+        default:
+        case SENDVALUE:
+            this.updateMyValue();
+            this.state = State.PICKVALUE;
+            break;
+        }
+    }
 
-		if (bestCost > oldCost) {
-			return;
-		}
+    public void pickValue() {
+        double bestCost = Double.MAX_VALUE;
 
-		if ((bestCost == oldCost) && (Math.random() > DSASolver.CHANGE_TO_EQUAL_PROB)) {
-			return;
-		}
+        RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
+        this.context.setAssignment(this.myVariable, this.myVariable.getValue());
+        double oldCost = this.parent.getLocalCostIf(this.context);
 
-		if ((bestCost < oldCost) && (Math.random() > DSASolver.CHANGE_TO_IMPROVE_PROB)) {
-			return;
-		}
+        for (V value : this.myVariable) {
+            this.context.setAssignment(this.myVariable, value);
 
-		// Chose any of the "best" assignments
-		V assign = bestAssignment.randomElement();
+            double localCost = this.parent.getLocalCostIf(this.context);
 
-		if (assign != this.myVariable.getValue()) {
-			this.updateMyValue(assign);
-		}
-	}
+            if (localCost < bestCost) {
+                bestCost = localCost;
+                bestAssignment.clear();
+            }
 
-	/**
-	 * @param assign
-	 */
-	private void updateMyValue(V assign) {
-		this.myVariable.setValue(assign);
+            if (localCost <= bestCost) {
+                bestAssignment.add(value);
+            }
+        }
 
-		HashMessage nextMessage = new HashMessage(this.myVariable.getID(), DSASolver.UPDATE_VALUE);
-		nextMessage.put(DSASolver.KEY_VARVALUE, assign);
+        if (bestCost > oldCost) {
+            return;
+        }
 
-		this.sendToNeighbors(nextMessage);
-	}
+        if ((bestCost == oldCost) && (Math.random() > DSASolver.CHANGE_TO_EQUAL_PROB)) {
+            return;
+        }
+
+        if ((bestCost < oldCost) && (Math.random() > DSASolver.CHANGE_TO_IMPROVE_PROB)) {
+            return;
+        }
+
+        // Chose any of the "best" assignments
+        V assign = bestAssignment.randomElement();
+
+        if (assign != this.myVariable.getValue()) {
+            this.myVariable.setValue(assign);
+            this.sendUpdate = true;
+        } else {
+            this.sendUpdate = false;
+        }
+    }
+
+    /**
+     * @param assign
+     */
+    private void updateMyValue() {
+        if (this.sendUpdate) {
+            HashMessage nextMessage = new HashMessage(this.myVariable.getID(), DSASolver.UPDATE_VALUE);
+            nextMessage.put(DSASolver.KEY_VARVALUE, this.myVariable.getValue());
+
+            this.sendToNeighbors(nextMessage);
+        }
+    }
 
 }

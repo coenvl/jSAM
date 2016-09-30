@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,22 +35,28 @@ import nl.coenvl.sam.variables.PublishableMap;
  */
 public interface Message extends Map<String, String> {
 
-	public String getType();
+    public String getType();
 
-	public UUID getSource();
+    public UUID getSource();
 
-	public void put(String key, Object value);
+    public void put(String key, Object value);
 
-	// public UUID getUUID(String key);
+    public void put(String key, Integer value);
 
-	public Integer getInteger(String key);
+    public void put(String key, Double value);
 
-	public Double getDouble(String key);
+    public void put(String key, PublishableMap<?, ?> value);
 
-	public PublishableMap<?, ?> getMap(String key);
+    // public UUID getUUID(String key);
 
-	public Message clone();
+    public Integer getInteger(String key);
 
-	public long messageSize();
+    public Double getDouble(String key);
+
+    public PublishableMap<?, ?> getMap(String key);
+
+    public Message clone();
+
+    public long messageSize();
 
 }
