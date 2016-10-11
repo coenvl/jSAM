@@ -47,6 +47,10 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
 
     protected AbstractAgent(T var, String name) {
         super();
+        if (var == null) {
+            throw new NullPointerException("Variable may not be null");
+        }
+
         this.name = name;
         this.variable = var;
         this.constraints = new HashSet<>();
@@ -79,9 +83,7 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
 
     @Override
     public void reset() {
-        if (this.variable != null) {
-            this.variable.clear();
-        }
+        this.variable.clear();
     }
 
     @Override

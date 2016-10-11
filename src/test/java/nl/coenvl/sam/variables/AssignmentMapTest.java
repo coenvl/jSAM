@@ -1,9 +1,9 @@
 /**
- * File TestAssignmentMap.java
+ * File AssignmentMapTest.java
  *
  * Copyright 2016 TNO
  */
-package nl.coenvl.sam.tests;
+package nl.coenvl.sam.variables;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,18 +14,18 @@ import nl.coenvl.sam.variables.IntegerVariable;
 import nl.coenvl.sam.variables.Variable;
 
 /**
- * TestAssignmentMap
+ * AssignmentMapTest
  *
  * @author leeuwencjv
  * @version 0.1
  * @since 30 sep. 2016
  */
-public class TestAssignmentMap {
+public class AssignmentMapTest {
 
     private final Variable<Integer> testVariable;
     private AssignmentMap<Integer> map;
 
-    public TestAssignmentMap() {
+    public AssignmentMapTest() {
         this.testVariable = new IntegerVariable(0, 2);
     }
 
@@ -89,7 +89,6 @@ public class TestAssignmentMap {
 
         // Now it it does not have the value
         Assert.assertFalse(this.map.containsAssignment(this.testVariable));
-
     }
 
 }

@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.coenvl.sam.tests;
+package nl.coenvl.sam.constraints;
 
 import java.util.Set;
 import java.util.UUID;
@@ -38,13 +38,13 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 4 mrt. 2016
  */
-public class TestRandomConstraint {
+public class RandomConstraintTest {
 
     private IntegerVariable var1;
     private IntegerVariable var2;
     private RandomConstraint<Integer> arc;
 
-    public TestRandomConstraint() {
+    public RandomConstraintTest() {
         this.var1 = new IntegerVariable(3, 10);
         this.var2 = new IntegerVariable(5, 20);
         this.arc = new RandomConstraint<>(this.var1, this.var2);

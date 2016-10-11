@@ -208,6 +208,8 @@ public class MGM2Solver extends AbstractSolver<IntegerVariable, Integer> impleme
      * with local cost reductions. If receiver, do nothing.
      */
     private void sendOffer() {
+        this.myProblemContext.setAssignment(this.myVariable, this.myVariable.getValue());
+
         // First determine whether we will offer or receive
         if (Math.random() > MGM2Solver.OFFER_PROBABILITY) {
             this.isOfferer = true;

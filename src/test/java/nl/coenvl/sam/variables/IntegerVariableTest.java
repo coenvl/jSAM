@@ -18,7 +18,7 @@
  * limitations under the License.
  *
  */
-package nl.coenvl.sam.tests;
+package nl.coenvl.sam.variables;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -30,10 +30,6 @@ import org.junit.Test;
 import nl.coenvl.sam.exceptions.InvalidDomainException;
 import nl.coenvl.sam.exceptions.InvalidValueException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
-import nl.coenvl.sam.variables.AssignmentMap;
-import nl.coenvl.sam.variables.IntegerVariable;
-import nl.coenvl.sam.variables.PublishableMap;
-import nl.coenvl.sam.variables.RandomAccessVector;
 
 /**
  * testVariable
@@ -44,7 +40,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  *
  */
 @SuppressWarnings("static-method")
-public class TestIntegerVariable {
+public class IntegerVariableTest {
 
     private IntegerVariable var;
 
@@ -156,37 +152,6 @@ public class TestIntegerVariable {
     public void testValue() throws InvalidValueException, VariableNotSetException {
         this.var.setValue(9);
         Assert.assertEquals(this.var.getValue(), new Integer(9));
-    }
-
-    @Test
-    public void testValueCandidates() {
-        RandomAccessVector<Integer> candidates = new RandomAccessVector<>();
-        try {
-            candidates.randomElement();
-            Assert.fail("An exception was expected");
-        } catch (Exception e) {
-            Assert.assertEquals(NoSuchElementException.class, e.getClass());
-        }
-
-        Integer candidate = 4;
-        candidates.add(candidate);
-        for (int i = 1; i < 100; i++) {
-            Assert.assertEquals(candidate, candidates.randomElement());
-        }
-
-        Integer candidate2 = 6;
-        candidates.add(candidate2);
-
-        boolean saw4 = false;
-        boolean saw6 = false;
-
-        for (int i = 1; i < 100; i++) {
-            saw4 = saw4 || (candidates.randomElement() == 4);
-            saw6 = saw6 || (candidates.randomElement() == 6);
-        }
-
-        Assert.assertTrue("Did not see one of the elements, p = 1.5e-30", saw4 && saw6);
-
     }
 
     @Test

@@ -18,7 +18,7 @@
  * limitations under the License.
  *
  */
-package nl.coenvl.sam.tests;
+package nl.coenvl.sam.variables;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -41,7 +41,7 @@ import nl.coenvl.sam.variables.FixedPrecisionVariable;
  *
  */
 @SuppressWarnings("static-method")
-public class TestFixedPrecisionVariable {
+public class FixedPrecisionVariableTest {
 
     private FixedPrecisionVariable var;
 

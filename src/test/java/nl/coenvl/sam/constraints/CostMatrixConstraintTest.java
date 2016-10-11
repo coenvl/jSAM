@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.coenvl.sam.tests;
+package nl.coenvl.sam.constraints;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +43,7 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @since 4 mrt. 2016
  */
 @SuppressWarnings("static-method")
-public class TestCostMatrixConstraint {
+public class CostMatrixConstraintTest {
 
     @Test
     public void testNonValueBehavior() throws InvalidDomainException {

@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
-import nl.coenvl.sam.exceptions.VariableNotInvolvedException;
 import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.Variable;
 
@@ -20,7 +19,7 @@ import nl.coenvl.sam.variables.Variable;
  * @version 0.1
  * @since 27 aug. 2016
  */
-public class LessThanConstraint<T extends Variable<V>, V extends Number> implements Constraint<T, V> {
+public class LessThanConstraint<T extends Variable<V>, V extends Number> extends BinaryConstraint<T, V> {
 
     private final T dynamicVariable;
     private final T staticVariable;
@@ -32,6 +31,7 @@ public class LessThanConstraint<T extends Variable<V>, V extends Number> impleme
      * @param staticVariable
      */
     public LessThanConstraint(T var1, T var2, double lessThanCost) {
+        super(var1, var2);
         this.dynamicVariable = var1;
         this.staticVariable = var2;
         this.cost = lessThanCost;
@@ -48,10 +48,7 @@ public class LessThanConstraint<T extends Variable<V>, V extends Number> impleme
      */
     @Override
     public double getCost(T targetVariable) {
-        if (!targetVariable.equals(this.dynamicVariable)) {
-            throw new VariableNotInvolvedException("Variable " + targetVariable + " is not involved in the constraint");
-        }
-
+        super.assertVariableIsInvolved(targetVariable);
         CompareCounter.compare();
 
         if (!this.dynamicVariable.isSet()) {
@@ -71,10 +68,7 @@ public class LessThanConstraint<T extends Variable<V>, V extends Number> impleme
      */
     @Override
     public double getCostIf(T targetVariable, AssignmentMap<V> valueMap) {
-        if (!targetVariable.equals(this.dynamicVariable)) {
-            throw new VariableNotInvolvedException("Variable " + targetVariable + " is not involved in the constraint");
-        }
-
+        super.assertVariableIsInvolved(targetVariable);
         CompareCounter.compare();
 
         if (!valueMap.containsAssignment(this.dynamicVariable)) {
@@ -105,6 +99,7 @@ public class LessThanConstraint<T extends Variable<V>, V extends Number> impleme
     @Override
     public Set<UUID> getVariableIds() {
         return Collections.singleton(this.dynamicVariable.getID());
+        // return new HashSet<>(Arrays.asList(this.dynamicVariable.getID(), this.staticVariable.getID()));
     }
 
 }
