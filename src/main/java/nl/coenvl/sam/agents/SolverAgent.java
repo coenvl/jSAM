@@ -35,7 +35,6 @@ import nl.coenvl.sam.variables.Variable;
  * @since 11 apr. 2014
  *
  */
-@Deprecated
 public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> implements IterativeSolver {
 
     private SolverRunner mySolver;
@@ -46,7 +45,6 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> i
      */
     public SolverAgent(T var, String name) {
         super(var, name);
-        System.err.println("This class is deprecated and will be deleted in the future: " + this.getClass());
     }
 
     /*
@@ -91,10 +89,37 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> i
         this.mySolver.reset();
     }
 
+    /**
+     * Updates the solver of the Agent. If a solver was already running, it will try to stop that running solver and
+     * update it with the new one. Note that the {@link Solver#init()} function is not called on the solver during this
+     * process.
+     *
+     * @param solver The new solver to be used by this agent
+     */
     public final void setSolver(Solver solver) {
-        this.mySolver = new SolverRunner(solver);
+        if (this.mySolver != null && this.mySolver.started()) {
+            // If a solver was started, clean it up nicely first
+            if (!this.mySolver.emptyQueue()) {
+                try {
+                    System.out.println("Warning queue is not empty of old solver!");
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            this.mySolver.stopThread();
+
+            this.mySolver = new SolverRunner(solver);
+
+            // And then start it again
+            this.mySolver.startThread();
+        } else {
+            // If not, just set it
+            this.mySolver = new SolverRunner(solver);
+        }
     }
 
+    @Deprecated
     public final void setSolver(Solver solver, boolean asynchronous) {
         if (asynchronous) {
             this.mySolver = new SolverRunner(solver);

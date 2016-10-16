@@ -76,8 +76,8 @@ public class LessThanConstraint<T extends Variable<V>, V extends Number> extends
             return 0;
         }
 
-        return valueMap.getAssignment(this.dynamicVariable).doubleValue() < this.staticVariable.getValue().doubleValue()
-                ? 0 : this.cost;
+        return valueMap.getAssignment(this.dynamicVariable).doubleValue() < valueMap.getAssignment(this.staticVariable)
+                .doubleValue() ? 0 : this.cost;
     }
 
     /*

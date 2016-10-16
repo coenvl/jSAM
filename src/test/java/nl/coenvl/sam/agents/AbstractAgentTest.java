@@ -14,9 +14,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import nl.coenvl.sam.constraints.Constraint;
+import nl.coenvl.sam.constraints.InequalityConstraint;
+import nl.coenvl.sam.constraints.LessThanConstraint;
 import nl.coenvl.sam.constraints.RandomConstraint;
 import nl.coenvl.sam.exceptions.VariableNotInvolvedException;
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.DiscreteVariable;
 import nl.coenvl.sam.variables.FixedPrecisionVariable;
 import nl.coenvl.sam.variables.Variable;
@@ -47,6 +50,8 @@ public class AbstractAgentTest {
     @Before
     public void init() {
         this.agent = new PublicConstraintsAgent<>(this.ownedVariable, AbstractAgentTest.TEST_NAME);
+        this.ownedVariable.clear();
+        this.otherVariable.clear();
     }
 
     @Test
@@ -131,17 +136,98 @@ public class AbstractAgentTest {
 
     @Test
     public void getLocalCost() {
-        this.agent.getLocalCost();
+        // Without any constraints should be zero
+        Assert.assertEquals(0.0, this.agent.getLocalCost(), 0);
+
+        // Add a less-than constraint
+        final double lessThanCost = 2.5;
+        Constraint<DiscreteVariable<Double>, Double> lessThanContraint = new LessThanConstraint<>(this.ownedVariable,
+                this.otherVariable, lessThanCost);
+        this.agent.addConstraint(lessThanContraint);
+
+        // Just set some values, it is not about the behavior of the constraint, but about the agent
+        this.ownedVariable.setValue(8.0 / 3);
+        this.otherVariable.setValue(4.0 / 3);
+        Assert.assertEquals(lessThanCost, this.agent.getLocalCost(), 0);
+
+        // Add an inequality constraint
+        final double inequalityCost = 1.337;
+        Constraint<DiscreteVariable<Double>, Double> inequalityContraint = new InequalityConstraint<>(
+                this.ownedVariable, this.otherVariable, inequalityCost);
+        this.agent.addConstraint(inequalityContraint);
+        Assert.assertEquals(lessThanCost, this.agent.getLocalCost(), 0);
+
+        // Set the values to be equal, should make both constraints fail
+        this.otherVariable.setValue(this.ownedVariable.getValue());
+        Assert.assertEquals(lessThanCost + inequalityCost, this.agent.getLocalCost(), 0);
+
+        // Adding the random constraint should increase it, but not sure by how much
+        this.agent.addConstraint(this.constraint);
+        Assert.assertTrue((lessThanCost + inequalityCost) < this.agent.getLocalCost());
+
+        // Removing one constraint leaves the other
+        this.agent.removeConstraint(this.constraint);
+        this.agent.removeConstraint(lessThanContraint);
+        Assert.assertEquals(inequalityCost, this.agent.getLocalCost(), 0);
     }
 
     @Test
     public void getLocalCostIf() {
-        this.agent.getLocalCostIf(null);
+        // Create the assignmentMap
+        AssignmentMap<Double> map = new AssignmentMap<>();
+
+        // Without any constraints should be zero
+        Assert.assertEquals(0.0, this.agent.getLocalCostIf(map), 0);
+
+        // Add a less-than constraint
+        final double lessThanCost = 2.5;
+        Constraint<DiscreteVariable<Double>, Double> lessThanContraint = new LessThanConstraint<>(this.ownedVariable,
+                this.otherVariable, lessThanCost);
+        this.agent.addConstraint(lessThanContraint);
+
+        // Just set some values, it is not about the behavior of the constraint, but about the agent
+        map.setAssignment(this.ownedVariable, 8.0 / 3);
+        map.setAssignment(this.otherVariable, 4.0 / 3);
+        Assert.assertEquals(lessThanCost, this.agent.getLocalCostIf(map), 0);
+
+        // Add an inequality constraint
+        final double inequalityCost = 1.337;
+        Constraint<DiscreteVariable<Double>, Double> inequalityContraint = new InequalityConstraint<>(
+                this.ownedVariable, this.otherVariable, inequalityCost);
+        this.agent.addConstraint(inequalityContraint);
+        Assert.assertEquals(lessThanCost, this.agent.getLocalCostIf(map), 0);
+
+        // Set the values to be equal, should make both constraints fail
+        map.setAssignment(this.otherVariable, map.getAssignment(this.ownedVariable));
+        Assert.assertEquals(lessThanCost + inequalityCost, this.agent.getLocalCostIf(map), 0);
+
+        // Adding the random constraint should increase it, but not sure by how much
+        this.agent.addConstraint(this.constraint);
+        Assert.assertTrue((lessThanCost + inequalityCost) < this.agent.getLocalCostIf(map));
+
+        // Removing one constraint leaves the other
+        this.agent.removeConstraint(this.constraint);
+        this.agent.removeConstraint(lessThanContraint);
+        Assert.assertEquals(inequalityCost, this.agent.getLocalCostIf(map), 0);
     }
 
     @Test
     public void getConstrainedVariableIds() {
-        this.agent.getConstrainedVariableIds();
+        Assert.assertTrue(this.agent.getConstrainedVariableIds().isEmpty());
+
+        this.agent.addConstraint(this.constraint);
+        Assert.assertTrue(this.agent.getConstrainedVariableIds().contains(this.otherVariable.getID()));
+        Assert.assertFalse(this.agent.getConstrainedVariableIds().contains(this.ownedVariable.getID()));
+        Assert.assertEquals(1, this.agent.getConstrainedVariableIds().size());
+
+        // Adding it again should not be of influence
+        this.agent.addConstraint(this.constraint);
+        Assert.assertTrue(this.agent.getConstrainedVariableIds().contains(this.otherVariable.getID()));
+        Assert.assertFalse(this.agent.getConstrainedVariableIds().contains(this.ownedVariable.getID()));
+        Assert.assertEquals(1, this.agent.getConstrainedVariableIds().size());
+
+        this.agent.removeConstraint(this.constraint);
+        Assert.assertTrue(this.agent.getConstrainedVariableIds().isEmpty());
     }
 
     @Test
