@@ -25,7 +25,6 @@ import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
 
-import nl.coenvl.sam.constraints.RandomConstraint;
 import nl.coenvl.sam.exceptions.VariableNotInvolvedException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
 import nl.coenvl.sam.variables.AssignmentMap;

@@ -22,12 +22,6 @@ package nl.coenvl.sam.constraints;
 import org.junit.Assert;
 import org.junit.Test;
 
-import nl.coenvl.sam.constraints.CostMatrixConstraint;
-import nl.coenvl.sam.constraints.InequalityConstraint;
-import nl.coenvl.sam.constraints.PreferentialEqualityConstraint;
-import nl.coenvl.sam.constraints.RandomConstraint;
-import nl.coenvl.sam.constraints.SemiRandomConstraint;
-import nl.coenvl.sam.constraints.SymmetricRandomConstraint;
 import nl.coenvl.sam.exceptions.CostMatrixRangeException;
 import nl.coenvl.sam.exceptions.InvalidDomainException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
@@ -42,7 +36,6 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 4 mrt. 2016
  */
-@SuppressWarnings("static-method")
 public class CostMatrixConstraintTest {
 
     @Test
@@ -225,7 +218,10 @@ public class CostMatrixConstraintTest {
             pref2[i] = Math.random();
         }
 
-        PreferentialEqualityConstraint<Integer> ic = new PreferentialEqualityConstraint<>(var1, var2, pref1, pref2,
+        PreferentialEqualityConstraint<Integer> ic = new PreferentialEqualityConstraint<>(var1,
+                var2,
+                pref1,
+                pref2,
                 ineqCost);
 
         for (Integer v1 : var1) {

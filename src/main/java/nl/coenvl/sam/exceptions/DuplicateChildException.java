@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,16 +32,16 @@ import nl.coenvl.sam.agents.Agent;
  */
 public class DuplicateChildException extends Exception {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 8719376691990837701L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 8719376691990837701L;
 
-	/**
-	 *
-	 */
-	public DuplicateChildException(Agent<?, ?> agent) {
-		super("Duplicate child for agent with name " + agent.getName());
-	}
+    /**
+     *
+     */
+    public DuplicateChildException(Agent<?, ?> agent) {
+        super("Duplicate child for agent with name " + agent.getName());
+    }
 
 }

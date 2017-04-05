@@ -30,7 +30,6 @@ import org.junit.Test;
 import nl.coenvl.sam.exceptions.InvalidDomainException;
 import nl.coenvl.sam.exceptions.InvalidValueException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
-import nl.coenvl.sam.variables.FixedPrecisionVariable;
 
 /**
  * testVariable
@@ -60,21 +59,28 @@ public class FixedPrecisionVariableTest {
         try {
             t = new FixedPrecisionVariable(0, -7, 1);
             Assert.fail("An exception was expected");
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            Assert.assertEquals(e.getClass(), InvalidDomainException.class);
+        }
+
+        try {
+            t = new FixedPrecisionVariable(0, 1, 1.0001);
+            Assert.fail("An exception was expected");
+        } catch (final Exception e) {
             Assert.assertEquals(e.getClass(), InvalidDomainException.class);
         }
 
         try {
             t = new FixedPrecisionVariable(0, 1, 0);
             Assert.fail("An exception was expected");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             Assert.assertEquals(e.getClass(), InvalidDomainException.class);
         }
     }
 
     @Test
     public void testIterator() {
-        Iterator<Double> it = this.var.iterator();
+        final Iterator<Double> it = this.var.iterator();
         Assert.assertTrue(it.hasNext());
         Assert.assertEquals(it.next(), new Double(0));
         Assert.assertEquals(it.next(), new Double(0.125));
@@ -89,18 +95,18 @@ public class FixedPrecisionVariableTest {
         try {
             it.next();
             Assert.fail("An exception was expected");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             Assert.assertEquals(e.getClass(), NoSuchElementException.class);
         }
     }
 
     @Test
     public void testIteratorRemove() {
-        Iterator<Double> it = this.var.iterator();
+        final Iterator<Double> it = this.var.iterator();
         try {
             it.remove();
             Assert.fail("An exception was expected");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             Assert.assertEquals(e.getClass(), UnsupportedOperationException.class);
         }
     }
@@ -120,7 +126,7 @@ public class FixedPrecisionVariableTest {
 
     @Test
     public void testShortHandIter() {
-        for (Double iter : this.var) {
+        for (final Double iter : this.var) {
             System.out.println("Current value is: " + iter);
         }
     }

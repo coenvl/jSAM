@@ -49,7 +49,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
     public static final String UPDATE_VALUE = "DSASolver:Value";
     public static final String KEY_VARVALUE = "value";
 
-    private AssignmentMap<V> context;
+    private final AssignmentMap<V> context;
 
     private boolean sendUpdate;
 
@@ -59,7 +59,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
      * @param dsaAgent
      * @param costfun
      */
-    public DSASolver(Agent<DiscreteVariable<V>, V> agent) {
+    public DSASolver(final Agent<DiscreteVariable<V>, V> agent) {
         super(agent);
         this.context = new AssignmentMap<>();
         this.state = State.SENDVALUE;
@@ -83,12 +83,12 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
      * @see org.anon.cocoa.solvers.Solver#push(org.anon.cocoa.messages.Message)
      */
     @Override
-    public synchronized void push(Message m) {
+    public synchronized void push(final Message m) {
         if (m.getType().equals(DSASolver.UPDATE_VALUE)) {
-            UUID varId = m.getSource();
+            final UUID varId = m.getSource();
 
             @SuppressWarnings("unchecked")
-            V newValue = (V) m.getInteger(DSASolver.KEY_VARVALUE);
+            final V newValue = (V) m.getNumber(DSASolver.KEY_VARVALUE);
 
             this.context.put(varId, newValue);
         }
@@ -127,14 +127,14 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
     public void pickValue() {
         double bestCost = Double.MAX_VALUE;
 
-        RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
+        final RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
         this.context.setAssignment(this.myVariable, this.myVariable.getValue());
-        double oldCost = this.parent.getLocalCostIf(this.context);
+        final double oldCost = this.parent.getLocalCostIf(this.context);
 
-        for (V value : this.myVariable) {
+        for (final V value : this.myVariable) {
             this.context.setAssignment(this.myVariable, value);
 
-            double localCost = this.parent.getLocalCostIf(this.context);
+            final double localCost = this.parent.getLocalCostIf(this.context);
 
             if (localCost < bestCost) {
                 bestCost = localCost;
@@ -159,7 +159,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
         }
 
         // Chose any of the "best" assignments
-        V assign = bestAssignment.randomElement();
+        final V assign = bestAssignment.randomElement();
 
         if (assign != this.myVariable.getValue()) {
             this.myVariable.setValue(assign);
@@ -174,7 +174,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
      */
     private void updateMyValue() {
         if (this.sendUpdate) {
-            HashMessage nextMessage = new HashMessage(this.myVariable.getID(), DSASolver.UPDATE_VALUE);
+            final HashMessage nextMessage = new HashMessage(this.myVariable.getID(), DSASolver.UPDATE_VALUE);
             nextMessage.put(DSASolver.KEY_VARVALUE, this.myVariable.getValue());
 
             this.sendToNeighbors(nextMessage);

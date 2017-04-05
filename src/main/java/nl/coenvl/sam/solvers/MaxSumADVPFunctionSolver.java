@@ -19,16 +19,14 @@
  */
 package nl.coenvl.sam.solvers;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import nl.coenvl.sam.MailMan;
 import nl.coenvl.sam.agents.ConstraintAgent;
-import nl.coenvl.sam.exceptions.InvalidValueException;
-import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.variables.AssignmentMap;
-import nl.coenvl.sam.variables.CostMap;
-import nl.coenvl.sam.variables.IntegerVariable;
+import nl.coenvl.sam.variables.DiscreteVariable;
 
 /**
  * MaxSumADVPFunctionSolver
@@ -37,14 +35,14 @@ import nl.coenvl.sam.variables.IntegerVariable;
  * @version 0.1
  * @since 22 jan. 2016
  */
-public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver<IntegerVariable, Integer> {
+public class MaxSumADVPFunctionSolver<T extends DiscreteVariable<V>, V> extends MaxSumADFunctionSolver<T, V> {
 
     // To make this one generic, we have to forward not values, but valueMaps since there are publishables, and discrete
     // values are not
 
-    private final AssignmentMap<Integer> knownValues;
+    private final AssignmentMap<V> knownValues;
 
-    public MaxSumADVPFunctionSolver(ConstraintAgent<IntegerVariable, Integer> agent) {
+    public MaxSumADVPFunctionSolver(final ConstraintAgent<T, V> agent) {
         super(agent);
         this.knownValues = new AssignmentMap<>();
     }
@@ -55,11 +53,13 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver<IntegerVari
      * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
      */
     @Override
-    public synchronized void push(Message m) {
+    public synchronized void push(final Message m) {
         super.push(m);
 
         if (m.containsKey("value")) {
-            this.knownValues.put(m.getSource(), m.getInteger("value"));
+            @SuppressWarnings("unchecked")
+            final V value = (V) m.get("value");
+            this.knownValues.put(m.getSource(), value);
         }
     }
 
@@ -89,72 +89,55 @@ public class MaxSumADVPFunctionSolver extends MaxSumADFunctionSolver<IntegerVari
         }
 
         // Only works for binary constraints
-        assert (super.numNeighbors() == 2);
+        // assert (super.numNeighbors() == 2);
 
-        for (UUID target : this.parent.getConstrainedVariableIds()) {
+        for (final UUID target : this.parent.getConstrainedVariableIds()) {
             if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
                 continue;
             }
 
-            AssignmentMap<Integer> temp = new AssignmentMap<>();
-
-            // For all values of variable
-            CostMap<Integer> costMap = new CostMap<>();
-            for (Integer value : this.constraintAgent.getVariableWithID(target)) {
-                temp.put(target, value);
-
-                double minCost = Double.MAX_VALUE;
-                // Now we know there is only one other neighbor, so iterate for him
-                for (UUID other : this.parent.getConstrainedVariableIds()) {
-                    if (other == target) {
-                        continue;
-                    }
-
-                    if (minCost < Double.MAX_VALUE) {
-                        throw new InvalidValueException(
-                                "The min cost could not be lowered already, more than one agent in constraint?");
-                    }
-
-                    if (this.knownValues.containsKey(other)) {
-                        // For VP: Only consider known values
-                        Integer val2 = this.knownValues.get(other);
-                        temp.put(other, val2);
-
-                        double cost = this.parent.getLocalCostIf(temp);
-                        if (this.receivedCosts.containsKey(other) && this.receivedCosts.get(other).containsKey(val2)) {
-                            cost += this.receivedCosts.get(other).get(val2);
-                        }
-
-                        // I think this is redundant, because it will always be true
-                        if (cost < minCost) {
-                            minCost = cost;
-                        }
-                    } else {
-                        for (Integer val2 : this.constraintAgent.getVariableWithID(other)) {
-                            temp.put(other, val2);
-                            double cost = this.parent.getLocalCostIf(temp);
-
-                            if (this.receivedCosts.containsKey(other)
-                                    && this.receivedCosts.get(other).containsKey(val2)) {
-                                cost += this.receivedCosts.get(other).get(val2);
-                            }
-
-                            if (cost < minCost) {
-                                minCost = cost;
-                            }
-                        }
-                    }
-                }
-
-                costMap.put(value, minCost);
-            }
-
-            Message msg = new HashMessage(this.constraintAgent.getID(), "FUN2VAR");
-            msg.put("costMap", costMap);
-            MailMan.sendMessage(target, msg);
+            final Message f2vadvp = this.fun2varmessage(target);
+            MailMan.sendMessage(target, f2vadvp);
         }
 
         // this.receivedCosts.clear();
+    }
+
+    @Override
+    protected double findMin(final AssignmentMap<V> temp, final ArrayList<UUID> neighbors, final int i) {
+        if (neighbors.size() == i) {
+            return this.parent.getLocalCostIf(temp);
+        } else {
+            final UUID neighbor = neighbors.get(i);
+            double bestCost = Double.MAX_VALUE;
+
+            if (this.knownValues.containsKey(neighbor)) {
+                final V val = this.knownValues.get(neighbor);
+
+                temp.put(neighbor, val);
+                double cost = this.findMin(temp, neighbors, i + 1);
+
+                if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(val)) {
+                    cost += this.receivedCosts.get(neighbor).get(val);
+                }
+
+                return cost;
+            } else {
+                for (final V val : this.constraintAgent.getVariableWithID(neighbor)) {
+                    temp.put(neighbor, val);
+                    double cost = this.findMin(temp, neighbors, i + 1);
+
+                    if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(val)) {
+                        cost += this.receivedCosts.get(neighbor).get(val);
+                    }
+
+                    if (cost < bestCost) {
+                        bestCost = cost;
+                    }
+                }
+                return bestCost;
+            }
+        }
     }
 
     /*

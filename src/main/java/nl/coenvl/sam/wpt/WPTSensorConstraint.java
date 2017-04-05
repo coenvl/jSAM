@@ -3,8 +3,10 @@
  *
  * Copyright 2016 TNO
  */
-package nl.coenvl.sam.constraints;
+package nl.coenvl.sam.wpt;
 
+import nl.coenvl.sam.constraints.CompareCounter;
+import nl.coenvl.sam.constraints.HigherOrderConstraint;
 import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.Variable;
 
@@ -17,8 +19,7 @@ import nl.coenvl.sam.variables.Variable;
  */
 public class WPTSensorConstraint<T extends Variable<V>, V extends Number> extends HigherOrderConstraint<T, V> {
 
-    public static final double THRESHOLD = 0.5;
-    public static final double CONSTANT = 1.0;
+    public static final double THRESHOLD = 0.018;
     public static final double COST = 1e9;
 
     private final double[] position;
@@ -26,7 +27,7 @@ public class WPTSensorConstraint<T extends Variable<V>, V extends Number> extend
     /**
      *
      */
-    public WPTSensorConstraint(double[] pos) {
+    public WPTSensorConstraint(final double[] pos) {
         this.position = pos;
     }
 
@@ -36,18 +37,9 @@ public class WPTSensorConstraint<T extends Variable<V>, V extends Number> extend
      * @see nl.coenvl.sam.constraints.Constraint#getCost(nl.coenvl.sam.variables.Variable)
      */
     @Override
-    public double getCost(T targetVariable) {
+    public double getCost(final T targetVariable) {
         CompareCounter.compare();
         return this.getExternalCost();
-    }
-
-    /**
-     * @param var
-     * @return
-     */
-    private double distanceTo(T var) {
-        double[] loc = (double[]) var.get("position");
-        return Math.pow(loc[0] - this.position[0], 2) + Math.pow(loc[1] - this.position[1], 2);
     }
 
     /*
@@ -57,17 +49,16 @@ public class WPTSensorConstraint<T extends Variable<V>, V extends Number> extend
      * nl.coenvl.sam.variables.AssignmentMap)
      */
     @Override
-    public double getCostIf(T variable, AssignmentMap<V> valueMap) {
+    public double getCostIf(final T variable, final AssignmentMap<V> valueMap) {
         CompareCounter.compare();
-        double energy = 0;
-        double distance;
-        for (T var : this.constrainedVariables.values()) {
+        double receivedEnergy = 0;
+        for (final T var : this.constrainedVariables.values()) {
             if (valueMap.containsAssignment(var)) {
-                distance = this.distanceTo(var);
-                energy += (WPTSensorConstraint.CONSTANT * valueMap.getAssignment(var).doubleValue()) / distance;
+                final double pathLoss = PathLossFactor.computePathLoss(this.position, (double[]) var.get("position"));
+                receivedEnergy += valueMap.getAssignment(var).doubleValue() * pathLoss;
             }
         }
-        return energy < WPTSensorConstraint.THRESHOLD ? 0 : WPTSensorConstraint.COST;
+        return receivedEnergy < WPTSensorConstraint.THRESHOLD ? 0 : WPTSensorConstraint.COST;
     }
 
     /*
@@ -77,13 +68,12 @@ public class WPTSensorConstraint<T extends Variable<V>, V extends Number> extend
      */
     @Override
     public double getExternalCost() {
-        double energy = 0;
-        double distance;
-        for (T var : this.constrainedVariables.values()) {
-            distance = this.distanceTo(var);
-            energy += (WPTSensorConstraint.CONSTANT * var.getValue().doubleValue()) / distance;
+        double receivedEnergy = 0;
+        for (final T var : this.constrainedVariables.values()) {
+            final double pathLoss = PathLossFactor.computePathLoss(this.position, (double[]) var.get("position"));
+            receivedEnergy += (var.getValue().doubleValue()) * pathLoss;
         }
-        return energy < WPTSensorConstraint.THRESHOLD ? 0 : WPTSensorConstraint.COST;
+        return receivedEnergy < WPTSensorConstraint.THRESHOLD ? 0 : WPTSensorConstraint.COST;
     }
 
 }

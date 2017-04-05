@@ -58,7 +58,10 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
      * @param name
      * @param var
      */
-    public BinaryConstraintAgent(String name, BinaryConstraint<T, V> constraint, T var1, T var2) {
+    public BinaryConstraintAgent(final String name,
+            final BinaryConstraint<T, V> constraint,
+            final T var1,
+            final T var2) {
         super();
         this.name = name;
         this.myConstraint = constraint;
@@ -85,7 +88,7 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
      * @see nl.coenvl.sam.Agent#push(nl.coenvl.sam.Message)
      */
     @Override
-    public final synchronized void push(Message m) {
+    public final synchronized void push(final Message m) {
         this.mySolver.push(m);
     }
 
@@ -109,17 +112,17 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
         this.mySolver.reset();
     }
 
-    public final void setSolver(IterativeSolver solver) {
+    public final void setSolver(final IterativeSolver solver) {
         this.mySolver = new SolverRunner(solver);
     }
 
-    @Override
-    public boolean isFinished() {
-        return this.mySolver.emptyQueue();
-    }
+    // @Override
+    // public boolean isFinished() {
+    // return this.mySolver.emptyQueue();
+    // }
 
     @Override
-    public T getVariableWithID(UUID id) {
+    public T getVariableWithID(final UUID id) {
         if (this.var1.getID().equals(id)) {
             return this.var1;
         } else if (this.var2.getID().equals(id)) {
@@ -173,7 +176,7 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
      * @see nl.coenvl.sam.agents.Agent#getLocalCostIf(nl.coenvl.sam.variables.AssignmentMap)
      */
     @Override
-    public double getLocalCostIf(AssignmentMap<V> valueMap) {
+    public double getLocalCostIf(final AssignmentMap<V> valueMap) {
         return this.myConstraint.getCostIf(this.var1, valueMap) + this.myConstraint.getCostIf(this.var2, valueMap);
     }
 
@@ -228,7 +231,7 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
             }
 
             @Override
-            public Variable<V> setValue(V value) throws InvalidValueException {
+            public Variable<V> setValue(final V value) throws InvalidValueException {
                 throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
             }
 
@@ -238,19 +241,19 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
             }
 
             @Override
-            public boolean has(String key) {
+            public boolean has(final String key) {
                 throw new UnsupportedOperationException(
                         "Cannot access properties of the variable of a constraint agent");
             }
 
             @Override
-            public Object get(String key) throws PropertyNotSetException {
+            public Object get(final String key) throws PropertyNotSetException {
                 throw new UnsupportedOperationException(
                         "Cannot access properties of the variable of a constraint agent");
             }
 
             @Override
-            public void set(String key, Object val) throws InvalidPropertyException {
+            public void set(final String key, final Object val) throws InvalidPropertyException {
                 throw new UnsupportedOperationException(
                         "Cannot access properties of the variable of a constraint agent");
             }
@@ -265,7 +268,7 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
      * @see nl.coenvl.sam.agents.Agent#addConstraint(nl.coenvl.sam.constraints.Constraint)
      */
     @Override
-    public void addConstraint(Constraint<T, V> c) {
+    public void addConstraint(final Constraint<T, V> c) {
         throw new UnsupportedOperationException("Cannot add Constraints to ConstraintAgent");
     }
 
@@ -275,7 +278,7 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
      * @see nl.coenvl.sam.agents.Agent#removeConstraint(nl.coenvl.sam.constraints.Constraint)
      */
     @Override
-    public void removeConstraint(Constraint<T, V> c) {
+    public void removeConstraint(final Constraint<T, V> c) {
         throw new UnsupportedOperationException("Cannot remove Constraints to ConstraintAgent");
     }
 
@@ -285,7 +288,7 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
      * @see nl.coenvl.sam.agents.Agent#getConstraintForAgent(java.util.UUID)
      */
     @Override
-    public Constraint<T, V> getConstraintForAgent(UUID target) {
+    public Constraint<T, V> getConstraintForAgent(final UUID target) {
         throw new UnsupportedOperationException("Cannot get Constraints from ConstraintAgent");
     }
 

@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,33 +34,33 @@ import nl.coenvl.sam.exceptions.PropertyNotSetException;
  */
 public abstract class AbstractPropertyOwner implements PropertyOwner {
 
-	private final Map<String, Object> properties;
+    private final Map<String, Object> properties;
 
-	protected AbstractPropertyOwner() {
-		this.properties = new HashMap<>();
-	}
+    protected AbstractPropertyOwner() {
+        this.properties = new HashMap<>();
+    }
 
-	@Override
-	public final boolean has(String key) {
-		return this.properties.containsKey(key);
-	}
+    @Override
+    public final boolean has(String key) {
+        return this.properties.containsKey(key);
+    }
 
-	@Override
-	public Object get(String key) throws PropertyNotSetException {
-		if (!this.properties.containsKey(key)) {
-			throw new PropertyNotSetException(key);
-		}
+    @Override
+    public Object get(String key) throws PropertyNotSetException {
+        if (!this.properties.containsKey(key)) {
+            throw new PropertyNotSetException(key);
+        }
 
-		return this.properties.get(key);
-	}
+        return this.properties.get(key);
+    }
 
-	@Override
-	public final void set(String key, Object val) throws InvalidPropertyException {
-		if (key == null || key.isEmpty()) {
-			throw new InvalidPropertyException("Property name cannot be empty");
-		}
+    @Override
+    public final void set(String key, Object val) throws InvalidPropertyException {
+        if (key == null || key.isEmpty()) {
+            throw new InvalidPropertyException("Property name cannot be empty");
+        }
 
-		this.properties.put(key, val);
-	}
+        this.properties.put(key, val);
+    }
 
 }

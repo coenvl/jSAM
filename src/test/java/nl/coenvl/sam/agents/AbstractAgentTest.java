@@ -59,7 +59,7 @@ public class AbstractAgentTest {
         Assert.assertEquals(AbstractAgentTest.TEST_NAME, this.agent.getName());
 
         // Not setting a name is allowed
-        Agent<DiscreteVariable<Double>, Double> a = new VariableAgent<>(this.ownedVariable, null);
+        final Agent<DiscreteVariable<Double>, Double> a = new VariableAgent<>(this.ownedVariable, null);
         Assert.assertNull(a.getName());
 
         Assert.assertNotNull(a.toString());
@@ -72,10 +72,10 @@ public class AbstractAgentTest {
         // Not setting a ownedVariable is not allowed
         try {
             @SuppressWarnings("unused")
-            VariableAgent<DiscreteVariable<Double>, Double> variableAgent = new VariableAgent<>(null,
+            final VariableAgent<DiscreteVariable<Double>, Double> variableAgent = new VariableAgent<>(null,
                     AbstractAgentTest.TEST_NAME);
             Assert.fail("Expected NullPointerException");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             Assert.assertEquals(NullPointerException.class, e.getClass());
         }
     }
@@ -119,12 +119,12 @@ public class AbstractAgentTest {
         Assert.assertTrue(this.agent.getConstraints().isEmpty());
 
         // Cannot add the following constraint:
-        Constraint<DiscreteVariable<Double>, Double> incorrect = new RandomConstraint<>(this.otherVariable,
+        final Constraint<DiscreteVariable<Double>, Double> incorrect = new RandomConstraint<>(this.otherVariable,
                 this.otherVariable);
         try {
             this.agent.addConstraint(incorrect);
             Assert.fail("Expected VariableNotSetException");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             Assert.assertEquals(VariableNotInvolvedException.class, e.getClass());
         }
         Assert.assertFalse(this.agent.getConstraints().contains(incorrect));
@@ -141,8 +141,10 @@ public class AbstractAgentTest {
 
         // Add a less-than constraint
         final double lessThanCost = 2.5;
-        Constraint<DiscreteVariable<Double>, Double> lessThanContraint = new LessThanConstraint<>(this.ownedVariable,
-                this.otherVariable, lessThanCost);
+        final Constraint<DiscreteVariable<Double>, Double> lessThanContraint = new LessThanConstraint<>(
+                this.ownedVariable,
+                this.otherVariable,
+                lessThanCost);
         this.agent.addConstraint(lessThanContraint);
 
         // Just set some values, it is not about the behavior of the constraint, but about the agent
@@ -152,8 +154,10 @@ public class AbstractAgentTest {
 
         // Add an inequality constraint
         final double inequalityCost = 1.337;
-        Constraint<DiscreteVariable<Double>, Double> inequalityContraint = new InequalityConstraint<>(
-                this.ownedVariable, this.otherVariable, inequalityCost);
+        final Constraint<DiscreteVariable<Double>, Double> inequalityContraint = new InequalityConstraint<>(
+                this.ownedVariable,
+                this.otherVariable,
+                inequalityCost);
         this.agent.addConstraint(inequalityContraint);
         Assert.assertEquals(lessThanCost, this.agent.getLocalCost(), 0);
 
@@ -174,15 +178,17 @@ public class AbstractAgentTest {
     @Test
     public void getLocalCostIf() {
         // Create the assignmentMap
-        AssignmentMap<Double> map = new AssignmentMap<>();
+        final AssignmentMap<Double> map = new AssignmentMap<>();
 
         // Without any constraints should be zero
         Assert.assertEquals(0.0, this.agent.getLocalCostIf(map), 0);
 
         // Add a less-than constraint
         final double lessThanCost = 2.5;
-        Constraint<DiscreteVariable<Double>, Double> lessThanContraint = new LessThanConstraint<>(this.ownedVariable,
-                this.otherVariable, lessThanCost);
+        final Constraint<DiscreteVariable<Double>, Double> lessThanContraint = new LessThanConstraint<>(
+                this.ownedVariable,
+                this.otherVariable,
+                lessThanCost);
         this.agent.addConstraint(lessThanContraint);
 
         // Just set some values, it is not about the behavior of the constraint, but about the agent
@@ -192,8 +198,10 @@ public class AbstractAgentTest {
 
         // Add an inequality constraint
         final double inequalityCost = 1.337;
-        Constraint<DiscreteVariable<Double>, Double> inequalityContraint = new InequalityConstraint<>(
-                this.ownedVariable, this.otherVariable, inequalityCost);
+        final Constraint<DiscreteVariable<Double>, Double> inequalityContraint = new InequalityConstraint<>(
+                this.ownedVariable,
+                this.otherVariable,
+                inequalityCost);
         this.agent.addConstraint(inequalityContraint);
         Assert.assertEquals(lessThanCost, this.agent.getLocalCostIf(map), 0);
 
@@ -257,12 +265,12 @@ public class AbstractAgentTest {
          * @param var
          * @param name
          */
-        protected PublicConstraintsAgent(T var, String name) {
+        protected PublicConstraintsAgent(final T var, final String name) {
             super(var, name);
         }
 
         @Override
-        public void push(Message m) {
+        public void push(final Message m) {
             // Do nothing
         }
 
@@ -271,16 +279,16 @@ public class AbstractAgentTest {
             // Do nothing
         }
 
-        @Override
-        public boolean isFinished() {
-            return false;
-        }
+        // @Override
+        // public boolean isFinished() {
+        // return false;
+        // }
 
         // This is a dirty hack, but for testing purposes I will allow it.
         @SuppressWarnings("unchecked")
         public Set<Constraint<T, V>> getConstraints() throws IllegalAccessException {
             try {
-                Field f = AbstractAgent.class.getDeclaredField("constraints");
+                final Field f = AbstractAgent.class.getDeclaredField("constraints");
                 f.setAccessible(true);
                 return (Set<Constraint<T, V>>) f.get(this);
             } catch (NoSuchFieldException | SecurityException e) {

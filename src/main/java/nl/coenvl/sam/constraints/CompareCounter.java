@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,18 +29,18 @@ package nl.coenvl.sam.constraints;
  */
 public abstract class CompareCounter {
 
-	private static int nComparisons = 0;
+    private static int nComparisons = 0;
 
-	public static void compare() {
-		CompareCounter.nComparisons++;
-	}
+    public static void compare() {
+        CompareCounter.nComparisons++;
+    }
 
-	public static int getComparisons() {
-		return CompareCounter.nComparisons;
-	}
+    public static int getComparisons() {
+        return CompareCounter.nComparisons;
+    }
 
-	public static void reset() {
-		CompareCounter.nComparisons = 0;
-	}
+    public static void reset() {
+        CompareCounter.nComparisons = 0;
+    }
 
 }

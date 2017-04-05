@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,63 +31,63 @@ import nl.coenvl.sam.variables.Variable;
  */
 public class InequalityConstraint<T extends Variable<V>, V> extends BinaryConstraint<T, V> {
 
-	private final double cost;
+    private final double cost;
 
-	/**
-	 * @param var1
-	 * @param var2
-	 */
-	public InequalityConstraint(T var1, T var2, double inequalityCost) {
-		super(var1, var2);
-		this.cost = inequalityCost;
-	}
+    /**
+     * @param var1
+     * @param var2
+     */
+    public InequalityConstraint(T var1, T var2, double inequalityCost) {
+        super(var1, var2);
+        this.cost = inequalityCost;
+    }
 
-	public InequalityConstraint(T var1, T var2) {
-		this(var1, var2, 0.5);
-	}
+    public InequalityConstraint(T var1, T var2) {
+        this(var1, var2, 0.5);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.constraints.Constraint#getCost(nl.coenvl.sam.variables. Variable)
-	 */
-	@Override
-	public double getCost(T targetVariable) {
-		super.assertVariableIsInvolved(targetVariable);
-		CompareCounter.compare();
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.constraints.Constraint#getCost(nl.coenvl.sam.variables. Variable)
+     */
+    @Override
+    public double getCost(T targetVariable) {
+        super.assertVariableIsInvolved(targetVariable);
+        CompareCounter.compare();
 
-		if (this.var1.getValue().equals(this.var2.getValue())) {
-			return this.cost;
-		}
+        if (this.var1.getValue().equals(this.var2.getValue())) {
+            return this.cost;
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.constraints.Constraint#getCostIf(nl.coenvl.sam.variables. Variable, java.util.Map)
-	 */
-	@Override
-	public double getCostIf(T targetVariable, AssignmentMap<V> values) {
-		super.assertVariableIsInvolved(targetVariable);
-		CompareCounter.compare();
-		if (values.containsAssignment(this.var1) && values.containsAssignment(this.var2)
-				&& values.getAssignment(this.var1).equals(values.getAssignment(this.var2))) {
-			return this.cost;
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.constraints.Constraint#getCostIf(nl.coenvl.sam.variables. Variable, java.util.Map)
+     */
+    @Override
+    public double getCostIf(T targetVariable, AssignmentMap<V> values) {
+        super.assertVariableIsInvolved(targetVariable);
+        CompareCounter.compare();
+        if (values.containsAssignment(this.var1) && values.containsAssignment(this.var2)
+                && values.getAssignment(this.var1).equals(values.getAssignment(this.var2))) {
+            return this.cost;
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see nl.coenvl.sam.constraints.Constraint#getExternalCost()
-	 */
-	@Override
-	public double getExternalCost() {
-		return this.var1.getValue().equals(this.var2.getValue()) ? 2 * this.cost : 0;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.constraints.Constraint#getExternalCost()
+     */
+    @Override
+    public double getExternalCost() {
+        return this.var1.getValue().equals(this.var2.getValue()) ? 2 * this.cost : 0;
+    }
 
 }

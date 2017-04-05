@@ -1,5 +1,5 @@
 eclipse.preferences.version=1
-encoding//src/main/java/nl/coenvl/sam/solvers/MaxSumADVPFunctionSolver.java=UTF-8
-encoding//src/main/java/nl/coenvl/sam/solvers/MaxSumADVPVariableSolver.java=UTF-8
-encoding//src/main/java/nl/coenvl/sam/solvers/MaxSumFunctionSolver.java=UTF-8
-encoding//src/main/java/nl/coenvl/sam/solvers/MaxSumVariableSolver.java=UTF-8
+encoding//src/main/java=UTF-8
+encoding//src/main/resources=UTF-8
+encoding//src/test/java=UTF-8
+encoding/<project>=UTF-8

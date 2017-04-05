@@ -44,29 +44,24 @@ public final class HashMessage extends HashMap<String, String> implements Messag
 
     private final UUID source;
 
-    public HashMessage(UUID source, String type) {
+    public HashMessage(final UUID source, final String type) {
         super();
         this.source = source;
         this.type = type;
     }
 
     @Override
-    public void put(String key, Object value) {
+    public void put(final String key, final Object value) {
         super.put(key, value.toString());
     }
 
     @Override
-    public void put(String key, Integer value) {
+    public void put(final String key, final Number value) {
         super.put(key, value.toString());
     }
 
     @Override
-    public void put(String key, Double value) {
-        super.put(key, value.toString());
-    }
-
-    @Override
-    public void put(String key, PublishableMap<?, ?> value) {
+    public void put(final String key, final PublishableMap<?, ?> value) {
         super.put(key, value.serialize());
     }
 
@@ -85,24 +80,24 @@ public final class HashMessage extends HashMap<String, String> implements Messag
         return this.source;
     }
 
-    @Override
-    public Integer getInteger(String key) {
-        return Integer.valueOf(super.get(key));
-    }
+    // @Override
+    // public Integer getInteger(String key) {
+    // return Integer.valueOf(super.get(key));
+    // }
 
     @Override
-    public Double getDouble(String key) {
+    public Double getNumber(final String key) {
         return Double.valueOf(super.get(key));
     }
 
     @Override
-    public PublishableMap<?, ?> getMap(String key) {
+    public PublishableMap<?, ?> getMap(final String key) {
         return PublishableMap.deserialize(super.get(key));
     }
 
     @Override
     public HashMessage clone() {
-        HashMessage clone = new HashMessage(this.source, this.type);
+        final HashMessage clone = new HashMessage(this.source, this.type);
         clone.putAll(this);
         return clone;
     }

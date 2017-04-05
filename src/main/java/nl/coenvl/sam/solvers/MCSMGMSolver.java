@@ -54,7 +54,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
     private final CostMap<UUID> neighborImpacts;
     private final Map<ConstraintKey, ConstraintCost> constraintChanges;
 
-    public MCSMGMSolver(Agent<DiscreteVariable<V>, V> agent) {
+    public MCSMGMSolver(final Agent<DiscreteVariable<V>, V> agent) {
         super(agent);
         this.neighborImpacts = new CostMap<>();
         this.constraintChanges = new HashMap<>();
@@ -66,7 +66,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
         super.push(m);
 
         if (m.getType().equals(MCSMGMSolver.IMPACT_VALUE)) {
-            this.neighborImpacts.put(m.getSource(), m.getDouble("delta"));
+            this.neighborImpacts.put(m.getSource(), m.getNumber("delta").doubleValue());
         }
     }
 
@@ -101,29 +101,30 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
      */
     private void sendImpact() {
 
-        for (UUID target : this.parent.getConstrainedVariableIds()) {
-            AssignmentMap<V> pa = new AssignmentMap<>();
+        for (final UUID target : this.parent.getConstrainedVariableIds()) {
+            final AssignmentMap<V> pa = new AssignmentMap<>();
             pa.setAssignment(this.myVariable, this.myVariable.getValue());
             pa.put(target, this.myProblemContext.get(target));
 
             // Compute the cost INCREASE due to the update
-            double delta = this.parent.getConstraintForAgent(target).getCostIf(this.myVariable, pa);
+            final double delta = this.parent.getConstraintForAgent(target).getCostIf(this.myVariable, pa);
             // double delta = this.parent.getLocalCostIf(pa);
 
             // See if we have any modified problem
-            ConstraintKey key = new ConstraintKey(target, this.myVariable.getValue(),
+            final ConstraintKey key = new ConstraintKey(target,
+                    this.myVariable.getValue(),
                     this.myProblemContext.get(target));
             if (!this.constraintChanges.containsKey(key)) {
                 this.constraintChanges.put(key, new ConstraintCost());
             }
 
-            ConstraintCost r = this.constraintChanges.get(key);
+            final ConstraintCost r = this.constraintChanges.get(key);
             if (r.localCost == null) {
                 r.localCost = delta;
             }
 
             // Inform the neighbors
-            HashMessage m = new HashMessage(this.myVariable.getID(), MCSMGMSolver.IMPACT_VALUE);
+            final HashMessage m = new HashMessage(this.myVariable.getID(), MCSMGMSolver.IMPACT_VALUE);
 
             // Only add delta if we want to propagate back our cost
             if (delta > 0) {
@@ -147,9 +148,9 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
         double before = this.parent.getLocalCostIf(this.myProblemContext);
 
         // First process all the received impact messages
-        for (UUID a : this.parent.getConstrainedVariableIds()) {
+        for (final UUID a : this.parent.getConstrainedVariableIds()) {
             // Can we indeed assume that myProblemContext is still up to date?
-            ConstraintKey key = new ConstraintKey(a, this.myVariable.getValue(), this.myProblemContext.get(a));
+            final ConstraintKey key = new ConstraintKey(a, this.myVariable.getValue(), this.myProblemContext.get(a));
 
             if (!this.constraintChanges.containsKey(key)) {
                 this.constraintChanges.put(key, new ConstraintCost());
@@ -164,17 +165,17 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
         double bestCost = before;
         V bestAssignment = null;
 
-        AssignmentMap<V> temp = this.myProblemContext.clone();
-        for (V assignment : this.myVariable) {
+        final AssignmentMap<V> temp = this.myProblemContext.clone();
+        for (final V assignment : this.myVariable) {
             temp.setAssignment(this.myVariable, assignment);
             double localCost = 0;
 
             // for (Agent a : this.parent.getNeighborhood()) {
-            for (UUID a : this.parent.getConstrainedVariableIds()) {
-                ConstraintKey key = new ConstraintKey(a, assignment, temp.get(a));
+            for (final UUID a : this.parent.getConstrainedVariableIds()) {
+                final ConstraintKey key = new ConstraintKey(a, assignment, temp.get(a));
                 if (this.constraintChanges.containsKey(key)) {
                     // Add remote cost of neighbor)
-                    ConstraintCost r = this.constraintChanges.get(key);
+                    final ConstraintCost r = this.constraintChanges.get(key);
                     localCost += (r.remoteCost == null ? 0 : r.remoteCost);
                 }
             }
@@ -192,7 +193,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
         this.bestLocalReduction = before - bestCost;
         this.bestLocalAssignment = bestAssignment;
 
-        Message lrMsg = new HashMessage(this.myVariable.getID(), MGMSolver.LOCAL_REDUCTION);
+        final Message lrMsg = new HashMessage(this.myVariable.getID(), MGMSolver.LOCAL_REDUCTION);
         lrMsg.put("LR", this.bestLocalReduction);
 
         this.sendToNeighbors(lrMsg);
@@ -207,11 +208,12 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
     }
 
     private class ConstraintKey {
+
         public final V myValue;
         public final V hisValue;
         public final UUID neighbor;
 
-        public ConstraintKey(UUID neighbor, V myValue, V hisValue) {
+        public ConstraintKey(final UUID neighbor, final V myValue, final V hisValue) {
             this.neighbor = neighbor;
             this.myValue = myValue;
             this.hisValue = hisValue;
@@ -238,7 +240,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
          * @see java.lang.Object#equals(java.lang.Object)
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -249,7 +251,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
                 return false;
             }
             @SuppressWarnings("unchecked")
-            ConstraintKey other = (ConstraintKey) obj;
+            final ConstraintKey other = (ConstraintKey) obj;
 
             if (this.hisValue == null) {
                 if (other.hisValue != null) {
@@ -286,6 +288,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
     }
 
     private class ConstraintCost {
+
         public Double remoteCost; // Double because I want to check for null
         public Double localCost;
 

@@ -43,7 +43,7 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> i
      * @param name
      * @param var
      */
-    public SolverAgent(T var, String name) {
+    public SolverAgent(final T var, final String name) {
         super(var, name);
     }
 
@@ -64,7 +64,7 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> i
      * @see nl.coenvl.sam.Agent#push(nl.coenvl.sam.Message)
      */
     @Override
-    public final synchronized void push(Message m) {
+    public final synchronized void push(final Message m) {
         this.mySolver.push(m);
     }
 
@@ -96,14 +96,14 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> i
      *
      * @param solver The new solver to be used by this agent
      */
-    public final void setSolver(Solver solver) {
-        if (this.mySolver != null && this.mySolver.started()) {
+    public final void setSolver(final Solver solver) {
+        if ((this.mySolver != null) && this.mySolver.started()) {
             // If a solver was started, clean it up nicely first
             if (!this.mySolver.emptyQueue()) {
                 try {
                     System.out.println("Warning queue is not empty of old solver!");
                     Thread.sleep(100);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -120,7 +120,7 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> i
     }
 
     @Deprecated
-    public final void setSolver(Solver solver, boolean asynchronous) {
+    public final void setSolver(final Solver solver, final boolean asynchronous) {
         if (asynchronous) {
             this.mySolver = new SolverRunner(solver);
         } else {
@@ -130,9 +130,9 @@ public class SolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> i
         }
     }
 
-    @Override
-    public boolean isFinished() {
-        return this.mySolver.emptyQueue();
-    }
+    // @Override
+    // public boolean isFinished() {
+    // return this.mySolver.emptyQueue();
+    // }
 
 }

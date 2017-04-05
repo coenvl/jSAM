@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,39 +30,39 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  */
 public class PreferentialEqualityConstraint<V> extends CostMatrixConstraint<V> {
 
-	/**
-	 * @param var1
-	 * @param var2
-	 */
-	public PreferentialEqualityConstraint(DiscreteVariable<V> var1,
-			DiscreteVariable<V> var2,
-			double[] pref1,
-			double[] pref2,
-			double inequalityCost) {
-		super(var1,
-				var2,
-				PreferentialEqualityConstraint.buildCostMatrix(pref1, inequalityCost),
-				PreferentialEqualityConstraint.buildCostMatrix(pref2, inequalityCost));
-	}
+    /**
+     * @param var1
+     * @param var2
+     */
+    public PreferentialEqualityConstraint(DiscreteVariable<V> var1,
+            DiscreteVariable<V> var2,
+            double[] pref1,
+            double[] pref2,
+            double inequalityCost) {
+        super(var1,
+                var2,
+                PreferentialEqualityConstraint.buildCostMatrix(pref1, inequalityCost),
+                PreferentialEqualityConstraint.buildCostMatrix(pref2, inequalityCost));
+    }
 
-	/**
-	 * @param pref
-	 * @param inequalityCost
-	 * @return
-	 */
-	private static double[][] buildCostMatrix(double[] pref, double inequalityCost) {
-		int size = pref.length;
-		double[][] costs = new double[size][size];
-		for (int x = 0; x < size; x++) {
-			for (int y = 0; y < size; y++) {
-				if (x == y) {
-					costs[x][y] = pref[x];
-				} else {
-					costs[x][y] = inequalityCost;
-				}
-			}
-		}
-		return costs;
-	}
+    /**
+     * @param pref
+     * @param inequalityCost
+     * @return
+     */
+    private static double[][] buildCostMatrix(double[] pref, double inequalityCost) {
+        int size = pref.length;
+        double[][] costs = new double[size][size];
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                if (x == y) {
+                    costs[x][y] = pref[x];
+                } else {
+                    costs[x][y] = inequalityCost;
+                }
+            }
+        }
+        return costs;
+    }
 
 }

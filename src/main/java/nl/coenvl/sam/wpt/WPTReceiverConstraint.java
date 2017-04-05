@@ -3,8 +3,10 @@
  *
  * Copyright 2016 TNO
  */
-package nl.coenvl.sam.constraints;
+package nl.coenvl.sam.wpt;
 
+import nl.coenvl.sam.constraints.CompareCounter;
+import nl.coenvl.sam.constraints.HigherOrderConstraint;
 import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.Variable;
 
@@ -22,7 +24,7 @@ public class WPTReceiverConstraint<T extends Variable<V>, V extends Number> exte
     /**
      *
      */
-    public WPTReceiverConstraint(double[] pos) {
+    public WPTReceiverConstraint(final double[] pos) {
         this.position = pos;
     }
 
@@ -32,18 +34,9 @@ public class WPTReceiverConstraint<T extends Variable<V>, V extends Number> exte
      * @see nl.coenvl.sam.constraints.Constraint#getCost(nl.coenvl.sam.variables.Variable)
      */
     @Override
-    public double getCost(T targetVariable) {
+    public double getCost(final T targetVariable) {
         CompareCounter.compare();
         return this.getExternalCost();
-    }
-
-    /**
-     * @param var
-     * @return
-     */
-    private double distanceTo(T var) {
-        double[] loc = (double[]) var.get("position");
-        return Math.pow(loc[0] - this.position[0], 2) + Math.pow(loc[1] - this.position[1], 2);
     }
 
     /*
@@ -53,17 +46,16 @@ public class WPTReceiverConstraint<T extends Variable<V>, V extends Number> exte
      * nl.coenvl.sam.variables.AssignmentMap)
      */
     @Override
-    public double getCostIf(T variable, AssignmentMap<V> valueMap) {
+    public double getCostIf(final T variable, final AssignmentMap<V> valueMap) {
         CompareCounter.compare();
-        double energy = 0;
-        double distance;
-        for (T var : this.constrainedVariables.values()) {
+        double receivedEnergy = 0;
+        for (final T var : this.constrainedVariables.values()) {
             if (valueMap.containsAssignment(var)) {
-                distance = this.distanceTo(var);
-                energy += (valueMap.getAssignment(var).doubleValue()) / distance;
+                final double pathLoss = PathLossFactor.computePathLoss(this.position, (double[]) var.get("position"));
+                receivedEnergy += valueMap.getAssignment(var).doubleValue() * pathLoss;
             }
         }
-        return 10 - energy;
+        return -receivedEnergy;
     }
 
     /*
@@ -73,13 +65,12 @@ public class WPTReceiverConstraint<T extends Variable<V>, V extends Number> exte
      */
     @Override
     public double getExternalCost() {
-        double energy = 0;
-        double distance;
-        for (T var : this.constrainedVariables.values()) {
-            distance = this.distanceTo(var);
-            energy += (var.getValue().doubleValue()) / distance;
+        double receivedEnergy = 0;
+        for (final T var : this.constrainedVariables.values()) {
+            final double pathLoss = PathLossFactor.computePathLoss(this.position, (double[]) var.get("position"));
+            receivedEnergy += (var.getValue().doubleValue()) * pathLoss;
         }
-        return 10 - energy;
+        return -receivedEnergy;
     }
 
 }

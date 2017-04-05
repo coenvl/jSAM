@@ -55,7 +55,9 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
 
     private SolverRunner mySolver;
 
-    public HigherOrderConstraintAgent(String name, HigherOrderConstraint<T, V> constraint, Set<T> vars) {
+    public HigherOrderConstraintAgent(final String name,
+            final HigherOrderConstraint<T, V> constraint,
+            final Set<T> vars) {
         super();
         this.name = name;
         this.myConstraint = constraint;
@@ -68,7 +70,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      * @param name
      * @param var
      */
-    public HigherOrderConstraintAgent(String name, HigherOrderConstraint<T, V> constraint, T[] vars) {
+    public HigherOrderConstraintAgent(final String name, final HigherOrderConstraint<T, V> constraint, final T[] vars) {
         this(name, constraint, new HashSet<>(Arrays.asList(vars)));
     }
 
@@ -76,7 +78,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      * @param name
      * @param var
      */
-    public HigherOrderConstraintAgent(String name, HigherOrderConstraint<T, V> constraint, T var) {
+    public HigherOrderConstraintAgent(final String name, final HigherOrderConstraint<T, V> constraint, final T var) {
         this(name, constraint, new HashSet<>(Arrays.asList(var)));
     }
 
@@ -97,7 +99,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      * @see nl.coenvl.sam.Agent#push(nl.coenvl.sam.Message)
      */
     @Override
-    public final synchronized void push(Message m) {
+    public final synchronized void push(final Message m) {
         this.mySolver.push(m);
     }
 
@@ -121,18 +123,18 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
         this.mySolver.reset();
     }
 
-    public final void setSolver(IterativeSolver solver) {
+    public final void setSolver(final IterativeSolver solver) {
         this.mySolver = new SolverRunner(solver);
     }
 
-    @Override
-    public boolean isFinished() {
-        return this.mySolver.emptyQueue();
-    }
+    // @Override
+    // public boolean isFinished() {
+    // return this.mySolver.emptyQueue();
+    // }
 
     @Override
-    public T getVariableWithID(UUID id) {
-        for (T var : this.variables) {
+    public T getVariableWithID(final UUID id) {
+        for (final T var : this.variables) {
             if (var.getID().equals(id)) {
                 return var;
             }
@@ -176,7 +178,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
     @Override
     public double getLocalCost() {
         double cost = 0;
-        for (T var : this.variables) {
+        for (final T var : this.variables) {
             cost += this.myConstraint.getCost(var);
         }
         return cost;
@@ -188,9 +190,9 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      * @see nl.coenvl.sam.agents.Agent#getLocalCostIf(nl.coenvl.sam.variables.AssignmentMap)
      */
     @Override
-    public double getLocalCostIf(AssignmentMap<V> valueMap) {
+    public double getLocalCostIf(final AssignmentMap<V> valueMap) {
         double cost = 0;
-        for (T var : this.variables) {
+        for (final T var : this.variables) {
             cost += this.myConstraint.getCostIf(var, valueMap);
         }
         return cost;
@@ -247,7 +249,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
             }
 
             @Override
-            public Variable<V> setValue(V value) throws InvalidValueException {
+            public Variable<V> setValue(final V value) throws InvalidValueException {
                 throw new UnsupportedOperationException("Cannot use the variable of a constraint agent");
             }
 
@@ -257,19 +259,19 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
             }
 
             @Override
-            public boolean has(String key) {
+            public boolean has(final String key) {
                 throw new UnsupportedOperationException(
                         "Cannot access properties of the variable of a constraint agent");
             }
 
             @Override
-            public Object get(String key) throws PropertyNotSetException {
+            public Object get(final String key) throws PropertyNotSetException {
                 throw new UnsupportedOperationException(
                         "Cannot access properties of the variable of a constraint agent");
             }
 
             @Override
-            public void set(String key, Object val) throws InvalidPropertyException {
+            public void set(final String key, final Object val) throws InvalidPropertyException {
                 throw new UnsupportedOperationException(
                         "Cannot access properties of the variable of a constraint agent");
             }
@@ -284,7 +286,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      * @see nl.coenvl.sam.agents.Agent#addConstraint(nl.coenvl.sam.constraints.Constraint)
      */
     @Override
-    public void addConstraint(Constraint<T, V> c) {
+    public void addConstraint(final Constraint<T, V> c) {
         throw new UnsupportedOperationException("Cannot add Constraints to ConstraintAgent");
     }
 
@@ -294,7 +296,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      * @see nl.coenvl.sam.agents.Agent#removeConstraint(nl.coenvl.sam.constraints.Constraint)
      */
     @Override
-    public void removeConstraint(Constraint<T, V> c) {
+    public void removeConstraint(final Constraint<T, V> c) {
         throw new UnsupportedOperationException("Cannot remove Constraints to ConstraintAgent");
     }
 
@@ -304,7 +306,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      * @see nl.coenvl.sam.agents.Agent#getConstraintForAgent(java.util.UUID)
      */
     @Override
-    public Constraint<T, V> getConstraintForAgent(UUID target) {
+    public Constraint<T, V> getConstraintForAgent(final UUID target) {
         throw new UnsupportedOperationException("Cannot get Constraints from ConstraintAgent");
     }
 

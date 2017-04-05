@@ -44,7 +44,7 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
      * @param name
      * @param var
      */
-    public MultiSolverAgent(T var, String name) {
+    public MultiSolverAgent(final T var, final String name) {
         super(var, name);
     }
 
@@ -85,7 +85,7 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
      * @see nl.coenvl.sam.Agent#push(nl.coenvl.sam.Message)
      */
     @Override
-    public final synchronized void push(Message m) {
+    public final synchronized void push(final Message m) {
         if (this.initSolver != null) {
             this.initSolver.push(m);
         }
@@ -124,7 +124,7 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
         }
     }
 
-    public final void setInitSolver(Solver solver) {
+    public final void setInitSolver(final Solver solver) {
         if (solver == null) {
             this.initSolver = null;
         } else {
@@ -132,14 +132,14 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
         }
     }
 
-    public final void setIterativeSolver(IterativeSolver solver) {
+    public final void setIterativeSolver(final IterativeSolver solver) {
         if (solver == null) {
             this.iterativeSolver = null;
         }
         this.iterativeSolver = new SolverRunner(solver);
     }
 
-    public final void setSolver(Solver solver) {
+    public final void setSolver(final Solver solver) {
         if (solver instanceof IterativeSolver) {
             this.setIterativeSolver((IterativeSolver) solver);
         } else {
@@ -147,9 +147,9 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
         }
     }
 
-    @Override
-    public boolean isFinished() {
-        return this.initSolver.emptyQueue() && this.iterativeSolver.emptyQueue();
-    }
+    // @Override
+    // public boolean isFinished() {
+    // return this.initSolver.emptyQueue() && this.iterativeSolver.emptyQueue();
+    // }
 
 }

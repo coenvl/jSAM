@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,33 +30,33 @@ import java.util.UUID;
  */
 public class AssignmentMap<V> extends PublishableMap<UUID, V> {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -6627005216007138557L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6627005216007138557L;
 
-	public V setAssignment(Variable<V> var, V value) {
-		return super.put(var.getID(), value);
-	}
+    public V setAssignment(Variable<V> var, V value) {
+        return super.put(var.getID(), value);
+    }
 
-	public boolean containsAssignment(Variable<V> var) {
-		return super.containsKey(var.getID());
-	}
+    public boolean containsAssignment(Variable<V> var) {
+        return super.containsKey(var.getID());
+    }
 
-	public V getAssignment(Variable<V> var) {
-		return super.get(var.getID());
-	}
+    public V getAssignment(Variable<V> var) {
+        return super.get(var.getID());
+    }
 
-	public V removeAssignment(Variable<V> var) {
-		return super.remove(var.getID());
-	}
+    public V removeAssignment(Variable<V> var) {
+        return super.remove(var.getID());
+    }
 
-	@Override
-	public AssignmentMap<V> clone() {
-		AssignmentMap<V> clone = new AssignmentMap<>();
-		for (UUID key : this.keySet()) {
-			clone.put(key, this.get(key));
-		}
-		return clone;
-	}
+    @Override
+    public AssignmentMap<V> clone() {
+        AssignmentMap<V> clone = new AssignmentMap<>();
+        for (UUID key : this.keySet()) {
+            clone.put(key, this.get(key));
+        }
+        return clone;
+    }
 }

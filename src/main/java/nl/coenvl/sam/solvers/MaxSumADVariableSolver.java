@@ -35,12 +35,12 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  */
 public class MaxSumADVariableSolver<T extends DiscreteVariable<V>, V> extends MaxSumVariableSolver<T, V> {
 
-    protected final static int REVERSE_AFTER_ITERS = 100;
+    protected final static int REVERSE_AFTER_ITERS = 10;
 
     protected int iterCount;
     protected boolean direction;
 
-    public MaxSumADVariableSolver(VariableAgent<T, V> agent) {
+    public MaxSumADVariableSolver(final VariableAgent<T, V> agent) {
         super(agent);
         this.iterCount = 0;
         this.direction = true;
@@ -59,12 +59,12 @@ public class MaxSumADVariableSolver<T extends DiscreteVariable<V>, V> extends Ma
         }
 
         // Target represents function node f
-        for (UUID target : this.variableAgent.getFunctionAdresses()) {
+        for (final UUID target : this.variableAgent.getFunctionAdresses()) {
             if ((target.hashCode() > this.parent.hashCode()) == this.direction) {
                 continue;
             }
 
-            Message v2f = this.var2funMessage(target);
+            final Message v2f = this.var2funMessage(target);
             MailMan.sendMessage(target, v2f);
         }
 

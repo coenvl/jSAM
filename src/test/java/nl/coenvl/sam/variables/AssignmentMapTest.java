@@ -9,10 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import nl.coenvl.sam.variables.AssignmentMap;
-import nl.coenvl.sam.variables.IntegerVariable;
-import nl.coenvl.sam.variables.Variable;
-
 /**
  * AssignmentMapTest
  *

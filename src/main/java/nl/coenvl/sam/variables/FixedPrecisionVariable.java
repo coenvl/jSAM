@@ -52,8 +52,10 @@ public class FixedPrecisionVariable extends AbstractPropertyOwner implements Dis
      * @throws InvalidDomainException
      *             exception is the lower bound is higher than the upper bound
      */
-    public FixedPrecisionVariable(double lowerBound, double upperBound, double step) {
-        this(lowerBound, upperBound, step,
+    public FixedPrecisionVariable(final double lowerBound, final double upperBound, final double step) {
+        this(lowerBound,
+                upperBound,
+                step,
                 "MyFixedPrecisionVariable" + FixedPrecisionVariable.unnamedVariableSequence++);
     }
 
@@ -74,9 +76,11 @@ public class FixedPrecisionVariable extends AbstractPropertyOwner implements Dis
      *
      * @see #IntegerVariable(Integer, Integer)
      */
-    public FixedPrecisionVariable(double lowerBound, double upperBound, double step, String name)
-            throws InvalidDomainException {
-        if ((lowerBound > upperBound) || (step <= 0)) {
+    public FixedPrecisionVariable(final double lowerBound,
+            final double upperBound,
+            final double step,
+            final String name) throws InvalidDomainException {
+        if ((lowerBound > upperBound) || (step <= 0) || (step > (upperBound - lowerBound))) {
             throw new InvalidDomainException();
         }
 
@@ -115,7 +119,7 @@ public class FixedPrecisionVariable extends AbstractPropertyOwner implements Dis
         try {
             ret = new FixedPrecisionVariable(this.lowerBound, this.upperBound, this.step, this.name + " (clone)");
             ret.value = this.value;
-        } catch (InvalidDomainException e) {
+        } catch (final InvalidDomainException e) {
             e.printStackTrace();
         }
         return ret;
@@ -191,14 +195,14 @@ public class FixedPrecisionVariable extends AbstractPropertyOwner implements Dis
      * @see nl.coenvl.sam.variables.Variable#setValue(java.lang.Object)
      */
     @Override
-    public Variable<Double> setValue(Double value) throws InvalidValueException {
+    public Variable<Double> setValue(final Double value) throws InvalidValueException {
         if ((value < this.lowerBound) || (value > this.upperBound)) {
             throw new InvalidValueException(value);
         } else if (!this.attainableValues.contains(value)) {
             Double best = this.lowerBound;
             double mindiff = Double.MAX_VALUE;
-            for (Double possible : this.attainableValues) {
-                double diff = Math.abs(possible - value);
+            for (final Double possible : this.attainableValues) {
+                final double diff = Math.abs(possible - value);
                 if (diff < mindiff) {
                     mindiff = diff;
                     best = possible;

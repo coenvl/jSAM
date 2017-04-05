@@ -52,7 +52,7 @@ public interface Agent<T extends Variable<V>, V> extends PropertyOwner, Solver {
 
     public Set<UUID> getConstrainedVariableIds();
 
-    public boolean isFinished();
+    // public boolean isFinished();
 
     public Constraint<T, V> getConstraintForAgent(UUID target);
 

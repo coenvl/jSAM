@@ -43,7 +43,7 @@ public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends Abst
     private final Map<UUID, CostMap<V>> receivedCosts;
     protected final VariableAgent<T, V> variableAgent;
 
-    public MaxSumVariableSolver(VariableAgent<T, V> agent) {
+    public MaxSumVariableSolver(final VariableAgent<T, V> agent) {
         super(agent);
         this.variableAgent = agent;
         this.receivedCosts = new HashMap<>();
@@ -55,7 +55,7 @@ public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends Abst
      * @see nl.coenvl.sam.solvers.Solver#init()
      */
     @Override
-    public void init() {
+    public final void init() {
         // Do nothing?
     }
 
@@ -65,12 +65,12 @@ public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends Abst
      * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
      */
     @Override
-    public synchronized void push(Message m) {
+    public synchronized void push(final Message m) {
 
         if (m.getType().equals("FUN2VAR")) {
-            UUID neighbor = m.getSource();
+            final UUID neighbor = m.getSource();
             @SuppressWarnings("unchecked")
-            CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
+            final CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
             this.receivedCosts.put(neighbor, costMap);
         }
 
@@ -94,8 +94,8 @@ public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends Abst
     @Override
     public synchronized void tick() {
         // Target represents function node f
-        for (UUID target : this.variableAgent.getFunctionAdresses()) {
-            Message v2f = this.var2funMessage(target);
+        for (final UUID target : this.variableAgent.getFunctionAdresses()) {
+            final Message v2f = this.var2funMessage(target);
 
             MailMan.sendMessage(target, v2f);
         }
@@ -104,17 +104,18 @@ public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends Abst
         this.receivedCosts.clear();
     }
 
-    protected Message var2funMessage(UUID target) {
+    protected final Message var2funMessage(final UUID target) {
         // For all values of variable
-        CostMap<V> costMap = new CostMap<>();
-        double totalCost = 0;
+        final CostMap<V> costMap = new CostMap<>();
+        // double totalCost = 0;
+        double minCost = Double.MAX_VALUE;
 
-        for (V value : this.myVariable) {
+        for (final V value : this.myVariable) {
             double valueCost = 0;
 
             // The sum of costs for this value it received from all function neighbors apart from f in iteration i −
             // 1.
-            for (UUID neighbor : this.variableAgent.getFunctionAdresses()) {
+            for (final UUID neighbor : this.variableAgent.getFunctionAdresses()) {
                 if (neighbor != target) {
                     if (this.receivedCosts.containsKey(neighbor)
                             && this.receivedCosts.get(neighbor).containsKey(value)) {
@@ -123,28 +124,32 @@ public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends Abst
                 }
             }
 
-            totalCost += valueCost;
+            if (valueCost < minCost) {
+                minCost = valueCost;
+            }
+
+            // totalCost += valueCost;
             costMap.put(value, valueCost);
         }
 
         // Normalize to avoid increasingly large values
-        double avg = totalCost / costMap.size();
-        for (V value : this.myVariable) {
-            costMap.put(value, costMap.get(value) - avg);
+        // final double avg = totalCost / costMap.size();
+        for (final V value : this.myVariable) {
+            costMap.put(value, costMap.get(value) - minCost);
         }
 
-        Message msg = new HashMessage(this.myVariable.getID(), "VAR2FUN");
+        final Message msg = new HashMessage(this.myVariable.getID(), "VAR2FUN");
         msg.put("costMap", costMap);
         return msg;
     }
 
-    protected void setMinimizingValue() {
+    protected final void setMinimizingValue() {
         double minCost = Double.MAX_VALUE;
         V bestAssignment = null;
 
-        for (V value : this.myVariable) {
+        for (final V value : this.myVariable) {
             double valueCost = 0;
-            for (UUID neighbor : this.variableAgent.getFunctionAdresses()) {
+            for (final UUID neighbor : this.variableAgent.getFunctionAdresses()) {
                 if (this.receivedCosts.containsKey(neighbor) && this.receivedCosts.get(neighbor).containsKey(value)) {
                     valueCost += this.receivedCosts.get(neighbor).get(value);
                 }

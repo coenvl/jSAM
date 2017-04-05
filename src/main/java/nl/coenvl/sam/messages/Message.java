@@ -41,17 +41,15 @@ public interface Message extends Map<String, String> {
 
     public void put(String key, Object value);
 
-    public void put(String key, Integer value);
-
-    public void put(String key, Double value);
+    public void put(String key, Number value);
 
     public void put(String key, PublishableMap<?, ?> value);
 
     // public UUID getUUID(String key);
 
-    public Integer getInteger(String key);
+    // public Integer getInteger(String key);
 
-    public Double getDouble(String key);
+    public Number getNumber(String key);
 
     public PublishableMap<?, ?> getMap(String key);
 
