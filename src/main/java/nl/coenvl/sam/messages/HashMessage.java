@@ -52,13 +52,17 @@ public final class HashMessage extends HashMap<String, String> implements Messag
 
     @Override
     public void put(final String key, final Object value) {
-        super.put(key, value.toString());
+        if (value != null) {
+            super.put(key, value.toString());
+        }
     }
 
-    @Override
-    public void put(final String key, final Number value) {
-        super.put(key, value.toString());
-    }
+    /*
+     * @Override
+     * public void put(final String key, final Number value) {
+     * super.put(key, value.toString());
+     * }
+     */
 
     @Override
     public void put(final String key, final PublishableMap<?, ?> value) {

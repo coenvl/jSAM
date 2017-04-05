@@ -54,7 +54,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
     private final AssignmentMap<V> myProblemContext;
     private final CostMap<UUID> impactCosts;
     private State currentState;
-    protected String myProposal;
+    protected V myProposal;
 
     public ACLSSolver(final Agent<DiscreteVariable<V>, V> agent) {
         super(agent);
@@ -149,9 +149,9 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 
         // Determine the proposal for this round
         if (improvementSet.isEmpty()) {
-            this.myProposal = "";
+            this.myProposal = null;
         } else {
-            this.myProposal = improvementSet.randomElement().toString();
+            this.myProposal = improvementSet.randomElement(); // .toString();
         }
 
         // Send the proposal to all neighbors
@@ -172,7 +172,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         final String proposal = m.get("proposal");
         double impact;
 
-        if (proposal.isEmpty()) {
+        if (proposal == null) { // .isEmpty()) {
             impact = 0.;
         } else {
             final AssignmentMap<V> temp = this.myProblemContext.clone();
@@ -198,7 +198,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
      *
      */
     private void decideAssignment() {
-        if (this.myProposal.isEmpty()) {
+        if (this.myProposal == null) { // .isEmpty()) {
             return;
         }
 
@@ -207,8 +207,8 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 
         final double currentCost = this.parent.getLocalCostIf(temp);
 
-        @SuppressWarnings("unchecked")
-        final V proposedValue = (V) Double.valueOf(this.myProposal);
+        // @SuppressWarnings("unchecked")
+        final V proposedValue = this.myProposal; // (V) Double.valueOf(this.myProposal);
         temp.setAssignment(this.myVariable, proposedValue);
 
         double totalImpact = this.parent.getLocalCostIf(temp) - currentCost;

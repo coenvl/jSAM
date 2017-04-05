@@ -46,7 +46,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  * @since 2 april 2015
  *
  */
-public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number> implements IterativeSolver {
+public class MGM2Solver extends AbstractSolver<DiscreteVariable<Integer>, Integer> implements IterativeSolver {
 
     /*
      * Note: For now I cannot make it generic since GSON won't properly encode the Offer lists.
@@ -78,16 +78,16 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number>
     private static final String GAIN = "MGM2:UtilityGain";
     private static final String GO = "MGM2:GO";
 
-    private final AssignmentMap<Number> myProblemContext;
+    private final AssignmentMap<Integer> myProblemContext;
     private State algoState;
     private final List<Offer> receivedOffers;
     private final AssignmentMap<Double> neighborGains;
     private boolean isOfferer;
     private Offer committedOffer;
-    private Number bestLocalAssignment;
+    private Integer bestLocalAssignment;
     private double bestLocalReduction;
 
-    public MGM2Solver(final Agent<DiscreteVariable<Number>, Number> agent) {
+    public MGM2Solver(final Agent<DiscreteVariable<Integer>, Integer> agent) {
         super(agent);
 
         this.algoState = State.Value;
@@ -106,7 +106,7 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number>
         final UUID source = m.getSource();
 
         if (m.getType().equals(MGM2Solver.UPDATE_VALUE)) {
-            final Number value = m.getNumber("value");
+            final Integer value = m.getNumber("value").intValue();
 
             this.myProblemContext.put(source, value);
         } else if (m.getType().equals(MGM2Solver.OFFER)) {
@@ -222,15 +222,15 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number>
             assert (neighbor != null);
 
             // Get all offers that reduce the local cost
-            final PublishableMap<String, Number> offerList = new PublishableMap<>();
+            final PublishableMap<String, Integer> offerList = new PublishableMap<>();
 
             this.myProblemContext.setAssignment(this.myVariable, this.myVariable.getValue());
             final double before = this.parent.getLocalCostIf(this.myProblemContext);
 
-            final AssignmentMap<Number> temp = this.myProblemContext.clone();
-            for (final Number i : this.myVariable) {
+            final AssignmentMap<Integer> temp = this.myProblemContext.clone();
+            for (final Integer i : this.myVariable) {
                 temp.setAssignment(this.myVariable, i);
-                for (final Number j : this.myVariable) {
+                for (final Integer j : this.myVariable) {
                     temp.put(neighbor, j);
                     final double val = this.parent.getLocalCostIf(temp);
                     if (val < before) {
@@ -260,7 +260,7 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number>
             // Get current costs
             final double before = this.parent.getLocalCostIf(this.myProblemContext);
 
-            AssignmentMap<Number> temp;
+            AssignmentMap<Integer> temp;
 
             Offer bestOffer = null;
             double bestGain = Double.MIN_VALUE;
@@ -293,7 +293,7 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number>
 
                 // Set the value now
                 this.committedOffer = bestOffer;
-                this.myVariable.setValue(bestOffer.receiverValue.doubleValue());
+                this.myVariable.setValue(bestOffer.receiverValue);
             }
         }
 
@@ -315,12 +315,12 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number>
             this.myProblemContext.setAssignment(this.myVariable, this.myVariable.getValue());
             final double before = this.parent.getLocalCostIf(this.myProblemContext);
 
-            final AssignmentMap<Number> temp = this.myProblemContext.clone();
+            final AssignmentMap<Integer> temp = this.myProblemContext.clone();
 
             double bestCost = before; // Double.MAX_VALUE;
-            Number bestAssignment = null;
+            Integer bestAssignment = null;
 
-            for (final Number assignment : this.myVariable) {
+            for (final Integer assignment : this.myVariable) {
                 temp.setAssignment(this.myVariable, assignment);
 
                 final double localCost = this.parent.getLocalCostIf(temp);
@@ -421,16 +421,16 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Number>, Number>
         public final UUID offerer;
         public final UUID receiver;
 
-        public final Number offererValue;
-        public final Number receiverValue;
+        public final Integer offererValue;
+        public final Integer receiverValue;
 
         public final double offererReduction;
         public double receiverReduction;
 
         public Offer(final UUID offerer,
                 final UUID receiver,
-                final Number i,
-                final Number j,
+                final Integer i,
+                final Integer j,
                 final Double offererReduction) {
             this.offerer = offerer;
             this.receiver = receiver;

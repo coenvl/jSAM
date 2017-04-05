@@ -37,15 +37,18 @@ import nl.coenvl.sam.variables.Variable;
  */
 public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> implements IterativeSolver {
 
-    private SolverRunner initSolver;
-    private SolverRunner iterativeSolver;
+    private Solver initSolver;
+    private IterativeSolver iterativeSolver;
+
+    private final boolean synchronous;
 
     /**
      * @param name
      * @param var
      */
-    public MultiSolverAgent(final T var, final String name) {
+    public MultiSolverAgent(final T var, final String name, final boolean synchronous) {
         super(var, name);
+        this.synchronous = true; // synchronous;
     }
 
     /*
@@ -70,12 +73,16 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
      *
      */
     private void startThread() {
+        if (this.synchronous) {
+            return;
+        }
+
         // Start the runner threads
         if (this.initSolver != null) {
-            this.initSolver.startThread();
+            ((SolverRunner) this.initSolver).startThread();
         }
         if (this.iterativeSolver != null) {
-            this.iterativeSolver.startThread();
+            ((SolverRunner) this.iterativeSolver).startThread();
         }
     }
 
@@ -127,6 +134,8 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
     public final void setInitSolver(final Solver solver) {
         if (solver == null) {
             this.initSolver = null;
+        } else if (this.synchronous) {
+            this.initSolver = solver;
         } else {
             this.initSolver = new SolverRunner(solver);
         }
@@ -135,8 +144,11 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
     public final void setIterativeSolver(final IterativeSolver solver) {
         if (solver == null) {
             this.iterativeSolver = null;
+        } else if (this.synchronous) {
+            this.iterativeSolver = solver;
+        } else {
+            this.iterativeSolver = new SolverRunner(solver);
         }
-        this.iterativeSolver = new SolverRunner(solver);
     }
 
     public final void setSolver(final Solver solver) {

@@ -41,7 +41,7 @@ public interface Message extends Map<String, String> {
 
     public void put(String key, Object value);
 
-    public void put(String key, Number value);
+    // public void put(String key, Number value);
 
     public void put(String key, PublishableMap<?, ?> value);
 

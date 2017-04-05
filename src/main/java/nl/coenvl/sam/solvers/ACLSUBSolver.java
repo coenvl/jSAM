@@ -36,7 +36,7 @@ public class ACLSUBSolver<V> extends ACLSSolver<V> {
     /**
      * @param agent
      */
-    public ACLSUBSolver(Agent<DiscreteVariable<V>, V> agent) {
+    public ACLSUBSolver(final Agent<DiscreteVariable<V>, V> agent) {
         super(agent);
     }
 
@@ -46,10 +46,10 @@ public class ACLSUBSolver<V> extends ACLSSolver<V> {
     @Override
     protected void proposeAssignment() {
         // As simple as this
-        this.myProposal = this.myVariable.getRandomValue().toString();
+        this.myProposal = this.myVariable.getRandomValue();
 
         // Send the proposal to all neighbors
-        Message updateMsg = new HashMessage(this.myVariable.getID(), ACLSSolver.PROPOSED_UPDATE);
+        final Message updateMsg = new HashMessage(this.myVariable.getID(), ACLSSolver.PROPOSED_UPDATE);
 
         updateMsg.put("proposal", this.myProposal);
 

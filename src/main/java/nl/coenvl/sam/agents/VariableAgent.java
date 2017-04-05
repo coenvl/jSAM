@@ -41,7 +41,7 @@ public class VariableAgent<T extends DiscreteVariable<V>, V> extends MultiSolver
      * @param name
      */
     public VariableAgent(final T var, final String name) {
-        super(var, name); // , true);
+        super(var, name, true);
         this.functionAddresses = new HashSet<>();
     }
 
