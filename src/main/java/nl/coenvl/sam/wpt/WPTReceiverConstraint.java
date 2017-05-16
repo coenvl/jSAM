@@ -21,11 +21,22 @@ public class WPTReceiverConstraint<T extends Variable<V>, V extends Number> exte
 
     private final double[] position;
 
+    private final double mError;
+
     /**
      *
      */
     public WPTReceiverConstraint(final double[] pos) {
         this.position = pos;
+        this.mError = 1.0;
+    }
+
+    /**
+    *
+    */
+    public WPTReceiverConstraint(final double[] pos, final double mError) {
+        this.position = pos;
+        this.mError = mError;
     }
 
     /*
@@ -48,11 +59,18 @@ public class WPTReceiverConstraint<T extends Variable<V>, V extends Number> exte
     @Override
     public double getCostIf(final T variable, final AssignmentMap<V> valueMap) {
         CompareCounter.compare();
-        double receivedEnergy = 0;
+        double receivedEnergy = 0.0;
         for (final T var : this.constrainedVariables.values()) {
             if (valueMap.containsAssignment(var)) {
                 final double pathLoss = PathLossFactor.computePathLoss(this.position, (double[]) var.get("position"));
-                receivedEnergy += valueMap.getAssignment(var).doubleValue() * pathLoss;
+
+                // If the variable is set to the proposed value, act as is we ACTUALLY measured the received energy by
+                // incorporating the error
+                // if (var.isSet() && valueMap.getAssignment(var).equals(var.getValue())) {
+                receivedEnergy += this.mError * valueMap.getAssignment(var).doubleValue() * pathLoss;
+                // } else {
+                // receivedEnergy += valueMap.getAssignment(var).doubleValue() * pathLoss;
+                // }
             }
         }
         return -receivedEnergy;
@@ -65,10 +83,10 @@ public class WPTReceiverConstraint<T extends Variable<V>, V extends Number> exte
      */
     @Override
     public double getExternalCost() {
-        double receivedEnergy = 0;
+        double receivedEnergy = 0.0;
         for (final T var : this.constrainedVariables.values()) {
             final double pathLoss = PathLossFactor.computePathLoss(this.position, (double[]) var.get("position"));
-            receivedEnergy += (var.getValue().doubleValue()) * pathLoss;
+            receivedEnergy += this.mError * (var.getValue().doubleValue()) * pathLoss;
         }
         return -receivedEnergy;
     }

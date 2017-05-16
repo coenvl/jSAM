@@ -34,7 +34,7 @@ import nl.coenvl.sam.messages.Message;
  */
 public class SolverRunner implements IterativeSolver {
 
-    private class Runner implements Runnable {
+    protected final class Runner implements Runnable {
 
         private volatile boolean running;
 
@@ -49,15 +49,22 @@ public class SolverRunner implements IterativeSolver {
 
             try {
                 while (this.running) {
-                    Message m = SolverRunner.this.queue.take();
+                    final Message m = SolverRunner.this.queue.take();
                     synchronized (this) {
                         SolverRunner.this.mySolver.push(m);
                     }
                 }
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 // Do nothing... we are simply reset
                 // throw new RuntimeException();
             }
+        }
+
+        /**
+         *
+         */
+        public void stop() {
+            this.running = false;
         }
 
     }
@@ -65,9 +72,9 @@ public class SolverRunner implements IterativeSolver {
     private static int solverRunnerCounter = 0;
 
     private Runner myRunner;
-    private volatile Solver mySolver;
+    protected volatile Solver mySolver;
     private Thread myThread;
-    private LinkedBlockingQueue<Message> queue;
+    protected final LinkedBlockingQueue<Message> queue;
 
     private final String threadName;
 
@@ -76,7 +83,7 @@ public class SolverRunner implements IterativeSolver {
      *
      * @param solver The solver to run
      */
-    public SolverRunner(Solver solver) {
+    public SolverRunner(final Solver solver) {
         this.queue = new LinkedBlockingQueue<>();
         this.mySolver = solver;
         this.threadName = "SolverRunnerThread-" + SolverRunner.solverRunnerCounter++;
@@ -88,7 +95,7 @@ public class SolverRunner implements IterativeSolver {
      * @param s The solver to run
      * @param threadName The name of the internal thread which will be started by {@link #startThread()}
      */
-    public SolverRunner(Solver s, String threadName) {
+    public SolverRunner(final Solver s, final String threadName) {
         this.queue = new LinkedBlockingQueue<>();
         this.mySolver = s;
         this.threadName = threadName;
@@ -110,7 +117,7 @@ public class SolverRunner implements IterativeSolver {
      */
     public void stopThread() {
         if (this.myRunner != null) {
-            this.myRunner.running = false;
+            this.myRunner.stop();
         }
 
         if (this.myThread != null) {
@@ -118,7 +125,7 @@ public class SolverRunner implements IterativeSolver {
 
             try {
                 this.myThread.join();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
 
@@ -143,7 +150,7 @@ public class SolverRunner implements IterativeSolver {
      * @see nl.coenvl.sam.Solver#push(nl.coenvl.sam.Message)
      */
     @Override
-    public void push(Message m) {
+    public void push(final Message m) {
         this.queue.add(m);
     }
 

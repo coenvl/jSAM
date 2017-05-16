@@ -40,9 +40,13 @@ public class VariableAgent<T extends DiscreteVariable<V>, V> extends MultiSolver
      * @param var
      * @param name
      */
-    public VariableAgent(final T var, final String name) {
-        super(var, name, true);
+    public VariableAgent(final T var, final String name, final boolean synchronous) {
+        super(var, name, synchronous);
         this.functionAddresses = new HashSet<>();
+    }
+
+    public VariableAgent(final T var, final String name) {
+        this(var, name, SolverAgent.MULTI_THREADED);
     }
 
     public Set<UUID> getFunctionAdresses() {

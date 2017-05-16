@@ -43,7 +43,7 @@ import nl.coenvl.sam.variables.RandomAccessVector;
  */
 public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
 
-    private static enum State {
+    protected static enum State {
         ACTIVE,
         DONE,
         HOLD,
@@ -57,7 +57,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
     private static final String CURRENT_STATE = "CoCoASolver:StateChanged";
     private static final String INQUIRE_MSG = "CoCoASolver:InquireAssignment";
 
-    private final AssignmentMap<State> neighborStates;
+    protected final AssignmentMap<State> neighborStates;
     private final AssignmentMap<V> context;
 
     private volatile State currentState;
@@ -137,7 +137,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
         this.currentState = State.IDLE;
     }
 
-    private synchronized void sendInquireMsgs() {
+    protected synchronized void sendInquireMsgs() {
         // Create a map for storing incoming costmap messages
         this.receivedMaps = new ArrayList<>();
 
@@ -211,7 +211,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
      * This function is called when all cost messages have arrived and I can now make a decision on how to assign the
      * variable
      */
-    private void pickValue() {
+    protected void pickValue() {
         // Gather all of the results and get the best assignment for me
         double bestCost = Double.MAX_VALUE;
         final RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();

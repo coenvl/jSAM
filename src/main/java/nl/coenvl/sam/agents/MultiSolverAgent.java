@@ -35,20 +35,25 @@ import nl.coenvl.sam.variables.Variable;
  * @version 0.1
  * @since 10 jun. 2016
  */
-public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T, V> implements IterativeSolver {
+public class MultiSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, V> {
 
     private Solver initSolver;
     private IterativeSolver iterativeSolver;
-
-    private final boolean synchronous;
 
     /**
      * @param name
      * @param var
      */
     public MultiSolverAgent(final T var, final String name, final boolean synchronous) {
+        super(var, name, synchronous);
+    }
+
+    /**
+     * @param name
+     * @param var
+     */
+    public MultiSolverAgent(final T var, final String name) {
         super(var, name);
-        this.synchronous = true; // synchronous;
     }
 
     /*
@@ -151,6 +156,7 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends AbstractAgent<T,
         }
     }
 
+    @Override
     public final void setSolver(final Solver solver) {
         if (solver instanceof IterativeSolver) {
             this.setIterativeSolver((IterativeSolver) solver);

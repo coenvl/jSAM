@@ -31,7 +31,7 @@ import nl.coenvl.sam.variables.Variable;
  * @since 18 mrt. 2016
  */
 @Deprecated
-public class LinkedAgent<T extends Variable<V>, V> extends SolverAgent<T, V> {
+public class LinkedAgent<T extends Variable<V>, V> extends SingleSolverAgent<T, V> {
 
     private LinkedAgent<T, V> prev;
     private LinkedAgent<T, V> next;
