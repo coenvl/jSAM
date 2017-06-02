@@ -1,7 +1,7 @@
 build:
   box: 
     id: niaquinto/gradle
-    entrypoint: /bin/bash -c
+    entrypoint: /bin/sh -c "/bin/bash"
   steps:
     - script:
         name: Build java code
