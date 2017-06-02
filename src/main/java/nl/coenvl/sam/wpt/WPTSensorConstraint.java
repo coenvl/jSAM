@@ -95,4 +95,13 @@ public class WPTSensorConstraint<T extends Variable<V>, V extends Number> extend
         return receivedEnergy < WPTSensorConstraint.THRESHOLD ? 0 : WPTSensorConstraint.COST;
     }
 
+    public double getPower() {
+        double receivedEnergy = 0.0;
+        for (final T var : this.constrainedVariables.values()) {
+            final double pathLoss = PathLossFactor.computePathLoss(this.position, (double[]) var.get("position"));
+            receivedEnergy += this.mError * (var.getValue().doubleValue()) * pathLoss;
+        }
+        return receivedEnergy;
+    }
+
 }
