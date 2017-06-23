@@ -35,7 +35,7 @@ import nl.coenvl.sam.variables.DiscreteVariable;
  */
 public class ReCoCoSolver<V> extends CoCoSolver<V> implements IterativeSolver {
 
-    public ReCoCoSolver(Agent<DiscreteVariable<V>, V> parent) {
+    public ReCoCoSolver(final Agent<DiscreteVariable<V>, V> parent) {
         super(parent);
     }
 
@@ -53,10 +53,10 @@ public class ReCoCoSolver<V> extends CoCoSolver<V> implements IterativeSolver {
      * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
      */
     @Override
-    public void push(Message m) {
+    public void push(final Message m) {
         if (m.containsKey("cpa")) {
             @SuppressWarnings("unchecked")
-            AssignmentMap<V> cpa = (AssignmentMap<V>) m.getMap("cpa");
+            final AssignmentMap<V> cpa = (AssignmentMap<V>) m.get("cpa");
             this.context.putAll(cpa);
         }
 

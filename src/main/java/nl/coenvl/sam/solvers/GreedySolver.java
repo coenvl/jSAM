@@ -36,9 +36,9 @@ import nl.coenvl.sam.variables.RandomAccessVector;
 public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implements Solver {
 
     private static final String ASSIGN_VAR = "GreedySolver:AssignVariable";
-    private AssignmentMap<V> context;
+    private final AssignmentMap<V> context;
 
-    public GreedySolver(Agent<DiscreteVariable<V>, V> agent) {
+    public GreedySolver(final Agent<DiscreteVariable<V>, V> agent) {
         super(agent);
         this.context = new AssignmentMap<>();
     }
@@ -66,15 +66,15 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
     /**
      * @param m
      */
-    private synchronized void pickVar(AssignmentMap<V> pa) {
+    private synchronized void pickVar(final AssignmentMap<V> pa) {
         this.context.putAll(pa);
         double bestCost = Double.MAX_VALUE;
 
-        RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
-        for (V iterAssignment : this.myVariable) {
+        final RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
+        for (final V iterAssignment : this.myVariable) {
             this.context.setAssignment(this.myVariable, iterAssignment);
 
-            double localCost = this.parent.getLocalCostIf(this.context);
+            final double localCost = this.parent.getLocalCostIf(this.context);
 
             if (localCost < bestCost) {
                 bestCost = localCost;
@@ -86,12 +86,12 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
             }
         }
 
-        V assign = bestAssignment.randomElement();
+        final V assign = bestAssignment.randomElement();
 
         this.myVariable.setValue(assign);
         this.context.setAssignment(this.myVariable, assign);
 
-        HashMessage nextMessage = new HashMessage(this.myVariable.getID(), GreedySolver.ASSIGN_VAR);
+        final HashMessage nextMessage = new HashMessage(this.myVariable.getID(), GreedySolver.ASSIGN_VAR);
         nextMessage.put("cpa", this.context);
 
         // Maybe it would be better if I would send the update message 1 by 1.
@@ -105,7 +105,7 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
      */
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized void push(Message m) {
+    public synchronized void push(final Message m) {
         if (m.getType().equals(GreedySolver.ASSIGN_VAR)) {
             if (this.myVariable.isSet()) {
                 return;
@@ -113,7 +113,7 @@ public class GreedySolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impl
 
             AssignmentMap<V> pa;
             if (m.containsKey("cpa")) {
-                pa = (AssignmentMap<V>) m.getMap("cpa");
+                pa = (AssignmentMap<V>) m.get("cpa");
             } else {
                 pa = new AssignmentMap<>();
             }

@@ -157,14 +157,14 @@ public class FBSolver<V> implements Solver {
 
             if (msg.containsKey("pa")) {
                 @SuppressWarnings("unchecked")
-                final AssignmentMap<V> cpa = (AssignmentMap<V>) msg.getMap("pa");
+                final AssignmentMap<V> cpa = (AssignmentMap<V>) msg.get("pa");
                 this.context.putAll(cpa);
             }
 
             // Check to see if it is a new branch we need to research instead of
             // backtrack
             if (msg.containsKey("paCost")) {
-                this.pastCost = msg.getNumber("paCost").doubleValue();
+                this.pastCost = (Double) msg.get("paCost");
                 this.context.removeAssignment(this.myVariable);
                 this.exploredValues.clear();
             }
@@ -184,9 +184,9 @@ public class FBSolver<V> implements Solver {
             }
         } else if (msg.getType().equals(FBSolver.NEW_SOLUTION)) {
             @SuppressWarnings("unchecked")
-            final AssignmentMap<V> solution = (AssignmentMap<V>) msg.getMap("pa");
+            final AssignmentMap<V> solution = (AssignmentMap<V>) msg.get("pa");
             this.bestValue = solution.getAssignment(this.myVariable);
-            this.upperBound = msg.getNumber("paCost").doubleValue();
+            this.upperBound = (Double) msg.get("paCost");
         } else {
             System.err.println("Unexpected message of type " + msg.getType());
         }

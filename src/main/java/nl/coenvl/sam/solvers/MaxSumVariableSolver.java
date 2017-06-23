@@ -70,7 +70,7 @@ public class MaxSumVariableSolver<T extends DiscreteVariable<V>, V> extends Abst
         if (m.getType().equals("FUN2VAR")) {
             final UUID neighbor = m.getSource();
             @SuppressWarnings("unchecked")
-            final CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
+            final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
             this.receivedCosts.put(neighbor, costMap);
         }
 

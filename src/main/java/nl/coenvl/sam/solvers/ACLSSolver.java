@@ -84,12 +84,12 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
 
         if (m.getType().equals(ACLSSolver.UPDATE_VALUE)) {
             @SuppressWarnings("unchecked")
-            final V value = (V) m.getNumber("value");
+            final V value = (V) m.get("value");
             this.myProblemContext.put(source, value);
         } else if (m.getType().equals(ACLSSolver.PROPOSED_UPDATE)) {
             this.replyWithLocalCost(m);
         } else if (m.getType().equals(ACLSSolver.IMPACT_MESSAGE)) {
-            this.impactCosts.put(source, m.getNumber("costImpact").doubleValue());
+            this.impactCosts.put(source, (Double) m.get("costImpact"));
         }
     }
 
@@ -169,7 +169,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
     private void replyWithLocalCost(final Message m) {
         // Compute current cost
         final UUID neighbor = m.getSource();
-        final String proposal = m.get("proposal");
+        final V proposal = (V) m.get("proposal");
         double impact;
 
         if (proposal == null) { // .isEmpty()) {
@@ -181,9 +181,9 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
             final double currentCost = this.parent.getLocalCostIf(temp);
 
             // Compute cost after update
-            @SuppressWarnings("unchecked")
-            final V proposedValue = (V) Double.valueOf(proposal);
-            temp.put(neighbor, proposedValue);
+            // @SuppressWarnings("unchecked")
+            // final V proposedValue = (V) Double.valueOf(proposal);
+            temp.put(neighbor, proposal);
 
             impact = this.parent.getLocalCostIf(temp) - currentCost;
         }

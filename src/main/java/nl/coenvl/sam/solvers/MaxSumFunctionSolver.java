@@ -71,7 +71,7 @@ public class MaxSumFunctionSolver<T extends DiscreteVariable<V>, V> extends Abst
         if (m.getType().equals("VAR2FUN")) {
             final UUID neighbor = m.getSource();
             @SuppressWarnings("unchecked")
-            final CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
+            final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
             this.receivedCosts.put(neighbor, costMap);
         }
     }

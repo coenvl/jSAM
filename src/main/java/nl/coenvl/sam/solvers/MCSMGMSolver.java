@@ -66,7 +66,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
         super.push(m);
 
         if (m.getType().equals(MCSMGMSolver.IMPACT_VALUE)) {
-            this.neighborImpacts.put(m.getSource(), m.getNumber("delta").doubleValue());
+            this.neighborImpacts.put(m.getSource(), (Double) m.get("delta"));
         }
     }
 
@@ -131,7 +131,7 @@ public class MCSMGMSolver<V> extends MGMSolver<V> {
                 m.put("delta", delta);
                 r.localCost = 0.;
             } else {
-                m.put("delta", 0);
+                m.put("delta", 0.0);
             }
 
             this.constraintChanges.put(key, r);

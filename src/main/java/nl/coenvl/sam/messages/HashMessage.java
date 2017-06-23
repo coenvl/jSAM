@@ -21,9 +21,8 @@
 package nl.coenvl.sam.messages;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
-
-import nl.coenvl.sam.variables.PublishableMap;
 
 /**
  * Message
@@ -33,76 +32,51 @@ import nl.coenvl.sam.variables.PublishableMap;
  * @since 4 feb. 2014
  *
  */
-public final class HashMessage extends HashMap<String, String> implements Message {
+public final class HashMessage implements Message {
 
     /**
      *
      */
     private static final long serialVersionUID = 6306118222585166399L;
+    // private static final Gson gson = new Gson();
 
+    private static final StringSerializer serializer = new StringSerializer();
     private final String type;
-
     private final UUID source;
+
+    private final Map<String, String> valueMap;
 
     public HashMessage(final UUID source, final String type) {
         super();
         this.source = source;
         this.type = type;
+        this.valueMap = new HashMap<>();
     }
 
     @Override
     public void put(final String key, final Object value) {
         if (value != null) {
-            super.put(key, value.toString());
+            this.valueMap.put(key, HashMessage.serializer.serialize(value));
         }
     }
-
-    /*
-     * @Override
-     * public void put(final String key, final Number value) {
-     * super.put(key, value.toString());
-     * }
-     */
-
-    @Override
-    public void put(final String key, final PublishableMap<?, ?> value) {
-        super.put(key, value.serialize());
-    }
-
-    // @Override
-    // public void put(String key, Object value) {
-    // super.put(key, value.toString());
-    // }
-
-    // @Override
-    // public UUID getUUID(String key) {
-    // return UUID.fromString(super.get(key));
-    // }
 
     @Override
     public UUID getSource() {
         return this.source;
     }
 
-    // @Override
-    // public Integer getInteger(String key) {
-    // return Integer.valueOf(super.get(key));
-    // }
-
     @Override
-    public Double getNumber(final String key) {
-        return Double.valueOf(super.get(key));
-    }
-
-    @Override
-    public PublishableMap<?, ?> getMap(final String key) {
-        return PublishableMap.deserialize(super.get(key));
+    public Object get(final String key) {
+        if (!this.valueMap.containsKey(key)) {
+            return null;
+        }
+        return HashMessage.serializer.deserialize(this.valueMap.get(key));
     }
 
     @Override
     public HashMessage clone() {
         final HashMessage clone = new HashMessage(this.source, this.type);
-        clone.putAll(this);
+        clone.valueMap.putAll(this.valueMap);
         return clone;
     }
 
@@ -119,6 +93,16 @@ public final class HashMessage extends HashMap<String, String> implements Messag
     @Override
     public String toString() {
         return "Message of Type " + this.type + "(" + super.toString() + ")";
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.messages.Message#containsKey()
+     */
+    @Override
+    public boolean containsKey(final String key) {
+        return this.valueMap.containsKey(key);
     }
 
 }

@@ -88,7 +88,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
             final UUID varId = m.getSource();
 
             @SuppressWarnings("unchecked")
-            final V newValue = (V) m.getNumber(DSASolver.KEY_VARVALUE);
+            final V newValue = (V) m.get(DSASolver.KEY_VARVALUE);
 
             this.context.put(varId, newValue);
         }

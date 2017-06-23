@@ -20,10 +20,7 @@
  */
 package nl.coenvl.sam.messages;
 
-import java.util.Map;
 import java.util.UUID;
-
-import nl.coenvl.sam.variables.PublishableMap;
 
 /**
  * Message
@@ -33,7 +30,7 @@ import nl.coenvl.sam.variables.PublishableMap;
  * @since 4 feb. 2014
  *
  */
-public interface Message extends Map<String, String> {
+public interface Message {
 
     public String getType();
 
@@ -41,17 +38,21 @@ public interface Message extends Map<String, String> {
 
     public void put(String key, Object value);
 
+    public Object get(String key);
+
+    public boolean containsKey(String key);
+
     // public void put(String key, Number value);
 
-    public void put(String key, PublishableMap<?, ?> value);
+    // public void put(String key, PublishableMap<?, ?> value);
 
     // public UUID getUUID(String key);
 
     // public Integer getInteger(String key);
 
-    public Number getNumber(String key);
+    // public Number getNumber(String key);
 
-    public PublishableMap<?, ?> getMap(String key);
+    // public PublishableMap<?, ?> getMap(String key);
 
     public Message clone();
 

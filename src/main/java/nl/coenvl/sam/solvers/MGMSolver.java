@@ -71,10 +71,10 @@ public class MGMSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
 
         if (m.getType().equals(MGMSolver.UPDATE_VALUE)) {
             @SuppressWarnings("unchecked")
-            final V value = (V) m.getNumber("value");
+            final V value = (V) m.get("value");
             this.myProblemContext.put(source, value);
         } else if (m.getType().equals(MGMSolver.LOCAL_REDUCTION)) {
-            this.neighborReduction.put(source, m.getNumber("LR").doubleValue());
+            this.neighborReduction.put(source, (Double) m.get("LR"));
         }
     }
 

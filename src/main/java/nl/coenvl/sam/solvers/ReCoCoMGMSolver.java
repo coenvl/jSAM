@@ -67,7 +67,7 @@ public class ReCoCoMGMSolver<V> extends ReCoCoSolver<V> {
     public synchronized void push(final Message m) {
         if (m.containsKey("cpa")) {
             @SuppressWarnings("unchecked")
-            final AssignmentMap<V> cpa = (AssignmentMap<V>) m.getMap("cpa");
+            final AssignmentMap<V> cpa = (AssignmentMap<V>) m.get("cpa");
             this.context.putAll(cpa);
         }
 
@@ -90,7 +90,7 @@ public class ReCoCoMGMSolver<V> extends ReCoCoSolver<V> {
     @Override
     protected void processCostMessage(final Message m) {
         @SuppressWarnings("unchecked")
-        final CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
+        final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
         this.receivedMaps.add(costMap);
 
         if (this.receivedMaps.size() >= this.numNeighbors()) {
@@ -99,7 +99,7 @@ public class ReCoCoMGMSolver<V> extends ReCoCoSolver<V> {
     }
 
     private void processReductionMessage(final Message m) {
-        this.neighborReductions.put(m.getSource(), m.getNumber("reduction").doubleValue());
+        this.neighborReductions.put(m.getSource(), (Double) m.get("reduction"));
 
         // If also WE are done, we can pick a value
         if (this.started && (this.bestLocalAssignment != null)

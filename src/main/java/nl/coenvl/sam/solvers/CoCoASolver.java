@@ -95,7 +95,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 
         if (m.containsKey("cpa")) {
             @SuppressWarnings("unchecked")
-            final AssignmentMap<V> cpa = (AssignmentMap<V>) m.getMap("cpa");
+            final AssignmentMap<V> cpa = (AssignmentMap<V>) m.get("cpa");
             this.context.putAll(cpa);
         }
 
@@ -199,7 +199,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
      */
     private synchronized void processCostMessage(final Message m) {
         @SuppressWarnings("unchecked")
-        final CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
+        final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
         this.receivedMaps.add(costMap);
 
         if (this.receivedMaps.size() >= this.numNeighbors()) {
@@ -276,7 +276,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 
     private void updateRemoteState(final Message m) {
         final UUID source = m.getSource();
-        final State newState = State.valueOf(m.get("state"));
+        final State newState = State.valueOf((String) m.get("state"));
         this.neighborStates.put(source, newState);
 
         if ((newState == State.HOLD) && (this.currentState == State.HOLD) && (this.getActiveNeighbors() < 1)) {

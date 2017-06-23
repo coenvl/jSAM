@@ -18,6 +18,7 @@
  */
 package nl.coenvl.sam.solvers;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -106,7 +107,7 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Integer>, Intege
         final UUID source = m.getSource();
 
         if (m.getType().equals(MGM2Solver.UPDATE_VALUE)) {
-            final Integer value = m.getNumber("value").intValue();
+            final Integer value = (Integer) m.get("value");
 
             this.myProblemContext.put(source, value);
         } else if (m.getType().equals(MGM2Solver.OFFER)) {
@@ -114,7 +115,7 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Integer>, Intege
             // Any OFFER message should contain this...
             if (m.containsKey("offers")) {
                 @SuppressWarnings("unchecked")
-                final Set<String> jsonOffers = (Set<String>) m.getMap("offers").keySet();
+                final Set<String> jsonOffers = ((HashMap<String, Integer>) m.get("offers")).keySet();
                 for (final String json : jsonOffers) {
                     final Offer o = (new Gson()).fromJson(json, Offer.class);
                     this.receivedOffers.add(o);
@@ -123,12 +124,12 @@ public class MGM2Solver extends AbstractSolver<DiscreteVariable<Integer>, Intege
 
         } else if (m.getType().equals(MGM2Solver.ACCEPT)) {
 
-            this.committedOffer = MGM2Solver.fromJson(m.get("offer"));
+            this.committedOffer = MGM2Solver.fromJson((String) m.get("offer"));
 
         } else if (m.getType().equals(MGM2Solver.GAIN)) {
 
             // Any ACCEPT message should contain this...
-            final double gain = m.getNumber("gain").doubleValue();
+            final Double gain = (Double) m.get("gain");
             this.neighborGains.put(source, gain);
 
         } else if (m.getType().equals(MGM2Solver.GO)) {

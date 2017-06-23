@@ -53,7 +53,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
     protected AssignmentMap<V> context;
     protected boolean started;
 
-    public CoCoSolver(Agent<DiscreteVariable<V>, V> parent) {
+    public CoCoSolver(final Agent<DiscreteVariable<V>, V> parent) {
         super(parent);
         this.started = false;
         this.context = new AssignmentMap<>();
@@ -63,7 +63,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
      * Send an activation message (ASSIGN_VAR) to the non-active neighbors
      */
     protected void activateNeighbors() {
-        HashMessage nextMessage = new HashMessage(this.myVariable.getID(), CoCoSolver.ASSIGN_VAR);
+        final HashMessage nextMessage = new HashMessage(this.myVariable.getID(), CoCoSolver.ASSIGN_VAR);
         nextMessage.put("cpa", this.context);
 
         this.sendToNeighbors(nextMessage);
@@ -88,16 +88,16 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
     protected void pickValue() {
         // Gather all of the results and get the best assignment for me
         double bestCost = Double.MAX_VALUE;
-        RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
+        final RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
 
         // Create a problemContext to play around with to see which assignment is optimal
-        AssignmentMap<V> pa = this.context.clone();
+        final AssignmentMap<V> pa = this.context.clone();
 
-        for (V iterAssignment : this.myVariable) {
+        for (final V iterAssignment : this.myVariable) {
             // Sum the total cost of this partial assignment that all neighbors will incur
             double totalCost = 0;
-            for (CostMap<V> neighborMap : this.receivedMaps) {
-                Double neighborCost = neighborMap.get(iterAssignment);
+            for (final CostMap<V> neighborMap : this.receivedMaps) {
+                final Double neighborCost = neighborMap.get(iterAssignment);
                 totalCost += neighborCost;
             }
 
@@ -117,7 +117,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         }
 
         // Set the value
-        V assign = bestAssignment.randomElement();
+        final V assign = bestAssignment.randomElement();
         this.myVariable.setValue(assign);
         this.context.setAssignment(this.myVariable, assign);
 
@@ -130,9 +130,9 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
      *
      * @param m
      */
-    protected void processCostMessage(Message m) {
+    protected void processCostMessage(final Message m) {
         @SuppressWarnings("unchecked")
-        CostMap<V> costMap = (CostMap<V>) m.getMap("costMap");
+        final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
         this.receivedMaps.add(costMap);
 
         if (this.receivedMaps.size() < this.numNeighbors()) {
@@ -148,10 +148,10 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
      * @see nl.coenvl.sam.solvers.Solver#push(nl.coenvl.sam.messages.Message)
      */
     @Override
-    public void push(Message m) {
+    public void push(final Message m) {
         if (m.containsKey("cpa")) {
             @SuppressWarnings("unchecked")
-            AssignmentMap<V> cpa = (AssignmentMap<V>) m.getMap("cpa");
+            final AssignmentMap<V> cpa = (AssignmentMap<V>) m.get("cpa");
             this.context.putAll(cpa);
         }
 
@@ -192,15 +192,15 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
      *
      * @param m
      */
-    protected void respond(Message m) {
-        CostMap<V> costMap = new CostMap<>();
+    protected void respond(final Message m) {
+        final CostMap<V> costMap = new CostMap<>();
 
-        UUID source = m.getSource();
-        AssignmentMap<V> pa = this.context.clone(); // Should by now already include the CPA of the source
+        final UUID source = m.getSource();
+        final AssignmentMap<V> pa = this.context.clone(); // Should by now already include the CPA of the source
 
         // Build the cost map making the strong assumption that I have the same
         // type of variable as the source
-        for (V iterAssignment : this.myVariable) {
+        for (final V iterAssignment : this.myVariable) {
             pa.put(source, iterAssignment);
 
             Double iterCost = Double.MAX_VALUE;
@@ -208,11 +208,11 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
                 iterCost = this.parent.getLocalCostIf(pa);
             } else {
                 // Now the internal loop to optimize MY value
-                AssignmentMap<V> spa = pa.clone();
+                final AssignmentMap<V> spa = pa.clone();
 
-                for (V siterAssignment : this.myVariable) {
+                for (final V siterAssignment : this.myVariable) {
                     spa.setAssignment(this.myVariable, siterAssignment);
-                    double siterCost = this.parent.getLocalCostIf(spa);
+                    final double siterCost = this.parent.getLocalCostIf(spa);
 
                     if (siterCost < iterCost) {
                         iterCost = siterCost;
@@ -224,7 +224,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         }
 
         // Respond to source
-        Message response = new HashMessage(this.myVariable.getID(), CoCoSolver.COST_MSG);
+        final Message response = new HashMessage(this.myVariable.getID(), CoCoSolver.COST_MSG);
         response.put("costMap", costMap);
         response.put("cpa", this.context);
 
@@ -236,7 +236,7 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         this.started = true;
         this.receivedMaps = new ArrayList<>();
 
-        Message m = new HashMessage(this.myVariable.getID(), CoCoSolver.INQUIRE_MSG);
+        final Message m = new HashMessage(this.myVariable.getID(), CoCoSolver.INQUIRE_MSG);
         m.put("cpa", this.context);
 
         this.sendToNeighbors(m);
