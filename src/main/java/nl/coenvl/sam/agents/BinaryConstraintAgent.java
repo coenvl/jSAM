@@ -78,7 +78,7 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
      */
     @Override
     public final synchronized void init() {
-        this.mySolver.startThread();
+        // this.mySolver.startThread();
         this.mySolver.init();
     }
 

@@ -84,9 +84,7 @@ public class SolverRunner implements IterativeSolver {
      * @param solver The solver to run
      */
     public SolverRunner(final Solver solver) {
-        this.queue = new LinkedBlockingQueue<>();
-        this.mySolver = solver;
-        this.threadName = "SolverRunnerThread-" + SolverRunner.solverRunnerCounter++;
+        this(solver, "SolverRunnerThread-" + SolverRunner.solverRunnerCounter++);
     }
 
     /**
@@ -100,12 +98,13 @@ public class SolverRunner implements IterativeSolver {
         this.mySolver = s;
         this.threadName = threadName;
         SolverRunner.solverRunnerCounter++;
+        this.startThread();
     }
 
     /**
      * Starts the internal thread
      */
-    public void startThread() {
+    private void startThread() {
         this.myRunner = new Runner();
         this.myThread = new Thread(null, this.myRunner, this.threadName);
         // this.myThread = new Thread(this.myRunner);
