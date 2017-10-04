@@ -59,16 +59,6 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         this.context = new AssignmentMap<>();
     }
 
-    /**
-     * Send an activation message (ASSIGN_VAR) to the non-active neighbors
-     */
-    protected void activateNeighbors() {
-        final HashMessage nextMessage = new HashMessage(this.myVariable.getID(), CoCoSolver.ASSIGN_VAR);
-        nextMessage.put("cpa", this.context);
-
-        this.sendToNeighbors(nextMessage);
-    }
-
     /*
      * (non-Javadoc)
      *
@@ -79,67 +69,6 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         if (this.isRoot()) {
             this.push(new HashMessage(null, CoCoSolver.ASSIGN_VAR));
         }
-    }
-
-    /**
-     * This function is called when all cost messages have arrived and I can now make a decision on how to assign the
-     * variable
-     */
-    protected void pickValue() {
-        // Gather all of the results and get the best assignment for me
-        double bestCost = Double.MAX_VALUE;
-        final RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
-
-        // Create a problemContext to play around with to see which assignment is optimal
-        final AssignmentMap<V> pa = this.context.clone();
-
-        for (final V iterAssignment : this.myVariable) {
-            // Sum the total cost of this partial assignment that all neighbors will incur
-            double totalCost = 0;
-            for (final CostMap<V> neighborMap : this.receivedMaps) {
-                final Double neighborCost = neighborMap.get(iterAssignment);
-                totalCost += neighborCost;
-            }
-
-            // Add my OWN cost
-            pa.setAssignment(this.myVariable, iterAssignment);
-            totalCost += this.parent.getLocalCostIf(pa);
-
-            // Store the best value, and maintain it's uniqueness
-            if (totalCost < bestCost) {
-                bestCost = totalCost;
-                bestAssignment.clear();
-            }
-
-            if (totalCost <= bestCost) {
-                bestAssignment.add(iterAssignment);
-            }
-        }
-
-        // Set the value
-        final V assign = bestAssignment.randomElement();
-        this.myVariable.setValue(assign);
-        this.context.setAssignment(this.myVariable, assign);
-
-        this.activateNeighbors();
-    }
-
-    /**
-     * The neighbors will respond with cost Messages, in this function such a message is handled. If the cost message is
-     * the last one to be received, continue picking one assignment by calling the {@link #pickValue()} function
-     *
-     * @param m
-     */
-    protected void processCostMessage(final Message m) {
-        @SuppressWarnings("unchecked")
-        final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
-        this.receivedMaps.add(costMap);
-
-        if (this.receivedMaps.size() < this.numNeighbors()) {
-            return;
-        }
-
-        this.pickValue();
     }
 
     /*
@@ -182,9 +111,19 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
     public void reset() {
         super.reset();
         this.started = false;
-        this.myVariable.clear();
         this.context.clear();
         this.receivedMaps = null;
+    }
+
+    protected void sendInquireMsgs() {
+        // Create a map for storing incoming costmap messages
+        this.started = true;
+        this.receivedMaps = new ArrayList<>();
+
+        final Message m = new HashMessage(this.myVariable.getID(), CoCoSolver.INQUIRE_MSG);
+        m.put("cpa", this.context);
+
+        this.sendToNeighbors(m);
     }
 
     /**
@@ -231,15 +170,75 @@ public class CoCoSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         MailMan.sendMessage(source, response);
     }
 
-    protected void sendInquireMsgs() {
-        // Create a map for storing incoming costmap messages
-        this.started = true;
-        this.receivedMaps = new ArrayList<>();
+    /**
+     * The neighbors will respond with cost Messages, in this function such a message is handled. If the cost message is
+     * the last one to be received, continue picking one assignment by calling the {@link #pickValue()} function
+     *
+     * @param m
+     */
+    protected void processCostMessage(final Message m) {
+        @SuppressWarnings("unchecked")
+        final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
+        this.receivedMaps.add(costMap);
 
-        final Message m = new HashMessage(this.myVariable.getID(), CoCoSolver.INQUIRE_MSG);
-        m.put("cpa", this.context);
+        if (this.receivedMaps.size() < this.numNeighbors()) {
+            return;
+        }
 
-        this.sendToNeighbors(m);
+        this.pickValue();
+    }
+
+    /**
+     * This function is called when all cost messages have arrived and I can now make a decision on how to assign the
+     * variable
+     */
+    protected void pickValue() {
+        // Gather all of the results and get the best assignment for me
+        double bestCost = Double.MAX_VALUE;
+        final RandomAccessVector<V> bestAssignment = new RandomAccessVector<>();
+
+        // Create a problemContext to play around with to see which assignment is optimal
+        final AssignmentMap<V> pa = this.context.clone();
+
+        for (final V iterAssignment : this.myVariable) {
+            // Sum the total cost of this partial assignment that all neighbors will incur
+            double totalCost = 0;
+            for (final CostMap<V> neighborMap : this.receivedMaps) {
+                final Double neighborCost = neighborMap.get(iterAssignment);
+                totalCost += neighborCost;
+            }
+
+            // Add my OWN cost
+            pa.setAssignment(this.myVariable, iterAssignment);
+            totalCost += this.parent.getLocalCostIf(pa);
+
+            // Store the best value, and maintain it's uniqueness
+            if (totalCost < bestCost) {
+                bestCost = totalCost;
+                bestAssignment.clear();
+            }
+
+            if (totalCost <= bestCost) {
+                bestAssignment.add(iterAssignment);
+            }
+        }
+
+        // Set the value
+        final V assign = bestAssignment.randomElement();
+        this.myVariable.setValue(assign);
+        this.context.setAssignment(this.myVariable, assign);
+
+        this.activateNeighbors();
+    }
+
+    /**
+     * Send an activation message (ASSIGN_VAR) to the non-active neighbors
+     */
+    protected void activateNeighbors() {
+        final HashMessage nextMessage = new HashMessage(this.myVariable.getID(), CoCoSolver.ASSIGN_VAR);
+        nextMessage.put("cpa", this.context);
+
+        this.sendToNeighbors(nextMessage);
     }
 
     protected boolean isRoot() {

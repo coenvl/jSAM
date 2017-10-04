@@ -22,6 +22,8 @@ package nl.coenvl.sam.agents;
 
 import nl.coenvl.sam.messages.Message;
 import nl.coenvl.sam.solvers.IterativeSolver;
+import nl.coenvl.sam.solvers.RootedIterativeSolverWrapper;
+import nl.coenvl.sam.solvers.RootedSolverWrapper;
 import nl.coenvl.sam.solvers.Solver;
 import nl.coenvl.sam.solvers.SolverRunner;
 import nl.coenvl.sam.variables.Variable;
@@ -44,8 +46,8 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, V
      * @param name
      * @param var
      */
-    public MultiSolverAgent(final T var, final String name, final boolean synchronous) {
-        super(var, name, synchronous);
+    public MultiSolverAgent(final T var, final String name, final boolean synchronous, final boolean activation) {
+        super(var, name, synchronous, activation);
     }
 
     /**
@@ -63,7 +65,7 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, V
      */
     @Override
     public final synchronized void init() {
-        this.startThread();
+        // this.startThread();
 
         if (this.initSolver != null) {
             this.initSolver.init();
@@ -77,19 +79,19 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, V
     /**
      *
      */
-    private void startThread() {
-        if (this.synchronous) {
-            return;
-        }
-
-        // Start the runner threads
-        if (this.initSolver != null) {
-            ((SolverRunner) this.initSolver).startThread();
-        }
-        if (this.iterativeSolver != null) {
-            ((SolverRunner) this.iterativeSolver).startThread();
-        }
-    }
+    // public void startThread() {
+    // if (this.synchronous) {
+    // return;
+    // }
+    //
+    // // Start the runner threads
+    // if (this.initSolver != null) {
+    // ((SolverRunner) this.initSolver).startThread();
+    // }
+    // if (this.iterativeSolver != null) {
+    // ((SolverRunner) this.iterativeSolver).startThread();
+    // }
+    // }
 
     /*
      * (non-Javadoc)
@@ -139,20 +141,28 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, V
     public final void setInitSolver(final Solver solver) {
         if (solver == null) {
             this.initSolver = null;
-        } else if (this.synchronous) {
+        } else if (this.singleThreaded && !this.rootedActivation) {
             this.initSolver = solver;
-        } else {
+        } else if (this.singleThreaded && this.rootedActivation) {
+            this.initSolver = new RootedSolverWrapper<>(this, solver);
+        } else if (!this.singleThreaded && !this.rootedActivation) {
             this.initSolver = new SolverRunner(solver);
+        } else {
+            this.initSolver = new SolverRunner(new RootedSolverWrapper<>(this, solver));
         }
     }
 
     public final void setIterativeSolver(final IterativeSolver solver) {
         if (solver == null) {
             this.iterativeSolver = null;
-        } else if (this.synchronous) {
+        } else if (this.singleThreaded && !this.rootedActivation) {
             this.iterativeSolver = solver;
-        } else {
+        } else if (this.singleThreaded && this.rootedActivation) {
+            this.iterativeSolver = new RootedIterativeSolverWrapper<>(this, solver);
+        } else if (!this.singleThreaded && !this.rootedActivation) {
             this.iterativeSolver = new SolverRunner(solver);
+        } else {
+            this.iterativeSolver = new SolverRunner(new RootedIterativeSolverWrapper<>(this, solver));
         }
     }
 

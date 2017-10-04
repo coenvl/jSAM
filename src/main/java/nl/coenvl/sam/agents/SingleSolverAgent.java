@@ -54,7 +54,7 @@ public class SingleSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, 
      */
     @Override
     public final synchronized void init() {
-        this.startThread();
+        // this.startThread();
 
         if (this.mySolver != null) {
             this.mySolver.init();
@@ -66,16 +66,16 @@ public class SingleSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, 
     /**
      *
      */
-    private final void startThread() {
-        if (this.synchronous) {
-            return;
-        }
-
-        // Start the runner threads
-        if (this.mySolver != null) {
-            ((SolverRunner) this.mySolver).startThread();
-        }
-    }
+    // private final void startThread() {
+    // if (this.synchronous) {
+    // return;
+    // }
+    //
+    // // Start the runner threads
+    // if (this.mySolver != null) {
+    // ((SolverRunner) this.mySolver).startThread();
+    // }
+    // }
 
     /*
      * (non-Javadoc)
@@ -124,7 +124,7 @@ public class SingleSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, 
     public final void setSolver(final Solver solver) {
         if (solver == null) {
             this.mySolver = null;
-        } else if (this.synchronous) {
+        } else if (this.singleThreaded) {
             this.mySolver = solver;
         } else {
             this.mySolver = new SolverRunner(solver);

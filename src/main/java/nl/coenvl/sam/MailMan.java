@@ -20,6 +20,7 @@
 package nl.coenvl.sam;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ import nl.coenvl.sam.variables.Variable;
  */
 public final class MailMan {
 
-    private static final Map<UUID, Agent<?, ?>> ownerMap = new HashMap<>();
+    private static final Map<UUID, Agent<?, ?>> ownerMap = new LinkedHashMap<>();
     private static final Map<String, Integer> messageCounterMap = new HashMap<>();
     private static int sentMessages = 0;
 
@@ -44,22 +45,22 @@ public final class MailMan {
         // Private constructor
     }
 
-    public static void registerOwner(Variable<?> var, Agent<?, ?> agent) {
+    public static void registerOwner(final Variable<?> var, final Agent<?, ?> agent) {
         MailMan.register(var.getID(), agent);
     }
 
-    public static void register(UUID address, Agent<?, ?> agent) {
+    public static void register(final UUID address, final Agent<?, ?> agent) {
         MailMan.ownerMap.put(address, agent);
     }
 
-    public static void sendMessage(UUID id, Message m) {
+    public static void sendMessage(final UUID id, final Message m) {
         if (!MailMan.messageCounterMap.containsKey(m.getType())) {
             MailMan.messageCounterMap.put(m.getType(), 1);
         } else {
             MailMan.messageCounterMap.put(m.getType(), MailMan.messageCounterMap.get(m.getType()) + 1);
         }
 
-        Agent<?, ?> owner = MailMan.ownerMap.get(id);
+        final Agent<?, ?> owner = MailMan.ownerMap.get(id);
 
         if (owner != null) {
             MailMan.sentMessages++;
@@ -69,8 +70,8 @@ public final class MailMan {
         }
     }
 
-    public static void broadCast(Message msg) {
-        for (UUID id : MailMan.ownerMap.keySet()) {
+    public static void broadCast(final Message msg) {
+        for (final UUID id : MailMan.ownerMap.keySet()) {
             MailMan.sendMessage(id, msg);
         }
     }
@@ -84,13 +85,31 @@ public final class MailMan {
     }
 
     public static void reset() {
-        for (Agent<?, ?> a : MailMan.ownerMap.values()) {
+        for (final Agent<?, ?> a : MailMan.ownerMap.values()) {
             a.reset();
         }
 
         MailMan.ownerMap.clear();
         MailMan.messageCounterMap.clear();
         MailMan.sentMessages = 0;
+    }
+
+    public static String stateString(final Variable<?> var1,
+            final Object value1,
+            final Variable<?> var2,
+            final Object value2) {
+        String ret = "";
+        for (final Agent<?, ?> k : MailMan.ownerMap.values()) {
+            final Variable<?> v = k.getVariable();
+            if (v.equals(var1)) {
+                ret += value1 == null ? "-" : value1;
+            } else if (v.equals(var2)) {
+                ret += value2 == null ? "-" : value2;
+            } else {
+                ret += v.isSet() ? v.getValue() : "-";
+            }
+        }
+        return ret;
     }
 
 }

@@ -89,7 +89,7 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
      */
     @Override
     public final synchronized void init() {
-        this.mySolver.startThread();
+        // this.mySolver.startThread();
         this.mySolver.init();
     }
 

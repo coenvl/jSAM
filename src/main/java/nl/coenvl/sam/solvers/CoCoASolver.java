@@ -132,7 +132,6 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
         super.reset();
         this.neighborStates.clear();
         this.context.clear();
-
         this.receivedMaps = null;
         this.currentState = State.IDLE;
     }
@@ -218,6 +217,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 
         // Create a problemContext to play around with to see which assignment is optimal
         final AssignmentMap<V> pa = this.context.clone();
+
         for (final V iterAssignment : this.myVariable) {
             // Sum the total cost of this partial assignment that all neighbors will incur
             double totalCost = 0;

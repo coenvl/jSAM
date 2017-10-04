@@ -44,7 +44,9 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
      * @param var1
      * @param var2
      */
-    public CostMatrixConstraint(DiscreteVariable<V> var1, DiscreteVariable<V> var2, double[][] costs) {
+    public CostMatrixConstraint(final DiscreteVariable<V> var1,
+            final DiscreteVariable<V> var2,
+            final double[][] costs) {
         super(var1, var2);
         this.costMatrix1 = new CostMatrix(var1, var2, costs);
         this.costMatrix2 = this.costMatrix1.transpose();
@@ -54,10 +56,10 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
      * @param var1
      * @param var2
      */
-    public CostMatrixConstraint(DiscreteVariable<V> var1,
-            DiscreteVariable<V> var2,
-            double[][] costs1,
-            double[][] costs2) {
+    public CostMatrixConstraint(final DiscreteVariable<V> var1,
+            final DiscreteVariable<V> var2,
+            final double[][] costs1,
+            final double[][] costs2) {
         super(var1, var2);
         this.costMatrix1 = new CostMatrix(var1, var2, costs1);
         this.costMatrix2 = new CostMatrix(var2, var1, costs2);
@@ -69,9 +71,10 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
      * @see nl.coenvl.sam.constraints.Constraint#getCost(nl.coenvl.sam.variables. Variable)
      */
     @Override
-    public double getCost(DiscreteVariable<V> targetVariable) {
+    public double getCost(final DiscreteVariable<V> targetVariable) {
         super.assertVariableIsInvolved(targetVariable);
         CompareCounter.compare();
+        // CompareCounter.log(this.var1, this.var1.getValue(), this.var2, this.var2.getValue());
 
         if (targetVariable.equals(this.var1)) {
             return this.costMatrix1.getCost(this.var1.getValue(), this.var2.getValue());
@@ -88,7 +91,7 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
      * @see nl.coenvl.sam.constraints.Constraint#getCostIf(nl.coenvl.sam.variables. Variable, java.util.Map)
      */
     @Override
-    public double getCostIf(DiscreteVariable<V> targetVariable, AssignmentMap<V> values) {
+    public double getCostIf(final DiscreteVariable<V> targetVariable, final AssignmentMap<V> values) {
         super.assertVariableIsInvolved(targetVariable);
         CompareCounter.compare();
 
@@ -105,8 +108,10 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
             throw new VariableNotInvolvedException("Undefined behavior if target variable is not in valuemap");
         }
 
-        V value1 = values.getAssignment(this.var1);
-        V value2 = values.getAssignment(this.var2);
+        final V value1 = values.getAssignment(this.var1);
+        final V value2 = values.getAssignment(this.var2);
+
+        // CompareCounter.log(this.var1, value1, this.var2, value2);
 
         if (targetVariable.equals(this.var1)) {
             if (value2 == null) {
@@ -151,7 +156,9 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
          * @param toVariable
          * @param costs
          */
-        public CostMatrix(DiscreteVariable<V> fromVariable, DiscreteVariable<V> toVariable, double[][] costs) {
+        public CostMatrix(final DiscreteVariable<V> fromVariable,
+                final DiscreteVariable<V> toVariable,
+                final double[][] costs) {
             this.matrix = new HashMap<>();
 
             if (costs.length != fromVariable.getRange()) {
@@ -160,16 +167,16 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
             }
 
             int idx1 = 0, idx2 = 0;
-            for (V val1 : fromVariable) {
+            for (final V val1 : fromVariable) {
                 if (costs[idx1].length != toVariable.getRange()) {
                     throw new CostMatrixRangeException(
                             "Cost matrix array " + idx1 + " length does not match second variable's range");
                 }
 
-                Map<V, Double> xMap = new HashMap<>();
+                final Map<V, Double> xMap = new HashMap<>();
 
                 idx2 = 0;
-                for (V val2 : toVariable) {
+                for (final V val2 : toVariable) {
                     xMap.put(val2, costs[idx1][idx2++]);
                 }
 
@@ -182,9 +189,9 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
          * @param value1
          * @return
          */
-        public double meanValueFor(V value1) {
+        public double meanValueFor(final V value1) {
             double sum = 0;
-            for (Double val : this.matrix.get(value1).values()) {
+            for (final Double val : this.matrix.get(value1).values()) {
                 sum += val;
             }
             return sum / this.matrix.get(value1).size();
@@ -197,9 +204,9 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
          * @return
          */
         public CostMatrix transpose() {
-            CostMatrix other = new CostMatrix();
-            for (V from : this.matrix.keySet()) {
-                for (V to : this.matrix.get(from).keySet()) {
+            final CostMatrix other = new CostMatrix();
+            for (final V from : this.matrix.keySet()) {
+                for (final V to : this.matrix.get(from).keySet()) {
                     if (!other.matrix.containsKey(to)) {
                         other.matrix.put(to, new HashMap<V, Double>());
                     }
@@ -216,7 +223,7 @@ public class CostMatrixConstraint<V> extends BinaryConstraint<DiscreteVariable<V
             this.matrix = new HashMap<>();
         }
 
-        public double getCost(V value1, V value2) {
+        public double getCost(final V value1, final V value2) {
             if (!this.matrix.containsKey(value1)) {
                 throw new CostMatrixRangeException("Value for variable 1 out of range (" + value1 + ")");
             }

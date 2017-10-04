@@ -55,6 +55,7 @@ public class InequalityConstraint<T extends Variable<V>, V> extends BinaryConstr
     public double getCost(final T targetVariable) {
         super.assertVariableIsInvolved(targetVariable);
         CompareCounter.compare();
+        // CompareCounter.log(this.var1, this.var1.getValue(), this.var2, this.var2.getValue());
 
         return this.costOf(this.var1.getValue(), this.var2.getValue());
     }
@@ -68,6 +69,8 @@ public class InequalityConstraint<T extends Variable<V>, V> extends BinaryConstr
     public double getCostIf(final T targetVariable, final AssignmentMap<V> values) {
         super.assertVariableIsInvolved(targetVariable);
         CompareCounter.compare();
+        // CompareCounter.log(this.var1, values.getAssignment(this.var1), this.var2, values.getAssignment(this.var2));
+
         if (values.containsAssignment(this.var1) && values.containsAssignment(this.var2)) {
             return this.costOf(values.getAssignment(this.var1), values.getAssignment(this.var2));
         } else {
@@ -91,7 +94,9 @@ public class InequalityConstraint<T extends Variable<V>, V> extends BinaryConstr
      * @return
      */
     private double costOf(final V value, final V value2) {
-        if ((value instanceof Number) && (value2 instanceof Number)) {
+        if ((value == null) || (value2 == null)) {
+            return 0;
+        } else if ((value instanceof Number) && (value2 instanceof Number)) {
             final double v1 = ((Number) value).doubleValue();
             final double v2 = ((Number) value2).doubleValue();
             if (Math.abs(v1 - v2) < 1e-10) {

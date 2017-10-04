@@ -31,6 +31,17 @@ public abstract class CompareCounter {
 
     private static int nComparisons = 0;
 
+    // public static Set<String> loggedComparisons = new LinkedHashSet<>();
+    // public static int numComparisons = 0;
+
+    // public static void log(final Variable<?> var1, final Object value1, final Variable<?> var2, final Object value2)
+    // {
+    // // CompareCounter.loggedComparisons.add(String.format("%s%s%d%d", var1.getName(), var2.getName(), value1,
+    // // value2));
+    // CompareCounter.loggedComparisons.add(MailMan.stateString(var1, value1, var2, value2));
+    // CompareCounter.numComparisons++;
+    // }
+
     public static void compare() {
         CompareCounter.nComparisons++;
     }
@@ -41,6 +52,8 @@ public abstract class CompareCounter {
 
     public static void reset() {
         CompareCounter.nComparisons = 0;
+        // CompareCounter.loggedComparisons.clear();
+        // CompareCounter.numComparisons = 0;
     }
 
 }
