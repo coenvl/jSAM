@@ -39,20 +39,27 @@ public abstract class AbstractSolver<T extends Variable<V>, V> {
     protected final Agent<T, V> parent;
     protected final T myVariable;
 
-    protected AbstractSolver(Agent<T, V> agent) {
+    protected AbstractSolver(final Agent<T, V> agent) {
         this.parent = agent;
         this.myVariable = agent.getVariable();
     }
 
-    protected void sendToNeighbors(Message m) {
-        Set<UUID> set = this.parent.getConstrainedVariableIds();
-        for (UUID target : set) {
+    protected void sendToNeighbors(final Message m) {
+        final Set<UUID> set = this.parent.getConstrainedVariableIds();
+        for (final UUID target : set) {
             MailMan.sendMessage(target, m);
         }
     }
 
     protected int numNeighbors() {
         return this.parent.getConstrainedVariableIds().size();
+    }
+
+    /**
+     * @return
+     */
+    protected double getUpdateProbability() {
+        return 1.0 / (this.numNeighbors() + 1);
     }
 
     protected void reset() {

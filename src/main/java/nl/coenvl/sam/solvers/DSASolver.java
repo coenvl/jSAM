@@ -43,8 +43,8 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
         PICKVALUE
     }
 
-    public static final double CHANGE_TO_EQUAL_PROB = 0.5;
-    public static final double CHANGE_TO_IMPROVE_PROB = 0.5;
+    // public static final double CHANGE_TO_EQUAL_PROB = 0.1;
+    // public static final double CHANGE_TO_IMPROVE_PROB = 0.1;
 
     public static final String UPDATE_VALUE = "DSASolver:Value";
     public static final String KEY_VARVALUE = "value";
@@ -150,11 +150,11 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
             return;
         }
 
-        if ((bestCost == oldCost) && (Math.random() > DSASolver.CHANGE_TO_EQUAL_PROB)) {
+        if ((bestCost == oldCost) && (Math.random() > this.getUpdateProbability())) { // DSASolver.CHANGE_TO_EQUAL_PROB))
             return;
         }
 
-        if ((bestCost < oldCost) && (Math.random() > DSASolver.CHANGE_TO_IMPROVE_PROB)) {
+        if ((bestCost < oldCost) && (Math.random() > this.getUpdateProbability())) {// DSASolver.CHANGE_TO_IMPROVE_PROB))
             return;
         }
 

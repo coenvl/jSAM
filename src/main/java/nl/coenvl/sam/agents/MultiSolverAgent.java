@@ -175,9 +175,13 @@ public class MultiSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, V
         }
     }
 
-    // @Override
-    // public boolean isFinished() {
-    // return this.initSolver.emptyQueue() && this.iterativeSolver.emptyQueue();
-    // }
+    @Override
+    public boolean isFinished() {
+        final boolean initSolverFinished = !(this.initSolver instanceof SolverRunner)
+                || ((SolverRunner) this.initSolver).emptyQueue();
+        final boolean iterSolverFinished = !(this.iterativeSolver instanceof SolverRunner)
+                || ((SolverRunner) this.iterativeSolver).emptyQueue();
+        return initSolverFinished && iterSolverFinished;
+    }
 
 }

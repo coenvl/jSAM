@@ -131,9 +131,13 @@ public class SingleSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, 
         }
     }
 
-    // @Override
-    // public boolean isFinished() {
-    // return this.mySolver.emptyQueue();
-    // }
+    @Override
+    public boolean isFinished() {
+        if (this.mySolver instanceof SolverRunner) {
+            return ((SolverRunner) this.mySolver).emptyQueue();
+        } else {
+            return true;
+        }
+    }
 
 }

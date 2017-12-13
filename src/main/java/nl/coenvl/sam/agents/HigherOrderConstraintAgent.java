@@ -127,10 +127,10 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
         this.mySolver = new SolverRunner(solver);
     }
 
-    // @Override
-    // public boolean isFinished() {
-    // return this.mySolver.emptyQueue();
-    // }
+    @Override
+    public boolean isFinished() {
+        return this.mySolver.emptyQueue();
+    }
 
     @Override
     public T getVariableWithID(final UUID id) {

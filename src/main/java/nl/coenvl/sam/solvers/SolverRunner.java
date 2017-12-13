@@ -195,4 +195,5 @@ public class SolverRunner implements IterativeSolver {
     public boolean started() {
         return this.myThread != null;
     }
+
 }

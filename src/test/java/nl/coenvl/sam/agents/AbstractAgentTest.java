@@ -279,10 +279,10 @@ public class AbstractAgentTest {
             // Do nothing
         }
 
-        // @Override
-        // public boolean isFinished() {
-        // return false;
-        // }
+        @Override
+        public boolean isFinished() {
+            return false;
+        }
 
         // This is a dirty hack, but for testing purposes I will allow it.
         @SuppressWarnings("unchecked")

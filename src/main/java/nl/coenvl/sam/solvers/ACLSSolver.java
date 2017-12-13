@@ -46,10 +46,11 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
         ASSIGN
     }
 
+    // protected static final double UPDATE_PROBABILITY = 0.1;
+
     protected static final String UPDATE_VALUE = "ACLS:UpdateValue";
     protected static final String PROPOSED_UPDATE = "ACLS:ProposedUpdateValue";
     protected static final String IMPACT_MESSAGE = "ACLS:ProposalImpact";
-    protected static final double UPDATE_PROBABILITY = 0.5;
 
     private final AssignmentMap<V> myProblemContext;
     private final CostMap<UUID> impactCosts;
@@ -217,7 +218,7 @@ public class ACLSSolver<V> extends AbstractSolver<DiscreteVariable<V>, V> implem
             totalImpact += impact;
         }
 
-        if ((totalImpact < 0) && ((new Random()).nextDouble() < ACLSSolver.UPDATE_PROBABILITY)) {
+        if ((totalImpact < 0) && ((new Random()).nextDouble() < this.getUpdateProbability())) {
             this.myVariable.setValue(proposedValue);
         }
     }
