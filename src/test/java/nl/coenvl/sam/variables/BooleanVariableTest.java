@@ -39,46 +39,21 @@ import nl.coenvl.sam.exceptions.VariableNotSetException;
  * @since 4 feb. 2014
  *
  */
-@SuppressWarnings("static-method")
-public class IntegerVariableTest {
+public class BooleanVariableTest {
 
-    private IntegerVariable var;
+    private BooleanVariable var;
 
     @Before
     public void init() throws InvalidDomainException {
-        this.var = new IntegerVariable(0, 10);
-    }
-
-    @Test
-    public void testConstructor() throws InvalidDomainException {
-        @SuppressWarnings("unused")
-        IntegerVariable t;
-        t = new IntegerVariable(0, 1);
-        t = new IntegerVariable(-4, 10);
-        t = new IntegerVariable(77, 100);
-        try {
-            t = new IntegerVariable(0, -7);
-            Assert.fail("An exception was expected");
-        } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), InvalidDomainException.class);
-        }
+        this.var = new BooleanVariable();
     }
 
     @Test
     public void testIterator() {
-        final Iterator<Integer> it = this.var.iterator();
+        final Iterator<Boolean> it = this.var.iterator();
         Assert.assertTrue(it.hasNext());
-        Assert.assertEquals(Integer.valueOf(0), it.next());
-        Assert.assertEquals(Integer.valueOf(1), it.next());
-        Assert.assertEquals(Integer.valueOf(2), it.next());
-        Assert.assertEquals(Integer.valueOf(3), it.next());
-        Assert.assertEquals(Integer.valueOf(4), it.next());
-        Assert.assertEquals(Integer.valueOf(5), it.next());
-        Assert.assertEquals(Integer.valueOf(6), it.next());
-        Assert.assertEquals(Integer.valueOf(7), it.next());
-        Assert.assertEquals(Integer.valueOf(8), it.next());
-        Assert.assertEquals(Integer.valueOf(9), it.next());
-        Assert.assertEquals(Integer.valueOf(10), it.next());
+        Assert.assertEquals(false, it.next());
+        Assert.assertEquals(true, it.next());
         Assert.assertFalse(it.hasNext());
         try {
             it.next();
@@ -90,7 +65,7 @@ public class IntegerVariableTest {
 
     @Test
     public void testIteratorRemove() {
-        final Iterator<Integer> it = this.var.iterator();
+        final Iterator<Boolean> it = this.var.iterator();
         try {
             it.remove();
             Assert.fail("An exception was expected");
@@ -101,22 +76,7 @@ public class IntegerVariableTest {
 
     @Test
     public void testLowerBound() {
-        Assert.assertEquals(Integer.valueOf(0), this.var.getLowerBound());
-    }
-
-    @Test
-    public void testNamedConstructor() throws InvalidDomainException {
-        @SuppressWarnings("unused")
-        IntegerVariable t;
-        t = new IntegerVariable(0, 0, "ZeroVar");
-        t = new IntegerVariable(-4, 10, "OtherVar");
-        t = new IntegerVariable(77, 100, "LastValidVar");
-        try {
-            t = new IntegerVariable(0, -7, "Never really a var");
-            Assert.fail("An exception was expected");
-        } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), InvalidDomainException.class);
-        }
+        Assert.assertEquals(false, this.var.getLowerBound());
     }
 
     @Test
@@ -129,26 +89,45 @@ public class IntegerVariableTest {
 
     @Test
     public void testShortHandIter() {
-        for (final Integer iter : this.var) {
+        for (final Boolean iter : this.var) {
             System.out.println("Current value is: " + iter);
         }
     }
 
     @Test
     public void testUpperBound() {
-        Assert.assertEquals(Integer.valueOf(10), this.var.getUpperBound());
+        Assert.assertEquals(true, this.var.getUpperBound());
     }
 
     @Test
     public void testValue() throws InvalidValueException, VariableNotSetException {
-        this.var.setValue(9);
-        Assert.assertEquals(Integer.valueOf(9), this.var.getValue());
+        final BooleanVariable v = new BooleanVariable();
+        try {
+            v.getValue();
+            Assert.fail("An exception was expected");
+        } catch (final Exception e) {
+            Assert.assertEquals(e.getClass(), VariableNotSetException.class);
+        }
+
+        this.var.setValue(false);
+        Assert.assertEquals(false, this.var.getValue());
+        this.var.setValue(true);
+        Assert.assertEquals(true, this.var.getValue());
+
+        this.var.clear();
+        try {
+            this.var.getValue();
+            Assert.fail("An exception was expected");
+        } catch (final Exception e) {
+            Assert.assertEquals(e.getClass(), VariableNotSetException.class);
+        }
+
     }
 
     @Test
     public void testProblemContext() {
-        final AssignmentMap<Integer> pc = new AssignmentMap<>();
-        this.var.setValue(5);
+        final AssignmentMap<Boolean> pc = new AssignmentMap<>();
+        this.var.setValue(true);
         pc.setAssignment(this.var, this.var.getValue());
         final String str = pc.serialize();
         final AssignmentMap<?> dp = (AssignmentMap<?>) PublishableMap.deserialize(str);
