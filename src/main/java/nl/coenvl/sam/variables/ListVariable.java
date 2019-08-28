@@ -5,6 +5,7 @@
  */
 package nl.coenvl.sam.variables;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -115,6 +116,11 @@ public class ListVariable<T> extends AbstractPropertyOwner implements DiscreteVa
     @Override
     public String toString() {
         return "" + this.name + ": " + (this.set ? this.value : "(unset)");
+    }
+
+    @Override
+    public Collection<T> getDomain() {
+        return this.domain;
     }
 
 }

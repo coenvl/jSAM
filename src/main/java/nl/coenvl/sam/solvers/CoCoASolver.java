@@ -21,6 +21,7 @@
 package nl.coenvl.sam.solvers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -142,6 +143,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 
         final Message m = new HashMessage(this.myVariable.getID(), CoCoASolver.INQUIRE_MSG);
         m.put("cpa", this.context);
+        m.put("domain", this.myVariable.getDomain());
 
         this.sendToNeighbors(m);
     }
@@ -157,9 +159,10 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
         final UUID source = m.getSource();
         final AssignmentMap<V> pa = this.context.clone(); // Should by now already include the CPA of the source
 
+        final Collection<V> domain = (Collection<V>) m.get("domain");
         // Build the cost map making the strong assumption that I have the same
         // type of variable as the source
-        for (final V iterAssignment : this.myVariable) {
+        for (final V iterAssignment : domain) {
             pa.put(source, iterAssignment);
 
             Double iterCost = Double.MAX_VALUE;

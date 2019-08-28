@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import nl.coenvl.sam.exceptions.InvalidDomainException;
+import nl.coenvl.sam.exceptions.InvalidValueException;
 
 /**
  * FixedPrecisionVariable
@@ -63,6 +64,32 @@ public class FixedPrecisionVariable extends ListVariable<Double> {
             final double step,
             final String name) throws InvalidDomainException {
         super(FixedPrecisionVariable.generateDomain(lowerBound, upperBound, step), name);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.variables.Variable#setValue(java.lang.Object)
+     */
+    @Override
+    public Variable<Double> setValue(final Double value) throws InvalidValueException {
+        if ((value < this.getLowerBound()) || (value > this.getUpperBound())) {
+            throw new InvalidValueException(value);
+        } else if (!this.getDomain().contains(value)) {
+            Double best = this.getLowerBound();
+            double mindiff = Double.MAX_VALUE;
+            for (final Double possible : this) {
+                final double diff = Math.abs(possible - value);
+                if (diff < mindiff) {
+                    mindiff = diff;
+                    best = possible;
+                }
+            }
+            super.setValue(best);
+        } else {
+            super.setValue(value);
+        }
+        return this;
     }
 
     private static List<Double> generateDomain(final double lowerBound, final double upperBound, final double step)

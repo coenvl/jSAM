@@ -34,12 +34,6 @@ import java.util.UUID;
  */
 public final class HashMessage implements Message {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 6306118222585166399L;
-    // private static final Gson gson = new Gson();
-
     private static final StringSerializer serializer = new StringSerializer();
     private final String type;
     private final UUID source;

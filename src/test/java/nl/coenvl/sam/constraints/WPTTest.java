@@ -75,7 +75,7 @@ public class WPTTest {
         final double[] b = {Double.MAX_VALUE, Double.MAX_VALUE};
         final FixedPrecisionVariable var3 = new FixedPrecisionVariable(0, 10, 0.1);
         var3.set("position", b);
-        var3.setValue(10.0);
+        var3.setValue(9.999);
 
         receiverConstraint.addVariable(var3);
         Assert.assertEquals(-0.007435866221259, receiverConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);

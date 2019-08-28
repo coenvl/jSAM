@@ -302,4 +302,9 @@ public class BinaryConstraintAgent<T extends Variable<V>, V> extends AbstractPro
         return this.mySolver.emptyQueue();
     }
 
+    @Override
+    public int compareTo(final Agent<T, V> o) {
+        return this.getName().compareTo(o.getName());
+    }
+
 }
