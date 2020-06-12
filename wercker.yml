@@ -1,17 +1,14 @@
 # Build and test Java code
 build:
-  box: 
-    id: niaquinto/gradle
-    entrypoint: /bin/sh -c "/bin/bash"
   steps:
-    - script:
+    - java/gradle:
         name: Build java code
-        code: |
-          gradle assemble
-    - script:
+        task: assemble
+        cache_project_cache: true
+    - java/gradle:
         name: Run Junit Tests
-        code: |
-          gradle test
+        task: test
+        cache_project_cache: true
           
 # Deploy anonymized code
 deploy:
