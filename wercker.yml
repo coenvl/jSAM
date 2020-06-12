@@ -1,5 +1,5 @@
 # Build and test Java code
-box: openjdk:8-jdk
+box: openjdk:11-jdk
 
 build:
   steps:
