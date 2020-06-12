@@ -4,11 +4,7 @@ box: openjdk:8-jdk
 build:
   steps:
     - java/gradle:
-        name: Build java code
-        task: assemble
-        cache_project_cache: true
-    - java/gradle:
-        name: Run Junit Tests
+        name: Build and run Junit Tests
         task: test
         cache_project_cache: true
           
