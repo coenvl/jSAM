@@ -1,4 +1,6 @@
 # Build and test Java code
+box: openjdk:8-jdk
+
 build:
   steps:
     - java/gradle:
