@@ -1,11 +1,8 @@
 # Build and test Java code
-box: openjdk:11-oracle
+box: gradle:6.5-jdk11
 
 build:
   steps:
-    - script:
-        name: Instal pre-reqs
-        code: yum -y install unzip
     - java/gradle:
         name: Build and run Junit Tests
         task: test
