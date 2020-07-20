@@ -3,6 +3,9 @@ box: openjdk:11-oracle
 
 build:
   steps:
+    - script:
+        name: Instal pre-reqs
+        code: yum -y install unzip
     - java/gradle:
         name: Build and run Junit Tests
         task: test
