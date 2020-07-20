@@ -295,6 +295,16 @@ public class AbstractAgentTest {
                 throw new IllegalAccessException(e.getMessage());
             }
         }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see nl.coenvl.sam.agents.Agent#isFinished()
+         */
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
     }
 
 }
