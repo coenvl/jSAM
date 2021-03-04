@@ -45,7 +45,7 @@ public class ListVariableTest {
     private ListVariable<String> var;
 
     @BeforeEach
-    public void init() throws InvalidDomainException {
+    public void init() {
         this.var = new ListVariable<>(Arrays.asList("een", "twee", "drie", "vijf", "drie", "vijf"));
     }
 
@@ -60,23 +60,13 @@ public class ListVariableTest {
         Assertions.assertEquals("drie", it.next());
         Assertions.assertEquals("vijf", it.next());
         Assertions.assertFalse(it.hasNext());
-        try {
-            it.next();
-            Assertions.fail("An exception was expected");
-        } catch (final Exception e) {
-        	Assertions.assertEquals(e.getClass(), NoSuchElementException.class);
-        }
+        Assertions.assertThrows(NoSuchElementException.class, it::next);
     }
 
     @Test
     public void testIteratorRemove() {
         final Iterator<String> it = this.var.iterator();
-        try {
-            it.remove();
-            Assertions.fail("An exception was expected");
-        } catch (final Exception e) {
-        	Assertions.assertEquals(e.getClass(), UnsupportedOperationException.class);
-        }
+        Assertions.assertThrows(Exception.class, it::remove);
     }
 
     @Test
@@ -85,7 +75,7 @@ public class ListVariableTest {
     }
 
     @Test
-    public void testRandomValue() throws InvalidValueException {
+    public void testRandomValue() {
         for (int i = 0; i < 5000; i++) {
             this.var.setValue(this.var.getRandomValue());
             System.out.println("Current value: " + this.var);
@@ -105,7 +95,7 @@ public class ListVariableTest {
     }
 
     @Test
-    public void testValue() throws InvalidValueException, VariableNotSetException {
+    public void testValue() {
         this.var.setValue("drie");
         Assertions.assertEquals("drie", this.var.getValue());
     }

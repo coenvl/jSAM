@@ -28,7 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import nl.coenvl.sam.exceptions.InvalidDomainException;
-import nl.coenvl.sam.exceptions.InvalidValueException;
 import nl.coenvl.sam.exceptions.VariableNotSetException;
 
 /**
@@ -55,23 +54,13 @@ public class BooleanVariableTest {
         Assertions.assertEquals(false, it.next());
         Assertions.assertEquals(true, it.next());
         Assertions.assertFalse(it.hasNext());
-        try {
-            it.next();
-            Assertions.fail("An exception was expected");
-        } catch (final Exception e) {
-            Assertions.assertEquals(e.getClass(), NoSuchElementException.class);
-        }
+        Assertions.assertThrows(NoSuchElementException.class, it::next);
     }
 
     @Test
     public void testIteratorRemove() {
         final Iterator<Boolean> it = this.var.iterator();
-        try {
-            it.remove();
-            Assertions.fail("An exception was expected");
-        } catch (final Exception e) {
-            Assertions.assertEquals(e.getClass(), UnsupportedOperationException.class);
-        }
+        Assertions.assertThrows(Exception.class, it::remove);
     }
 
     @Test
@@ -80,7 +69,7 @@ public class BooleanVariableTest {
     }
 
     @Test
-    public void testRandomValue() throws InvalidValueException {
+    public void testRandomValue() {
         for (int i = 0; i < 5000; i++) {
             this.var.setValue(this.var.getRandomValue());
             System.out.println("Current value: " + this.var);
@@ -100,14 +89,9 @@ public class BooleanVariableTest {
     }
 
     @Test
-    public void testValue() throws InvalidValueException, VariableNotSetException {
+    public void testValue() {
         final BooleanVariable v = new BooleanVariable();
-        try {
-            v.getValue();
-            Assertions.fail("An exception was expected");
-        } catch (final Exception e) {
-            Assertions.assertEquals(e.getClass(), VariableNotSetException.class);
-        }
+        Assertions.assertThrows(VariableNotSetException.class, v::getValue);
 
         this.var.setValue(false);
         Assertions.assertEquals(false, this.var.getValue());
@@ -115,13 +99,7 @@ public class BooleanVariableTest {
         Assertions.assertEquals(true, this.var.getValue());
 
         this.var.clear();
-        try {
-            this.var.getValue();
-            Assertions.fail("An exception was expected");
-        } catch (final Exception e) {
-            Assertions.assertEquals(e.getClass(), VariableNotSetException.class);
-        }
-
+        Assertions.assertThrows(VariableNotSetException.class, v::getValue);
     }
 
     @Test
