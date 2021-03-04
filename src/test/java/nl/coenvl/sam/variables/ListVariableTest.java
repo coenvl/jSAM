@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import nl.coenvl.sam.exceptions.InvalidDomainException;
 import nl.coenvl.sam.exceptions.InvalidValueException;
@@ -44,7 +44,7 @@ public class ListVariableTest {
 
     private ListVariable<String> var;
 
-    @Before
+    @BeforeEach
     public void init() throws InvalidDomainException {
         this.var = new ListVariable<>(Arrays.asList("een", "twee", "drie", "vijf", "drie", "vijf"));
     }
@@ -52,19 +52,19 @@ public class ListVariableTest {
     @Test
     public void testIterator() {
         final Iterator<String> it = this.var.iterator();
-        Assert.assertTrue(it.hasNext());
-        Assert.assertEquals("een", it.next());
-        Assert.assertEquals("twee", it.next());
-        Assert.assertEquals("drie", it.next());
-        Assert.assertEquals("vijf", it.next());
-        Assert.assertEquals("drie", it.next());
-        Assert.assertEquals("vijf", it.next());
-        Assert.assertFalse(it.hasNext());
+        Assertions.assertTrue(it.hasNext());
+        Assertions.assertEquals("een", it.next());
+        Assertions.assertEquals("twee", it.next());
+        Assertions.assertEquals("drie", it.next());
+        Assertions.assertEquals("vijf", it.next());
+        Assertions.assertEquals("drie", it.next());
+        Assertions.assertEquals("vijf", it.next());
+        Assertions.assertFalse(it.hasNext());
         try {
             it.next();
-            Assert.fail("An exception was expected");
+            Assertions.fail("An exception was expected");
         } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), NoSuchElementException.class);
+        	Assertions.assertEquals(e.getClass(), NoSuchElementException.class);
         }
     }
 
@@ -73,15 +73,15 @@ public class ListVariableTest {
         final Iterator<String> it = this.var.iterator();
         try {
             it.remove();
-            Assert.fail("An exception was expected");
+            Assertions.fail("An exception was expected");
         } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), UnsupportedOperationException.class);
+        	Assertions.assertEquals(e.getClass(), UnsupportedOperationException.class);
         }
     }
 
     @Test
     public void testLowerBound() {
-        Assert.assertEquals("een", this.var.getLowerBound());
+    	Assertions.assertEquals("een", this.var.getLowerBound());
     }
 
     @Test
@@ -101,13 +101,13 @@ public class ListVariableTest {
 
     @Test
     public void testUpperBound() {
-        Assert.assertEquals("vijf", this.var.getUpperBound());
+    	Assertions.assertEquals("vijf", this.var.getUpperBound());
     }
 
     @Test
     public void testValue() throws InvalidValueException, VariableNotSetException {
         this.var.setValue("drie");
-        Assert.assertEquals("drie", this.var.getValue());
+        Assertions.assertEquals("drie", this.var.getValue());
     }
 
     @Test
@@ -117,6 +117,6 @@ public class ListVariableTest {
         pc.setAssignment(this.var, this.var.getValue());
         final String str = pc.serialize();
         final AssignmentMap<?> dp = (AssignmentMap<?>) PublishableMap.deserialize(str);
-        Assert.assertEquals(this.var.getValue(), dp.get(this.var.getID()));
+        Assertions.assertEquals(this.var.getValue(), dp.get(this.var.getID()));
     }
 }
