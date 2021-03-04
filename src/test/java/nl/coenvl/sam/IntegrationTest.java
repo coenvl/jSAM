@@ -52,7 +52,10 @@ public class IntegrationTest {
 
         agents.get(0).set(CoCoSolver.ROOTNAME_PROPERTY, true);
         agents.get(0).init();
-        Thread.sleep(1000);
+        
+        while(!agents.stream().allMatch(Agent::isFinished)) {
+        	Thread.sleep(10);
+        }
 
         for (final Variable v : variables) {
             System.out.println(v.getValue());

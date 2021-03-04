@@ -23,8 +23,6 @@ public class FixedPrecisionVariable extends ListVariable<Double> {
 
     private static int unnamedVariableSequence = 0;
 
-    private final double precision;
-
     /**
      * Creates a variable with a given lower bound and upper bound. Future calls to setValue will never be able to set
      * the Variable value to something higher or lower than these bounds' values
@@ -66,7 +64,6 @@ public class FixedPrecisionVariable extends ListVariable<Double> {
             final double step,
             final String name) throws InvalidDomainException {
         super(FixedPrecisionVariable.generateDomain(lowerBound, upperBound, step), name);
-        this.precision = step;
     }
 
     /*
@@ -106,23 +103,6 @@ public class FixedPrecisionVariable extends ListVariable<Double> {
             domain.add(Double.valueOf(d));
         }
         return Collections.unmodifiableList(domain);
-    }
-
-    @Override
-    public Variable<Double> setValue(final Double value) throws InvalidValueException {
-        Double nearest = null;
-        Double diff = this.precision / 10;
-        for (final Double d : this) {
-            if (Math.abs(d - value) < diff) {
-                nearest = d;
-                diff = Math.abs(d - value);
-            }
-        }
-        if (nearest != null) {
-            return super.setValue(nearest);
-        } else {
-            return super.setValue(value);
-        }
     }
 
 }

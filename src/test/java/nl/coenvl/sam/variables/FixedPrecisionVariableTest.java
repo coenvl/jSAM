@@ -81,15 +81,15 @@ public class FixedPrecisionVariableTest {
     public void testIterator() {
         final Iterator<Double> it = this.var.iterator();
         Assertions.assertTrue(it.hasNext());
-        Assertions.assertEquals(it.next(), new Double(0));
-        Assertions.assertEquals(it.next(), new Double(0.125));
-        Assertions.assertEquals(it.next(), new Double(0.250));
-        Assertions.assertEquals(it.next(), new Double(0.375));
-        Assertions.assertEquals(it.next(), new Double(0.5));
-        Assertions.assertEquals(it.next(), new Double(0.625));
-        Assertions.assertEquals(it.next(), new Double(0.750));
-        Assertions.assertEquals(it.next(), new Double(0.875));
-        Assertions.assertEquals(it.next(), new Double(1.0));
+        Assertions.assertEquals(it.next(), 0.0);
+        Assertions.assertEquals(it.next(), 0.125);
+        Assertions.assertEquals(it.next(), 0.250);
+        Assertions.assertEquals(it.next(), 0.375);
+        Assertions.assertEquals(it.next(), 0.5);
+        Assertions.assertEquals(it.next(), 0.625);
+        Assertions.assertEquals(it.next(), 0.750);
+        Assertions.assertEquals(it.next(), 0.875);
+        Assertions.assertEquals(it.next(), 1.0);
         Assertions.assertFalse(it.hasNext());
         try {
             it.next();
@@ -112,7 +112,7 @@ public class FixedPrecisionVariableTest {
 
     @Test
     public void testLowerBound() {
-        Assertions.assertEquals(this.var.getLowerBound(), new Double(0));
+        Assertions.assertEquals(this.var.getLowerBound(), 0.0);
     }
 
     @Test
@@ -132,12 +132,12 @@ public class FixedPrecisionVariableTest {
 
     @Test
     public void testUpperBound() {
-        Assertions.assertEquals(this.var.getUpperBound(), new Double(1));
+        Assertions.assertEquals(this.var.getUpperBound(), 1.0);
     }
 
     @Test
     public void testValue() throws InvalidValueException, VariableNotSetException {
         this.var.setValue(0.875);
-        Assertions.assertEquals(this.var.getValue(), new Double(0.875));
+        Assertions.assertEquals(this.var.getValue(), 0.875);
     }
 }

@@ -134,9 +134,9 @@ public class SingleSolverAgent<T extends Variable<V>, V> extends SolverAgent<T, 
     @Override
     public boolean isFinished() {
         if (this.mySolver instanceof SolverRunner) {
-            return ((SolverRunner) this.mySolver).emptyQueue();
+            return this.getVariable().isSet() && ((SolverRunner) this.mySolver).emptyQueue();
         } else {
-            return true;
+            return this.getVariable().isSet();
         }
     }
 

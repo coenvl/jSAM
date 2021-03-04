@@ -21,7 +21,6 @@
 package nl.coenvl.sam;
 
 import nl.coenvl.sam.constraints.CompareCounter;
-import nl.coenvl.sam.variables.ListVariable;
 
 /**
  * ExperimentControl
@@ -36,7 +35,6 @@ public class ExperimentControl {
     public static void ResetExperiment() {
         MailMan.reset();
         CompareCounter.reset();
-        ListVariable.updateTrail.clear();
     }
 
     public static int getNumberEvals() {
