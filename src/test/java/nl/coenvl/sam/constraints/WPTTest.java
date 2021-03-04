@@ -5,8 +5,8 @@
  */
 package nl.coenvl.sam.constraints;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import nl.coenvl.sam.exceptions.InvalidPropertyException;
 import nl.coenvl.sam.variables.FixedPrecisionVariable;
@@ -27,11 +27,11 @@ public class WPTTest {
 
     @Test
     public void testDecay() {
-        Assert.assertEquals(6.2497e-12, PathLossFactor.computePathLoss(4e6), this.ACCEPTABLE_ERROR);
-        Assert.assertEquals(4e-4, PathLossFactor.computePathLoss(400), this.ACCEPTABLE_ERROR);
-        Assert.assertEquals(0.0016, PathLossFactor.computePathLoss(150), this.ACCEPTABLE_ERROR);
-        Assert.assertEquals(0.01, PathLossFactor.computePathLoss(0.0), this.ACCEPTABLE_ERROR);
-        Assert.assertEquals(0.0, PathLossFactor.computePathLoss(Double.MAX_VALUE), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(6.2497e-12, PathLossFactor.computePathLoss(4e6), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(4e-4, PathLossFactor.computePathLoss(400), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(0.0016, PathLossFactor.computePathLoss(150), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(0.01, PathLossFactor.computePathLoss(0.0), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(0.0, PathLossFactor.computePathLoss(Double.MAX_VALUE), this.ACCEPTABLE_ERROR);
     }
 
     @Test
@@ -42,10 +42,10 @@ public class WPTTest {
         final double[] d = {-500, 1000};
 
         // These values are calculated using the original function in MATLAB
-        Assert.assertEquals(0.01, PathLossFactor.computePathLoss(a, a), this.ACCEPTABLE_ERROR);
-        Assert.assertEquals(9.070294784e-3, PathLossFactor.computePathLoss(a, b), this.ACCEPTABLE_ERROR);
-        Assert.assertEquals(1.715728752e-3, PathLossFactor.computePathLoss(a, c), this.ACCEPTABLE_ERROR);
-        Assert.assertEquals(6.740330399e-05, PathLossFactor.computePathLoss(a, d), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(0.01, PathLossFactor.computePathLoss(a, a), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(9.070294784e-3, PathLossFactor.computePathLoss(a, b), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(1.715728752e-3, PathLossFactor.computePathLoss(a, c), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(6.740330399e-05, PathLossFactor.computePathLoss(a, d), this.ACCEPTABLE_ERROR);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class WPTTest {
         var.setValue(0.5);
 
         receiverConstraint.addVariable(var);
-        Assert.assertEquals(-0.005, receiverConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(-0.005, receiverConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
 
         // A variable at some distance has a reasonable influence
         final double[] a = {81, -63};
@@ -69,16 +69,16 @@ public class WPTTest {
         var2.setValue(1.0);
 
         receiverConstraint.addVariable(var2);
-        Assert.assertEquals(-0.007435866221259, receiverConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(-0.007435866221259, receiverConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
 
         // A variable VERY far away should have no influence
         final double[] b = {Double.MAX_VALUE, Double.MAX_VALUE};
         final FixedPrecisionVariable var3 = new FixedPrecisionVariable(0, 10, 0.1);
         var3.set("position", b);
-        var3.setValue(10.0);
+        var3.setValue(9.999);
 
         receiverConstraint.addVariable(var3);
-        Assert.assertEquals(-0.007435866221259, receiverConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(-0.007435866221259, receiverConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
     }
 
     @Test
@@ -93,14 +93,14 @@ public class WPTTest {
         var.setValue(1.0);
 
         sensorConstraint.addVariable(var);
-        Assert.assertEquals(0.0, sensorConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(0.0, sensorConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
 
         var.setValue(1.7);
-        Assert.assertEquals(0.0, sensorConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(0.0, sensorConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
 
         // At this value we reach the threshold received energy, so we get a huge penalty
         var.setValue(1.8);
-        Assert.assertEquals(WPTSensorConstraint.COST, sensorConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
+        Assertions.assertEquals(WPTSensorConstraint.COST, sensorConstraint.getExternalCost(), this.ACCEPTABLE_ERROR);
     }
 
 }

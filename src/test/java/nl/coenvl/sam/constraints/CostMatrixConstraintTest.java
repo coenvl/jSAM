@@ -19,8 +19,8 @@
  */
 package nl.coenvl.sam.constraints;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import nl.coenvl.sam.exceptions.CostMatrixRangeException;
 import nl.coenvl.sam.exceptions.InvalidDomainException;
@@ -55,26 +55,26 @@ public class CostMatrixConstraintTest {
 
         // Test no value provided behavior
         AssignmentMap<Integer> valueMap = new AssignmentMap<>();
-        // Assert.assertEquals(0, scmc.getCostIf(var1, null), 0);
-        // Assert.assertEquals(0, scmc.getCostIf(var1, valueMap), 0);
+        // Assertions.assertEquals(0, scmc.getCostIf(var1, null), 0);
+        // Assertions.assertEquals(0, scmc.getCostIf(var1, valueMap), 0);
         valueMap.setAssignment(var1, 1);
-        Assert.assertEquals((costMat1[1][0] + costMat1[1][1] + costMat1[1][2]) / 3, scmc.getCostIf(var1, valueMap), 0);
+        Assertions.assertEquals((costMat1[1][0] + costMat1[1][1] + costMat1[1][2]) / 3, scmc.getCostIf(var1, valueMap), 0);
         valueMap.setAssignment(var2, 1);
-        Assert.assertEquals(costMat1[1][1], scmc.getCostIf(var1, valueMap), 0);
+        Assertions.assertEquals(costMat1[1][1], scmc.getCostIf(var1, valueMap), 0);
 
         valueMap.setAssignment(var2, 3);
         try {
             scmc.getCostIf(var1, valueMap);
-            Assert.fail("Expected CostMatrixRangeException");
+            Assertions.fail("Expected CostMatrixRangeException");
         } catch (Exception e) {
-            Assert.assertEquals(CostMatrixRangeException.class, e.getClass());
+            Assertions.assertEquals(CostMatrixRangeException.class, e.getClass());
         }
 
         try {
             scmc.getCost(var1);
-            Assert.fail("Expected VariableNotSetException");
+            Assertions.fail("Expected VariableNotSetException");
         } catch (Exception e) {
-            Assert.assertEquals(VariableNotSetException.class, e.getClass());
+            Assertions.assertEquals(VariableNotSetException.class, e.getClass());
         }
     }
 
@@ -95,13 +95,13 @@ public class CostMatrixConstraintTest {
                 var1.setValue(v1);
                 var2.setValue(v2);
 
-                Assert.assertEquals(src.getCost(var1), src.getCost(var2), 0);
-                Assert.assertNotEquals(arc.getCost(var1), arc.getCost(var2));
+                Assertions.assertEquals(src.getCost(var1), src.getCost(var2), 0);
+                Assertions.assertNotEquals(arc.getCost(var1), arc.getCost(var2));
                 eq += (hrc.getCost(var1) == hrc.getCost(var2) ? 1 : 0);
             }
         }
 
-        Assert.assertNotEquals(var1.getRange() * var2.getRange(), eq);
+        Assertions.assertNotEquals(var1.getRange() * var2.getRange(), eq);
         eq = 0;
 
         // Test getCostIf
@@ -111,13 +111,13 @@ public class CostMatrixConstraintTest {
                 valueMap.setAssignment(var1, v1);
                 valueMap.setAssignment(var2, v2);
 
-                Assert.assertEquals(src.getCostIf(var1, valueMap), src.getCostIf(var2, valueMap), 0);
-                Assert.assertNotEquals(arc.getCostIf(var1, valueMap), arc.getCostIf(var2, valueMap));
+                Assertions.assertEquals(src.getCostIf(var1, valueMap), src.getCostIf(var2, valueMap), 0);
+                Assertions.assertNotEquals(arc.getCostIf(var1, valueMap), arc.getCostIf(var2, valueMap));
                 eq += (hrc.getCostIf(var1, valueMap) == hrc.getCostIf(var2, valueMap) ? 1 : 0);
             }
         }
 
-        Assert.assertNotEquals(var1.getRange() * var2.getRange(), eq);
+        Assertions.assertNotEquals(var1.getRange() * var2.getRange(), eq);
     }
 
     @Test
@@ -144,14 +144,14 @@ public class CostMatrixConstraintTest {
                 var1.setValue(v1);
                 var2.setValue(v2);
 
-                Assert.assertEquals(scmc.getCost(var1), scmc.getCost(var2), 0);
-                Assert.assertNotEquals(acmc.getCost(var1), acmc.getCost(var2));
+                Assertions.assertEquals(scmc.getCost(var1), scmc.getCost(var2), 0);
+                Assertions.assertNotEquals(acmc.getCost(var1), acmc.getCost(var2));
 
-                Assert.assertEquals(costMat1[v1][v2], scmc.getCost(var1), 0);
-                Assert.assertEquals(costMat1[v1][v2], scmc.getCost(var2), 0);
+                Assertions.assertEquals(costMat1[v1][v2], scmc.getCost(var1), 0);
+                Assertions.assertEquals(costMat1[v1][v2], scmc.getCost(var2), 0);
 
-                Assert.assertEquals(costMat1[v1][v2], acmc.getCost(var1), 0);
-                Assert.assertEquals(costMat2[v2][v1], acmc.getCost(var2), 0);
+                Assertions.assertEquals(costMat1[v1][v2], acmc.getCost(var1), 0);
+                Assertions.assertEquals(costMat2[v2][v1], acmc.getCost(var2), 0);
             }
         }
 
@@ -162,14 +162,14 @@ public class CostMatrixConstraintTest {
                 valueMap.setAssignment(var1, v1);
                 valueMap.setAssignment(var2, v2);
 
-                Assert.assertEquals(scmc.getCostIf(var1, valueMap), scmc.getCostIf(var2, valueMap), 0);
-                Assert.assertNotEquals(acmc.getCostIf(var1, valueMap), acmc.getCostIf(var2, valueMap));
+                Assertions.assertEquals(scmc.getCostIf(var1, valueMap), scmc.getCostIf(var2, valueMap), 0);
+                Assertions.assertNotEquals(acmc.getCostIf(var1, valueMap), acmc.getCostIf(var2, valueMap));
 
-                Assert.assertEquals(costMat1[v1][v2], scmc.getCostIf(var1, valueMap), 0);
-                Assert.assertEquals(costMat1[v1][v2], scmc.getCostIf(var2, valueMap), 0);
+                Assertions.assertEquals(costMat1[v1][v2], scmc.getCostIf(var1, valueMap), 0);
+                Assertions.assertEquals(costMat1[v1][v2], scmc.getCostIf(var2, valueMap), 0);
 
-                Assert.assertEquals(costMat1[v1][v2], acmc.getCostIf(var1, valueMap), 0);
-                Assert.assertEquals(costMat2[v2][v1], acmc.getCostIf(var2, valueMap), 0);
+                Assertions.assertEquals(costMat1[v1][v2], acmc.getCostIf(var1, valueMap), 0);
+                Assertions.assertEquals(costMat2[v2][v1], acmc.getCostIf(var2, valueMap), 0);
             }
         }
     }
@@ -188,8 +188,8 @@ public class CostMatrixConstraintTest {
                 var2.setValue(v2);
 
                 // Non-overlapping domains, so never should be equal...
-                Assert.assertEquals(0, ic.getCost(var1), 0);
-                Assert.assertEquals(0, ic.getCost(var2), 0);
+                Assertions.assertEquals(0, ic.getCost(var1), 0);
+                Assertions.assertEquals(0, ic.getCost(var2), 0);
             }
         }
 
@@ -199,8 +199,8 @@ public class CostMatrixConstraintTest {
             valueMap.setAssignment(var1, v1);
             valueMap.setAssignment(var2, v1); // These are invalid values, but is allowed by inequalityConstraint
 
-            Assert.assertEquals(cost, ic.getCostIf(var1, valueMap), 0);
-            Assert.assertEquals(cost, ic.getCostIf(var2, valueMap), 0);
+            Assertions.assertEquals(cost, ic.getCostIf(var1, valueMap), 0);
+            Assertions.assertEquals(cost, ic.getCostIf(var2, valueMap), 0);
         }
     }
 
@@ -230,13 +230,13 @@ public class CostMatrixConstraintTest {
                 var2.setValue(v2);
 
                 if (v1 == v2) {
-                    Assert.assertEquals(pref1[v1], ic.getCost(var1), 0.0);
-                    Assert.assertEquals(pref2[v1], ic.getCost(var2), 0.0);
-                    Assert.assertEquals(pref1[v1] + pref2[v2], ic.getExternalCost(), 0.0);
+                    Assertions.assertEquals(pref1[v1], ic.getCost(var1), 0.0);
+                    Assertions.assertEquals(pref2[v1], ic.getCost(var2), 0.0);
+                    Assertions.assertEquals(pref1[v1] + pref2[v2], ic.getExternalCost(), 0.0);
                 } else {
-                    Assert.assertEquals(ineqCost, ic.getCost(var1), 0.0);
-                    Assert.assertEquals(ineqCost, ic.getCost(var2), 0.0);
-                    Assert.assertEquals(2 * ineqCost, ic.getExternalCost(), 0.0);
+                    Assertions.assertEquals(ineqCost, ic.getCost(var1), 0.0);
+                    Assertions.assertEquals(ineqCost, ic.getCost(var2), 0.0);
+                    Assertions.assertEquals(2 * ineqCost, ic.getExternalCost(), 0.0);
                 }
             }
         }
@@ -249,11 +249,11 @@ public class CostMatrixConstraintTest {
                 valueMap.setAssignment(var2, v2); // These are invalid values, but is allowed by inequalityConstraint
 
                 if (v1 == v2) {
-                    Assert.assertEquals(pref1[v1], ic.getCostIf(var1, valueMap), 0.0);
-                    Assert.assertEquals(pref2[v1], ic.getCostIf(var2, valueMap), 0.0);
+                    Assertions.assertEquals(pref1[v1], ic.getCostIf(var1, valueMap), 0.0);
+                    Assertions.assertEquals(pref2[v1], ic.getCostIf(var2, valueMap), 0.0);
                 } else {
-                    Assert.assertEquals(ineqCost, ic.getCostIf(var1, valueMap), 0.0);
-                    Assert.assertEquals(ineqCost, ic.getCostIf(var2, valueMap), 0.0);
+                    Assertions.assertEquals(ineqCost, ic.getCostIf(var1, valueMap), 0.0);
+                    Assertions.assertEquals(ineqCost, ic.getCostIf(var2, valueMap), 0.0);
                 }
             }
         }

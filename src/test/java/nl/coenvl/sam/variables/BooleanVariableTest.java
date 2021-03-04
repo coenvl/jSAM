@@ -1,5 +1,5 @@
 /**
- * File testVariable.java
+. * File testVariable.java
  *
  * This file is part of the jSAM project 2014.
  *
@@ -23,9 +23,9 @@ package nl.coenvl.sam.variables;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import nl.coenvl.sam.exceptions.InvalidDomainException;
 import nl.coenvl.sam.exceptions.InvalidValueException;
@@ -43,7 +43,7 @@ public class BooleanVariableTest {
 
     private BooleanVariable var;
 
-    @Before
+    @BeforeEach
     public void init() throws InvalidDomainException {
         this.var = new BooleanVariable();
     }
@@ -51,15 +51,15 @@ public class BooleanVariableTest {
     @Test
     public void testIterator() {
         final Iterator<Boolean> it = this.var.iterator();
-        Assert.assertTrue(it.hasNext());
-        Assert.assertEquals(false, it.next());
-        Assert.assertEquals(true, it.next());
-        Assert.assertFalse(it.hasNext());
+        Assertions.assertTrue(it.hasNext());
+        Assertions.assertEquals(false, it.next());
+        Assertions.assertEquals(true, it.next());
+        Assertions.assertFalse(it.hasNext());
         try {
             it.next();
-            Assert.fail("An exception was expected");
+            Assertions.fail("An exception was expected");
         } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), NoSuchElementException.class);
+            Assertions.assertEquals(e.getClass(), NoSuchElementException.class);
         }
     }
 
@@ -68,15 +68,15 @@ public class BooleanVariableTest {
         final Iterator<Boolean> it = this.var.iterator();
         try {
             it.remove();
-            Assert.fail("An exception was expected");
+            Assertions.fail("An exception was expected");
         } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), UnsupportedOperationException.class);
+            Assertions.assertEquals(e.getClass(), UnsupportedOperationException.class);
         }
     }
 
     @Test
     public void testLowerBound() {
-        Assert.assertEquals(false, this.var.getLowerBound());
+        Assertions.assertEquals(false, this.var.getLowerBound());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class BooleanVariableTest {
 
     @Test
     public void testUpperBound() {
-        Assert.assertEquals(true, this.var.getUpperBound());
+        Assertions.assertEquals(true, this.var.getUpperBound());
     }
 
     @Test
@@ -104,22 +104,22 @@ public class BooleanVariableTest {
         final BooleanVariable v = new BooleanVariable();
         try {
             v.getValue();
-            Assert.fail("An exception was expected");
+            Assertions.fail("An exception was expected");
         } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), VariableNotSetException.class);
+            Assertions.assertEquals(e.getClass(), VariableNotSetException.class);
         }
 
         this.var.setValue(false);
-        Assert.assertEquals(false, this.var.getValue());
+        Assertions.assertEquals(false, this.var.getValue());
         this.var.setValue(true);
-        Assert.assertEquals(true, this.var.getValue());
+        Assertions.assertEquals(true, this.var.getValue());
 
         this.var.clear();
         try {
             this.var.getValue();
-            Assert.fail("An exception was expected");
+            Assertions.fail("An exception was expected");
         } catch (final Exception e) {
-            Assert.assertEquals(e.getClass(), VariableNotSetException.class);
+            Assertions.assertEquals(e.getClass(), VariableNotSetException.class);
         }
 
     }
@@ -131,6 +131,6 @@ public class BooleanVariableTest {
         pc.setAssignment(this.var, this.var.getValue());
         final String str = pc.serialize();
         final AssignmentMap<?> dp = (AssignmentMap<?>) PublishableMap.deserialize(str);
-        Assert.assertEquals(this.var.getValue(), dp.get(this.var.getID()));
+        Assertions.assertEquals(this.var.getValue(), dp.get(this.var.getID()));
     }
 }

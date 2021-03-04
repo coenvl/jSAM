@@ -36,7 +36,7 @@ import nl.coenvl.sam.variables.Variable;
  * @since 4 feb. 2014
  *
  */
-public interface Agent<T extends Variable<V>, V> extends PropertyOwner, Solver {
+public interface Agent<T extends Variable<V>, V> extends PropertyOwner, Solver, Comparable<Agent<T, V>> {
 
     public String getName();
 

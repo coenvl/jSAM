@@ -45,7 +45,7 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
     private final String name;
     private final T variable;
 
-    protected AbstractAgent(T var, String name) {
+    protected AbstractAgent(final T var, final String name) {
         super();
         if (var == null) {
             throw new NullPointerException("Variable may not be null");
@@ -57,7 +57,7 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
         MailMan.registerOwner(var, this);
     }
 
-    protected AbstractAgent(T var) {
+    protected AbstractAgent(final T var) {
         this(var, "Anonymous agent");
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
     }
 
     @Override
-    public void addConstraint(Constraint<T, V> c) {
+    public void addConstraint(final Constraint<T, V> c) {
         if (!c.getVariableIds().contains(this.variable.getID())) {
             throw new VariableNotInvolvedException(
                     "The variable of the agent " + this.name + " is not involved in the provided constraint");
@@ -97,7 +97,7 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
     }
 
     @Override
-    public void removeConstraint(Constraint<T, V> c) {
+    public void removeConstraint(final Constraint<T, V> c) {
         this.constraints.remove(c);
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
     }
 
     @Override
-    public double getLocalCostIf(AssignmentMap<V> valueMap) {
+    public double getLocalCostIf(final AssignmentMap<V> valueMap) {
         double cost = 0;
         for (final Constraint<T, V> c : this.constraints) {
             cost += c.getCostIf(this.variable, valueMap);
@@ -132,12 +132,17 @@ public abstract class AbstractAgent<T extends Variable<V>, V> extends AbstractPr
     }
 
     @Override
-    public Constraint<T, V> getConstraintForAgent(UUID id) {
+    public Constraint<T, V> getConstraintForAgent(final UUID id) {
         for (final Constraint<T, V> c : this.constraints) {
             if (c.getVariableIds().contains(id)) {
                 return c;
             }
         }
         return null;
+    }
+
+    @Override
+    public int compareTo(final Agent<T, V> o) {
+        return this.getName().compareTo(o.getName());
     }
 }

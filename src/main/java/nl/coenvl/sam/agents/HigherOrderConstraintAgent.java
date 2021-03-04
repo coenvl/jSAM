@@ -310,4 +310,9 @@ public class HigherOrderConstraintAgent<T extends Variable<V>, V> extends Abstra
         throw new UnsupportedOperationException("Cannot get Constraints from ConstraintAgent");
     }
 
+    @Override
+    public int compareTo(final Agent<T, V> o) {
+        return this.getName().compareTo(o.getName());
+    }
+
 }

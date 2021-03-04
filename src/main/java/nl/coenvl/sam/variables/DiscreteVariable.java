@@ -20,6 +20,7 @@
  */
 package nl.coenvl.sam.variables;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -55,5 +56,7 @@ public interface DiscreteVariable<V> extends Variable<V>, Iterable<V> {
      */
     @Override
     public Iterator<V> iterator();
+
+    public Collection<V> getDomain();
 
 }

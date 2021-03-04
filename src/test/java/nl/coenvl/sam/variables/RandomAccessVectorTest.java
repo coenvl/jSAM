@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * RandomAccessVectorTest
@@ -31,7 +31,7 @@ public class RandomAccessVectorTest {
         this.candidates = new RandomAccessVector<>();
     }
 
-    @Before
+    @BeforeEach
     public void init() {
         this.candidates.clear();
     }
@@ -40,9 +40,9 @@ public class RandomAccessVectorTest {
     public void testEmptyGet() {
         try {
             this.candidates.randomElement();
-            Assert.fail("An exception was expected");
+            Assertions.fail("An exception was expected");
         } catch (Exception e) {
-            Assert.assertEquals(NoSuchElementException.class, e.getClass());
+        	Assertions.assertEquals(NoSuchElementException.class, e.getClass());
         }
     }
 
@@ -51,7 +51,7 @@ public class RandomAccessVectorTest {
         Integer candidate = 4;
         this.candidates.add(candidate);
         for (int i = 1; i < 100; i++) {
-            Assert.assertEquals(candidate, this.candidates.randomElement());
+        	Assertions.assertEquals(candidate, this.candidates.randomElement());
         }
     }
 
@@ -70,8 +70,8 @@ public class RandomAccessVectorTest {
         }
 
         System.out.println("Observed " + observed.size() + " integers in " + draw + " draws.");
-        Assert.assertTrue(draw >= 10);
-        Assert.assertEquals(10, observed.size());
-        Assert.assertNotEquals(MAX_DRAWS, draw);
+        Assertions.assertTrue(draw >= 10);
+        Assertions.assertEquals(10, observed.size());
+        Assertions.assertNotEquals(MAX_DRAWS, draw);
     }
 }

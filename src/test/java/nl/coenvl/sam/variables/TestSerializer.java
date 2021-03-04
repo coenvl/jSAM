@@ -8,8 +8,8 @@ package nl.coenvl.sam.variables;
 import java.io.NotSerializableException;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
@@ -31,9 +31,9 @@ public class TestSerializer {
         final Message m = new HashMessage(UUID.randomUUID(), "stuff");
         try {
             m.put("KEY", this.var);
-            Assert.fail("It is not allowed to serialize variables");
+            Assertions.fail("It is not allowed to serialize variables");
         } catch (final Exception e) {
-            Assert.assertEquals(NotSerializableException.class, e.getCause().getClass());
+            Assertions.assertEquals(NotSerializableException.class, e.getCause().getClass());
         }
     }
 

@@ -8,7 +8,7 @@ package nl.coenvl.sam;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.coenvl.sam.agents.Agent;
 import nl.coenvl.sam.agents.VariableAgent;

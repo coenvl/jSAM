@@ -5,8 +5,7 @@
  */
 package nl.coenvl.sam.variables;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -24,8 +23,6 @@ import nl.coenvl.sam.exceptions.VariableNotSetException;
  * @since Jul 3, 2019
  */
 public class ListVariable<T> extends AbstractPropertyOwner implements DiscreteVariable<T> {
-
-    public static List<String> updateTrail = Collections.synchronizedList(new ArrayList<>());
 
     private static int unnamedVariableSequence = 0;
 
@@ -98,12 +95,6 @@ public class ListVariable<T> extends AbstractPropertyOwner implements DiscreteVa
         }
         this.set = true;
         this.value = value;
-        ListVariable.updateTrail.add(System.nanoTime() + " @" + this.name + ": " + this.value);
-        try {
-            Thread.sleep(10);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
         return this;
     }
 
@@ -125,6 +116,11 @@ public class ListVariable<T> extends AbstractPropertyOwner implements DiscreteVa
     @Override
     public String toString() {
         return "" + this.name + ": " + (this.set ? this.value : "(unset)");
+    }
+
+    @Override
+    public Collection<T> getDomain() {
+        return this.domain;
     }
 
 }

@@ -69,6 +69,32 @@ public class FixedPrecisionVariable extends ListVariable<Double> {
         this.precision = step;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see nl.coenvl.sam.variables.Variable#setValue(java.lang.Object)
+     */
+    @Override
+    public Variable<Double> setValue(final Double value) throws InvalidValueException {
+        if ((value < this.getLowerBound()) || (value > this.getUpperBound())) {
+            throw new InvalidValueException(value);
+        } else if (!this.getDomain().contains(value)) {
+            Double best = this.getLowerBound();
+            double mindiff = Double.MAX_VALUE;
+            for (final Double possible : this) {
+                final double diff = Math.abs(possible - value);
+                if (diff < mindiff) {
+                    mindiff = diff;
+                    best = possible;
+                }
+            }
+            super.setValue(best);
+        } else {
+            super.setValue(value);
+        }
+        return this;
+    }
+
     private static List<Double> generateDomain(final double lowerBound, final double upperBound, final double step)
             throws InvalidDomainException {
         if ((lowerBound > upperBound) || (step <= 0) || (step > (upperBound - lowerBound))) {

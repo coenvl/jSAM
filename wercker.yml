@@ -1,9 +1,0 @@
-# Build and test Java code
-box: gradle:6.5-jdk11
-
-build:
-  steps:
-    - java/gradle:
-        name: Build and run Junit Tests
-        task: test
-        cache_project_cache: true

@@ -34,11 +34,11 @@ public class PreferentialEqualityConstraint<V> extends CostMatrixConstraint<V> {
      * @param var1
      * @param var2
      */
-    public PreferentialEqualityConstraint(DiscreteVariable<V> var1,
-            DiscreteVariable<V> var2,
-            double[] pref1,
-            double[] pref2,
-            double inequalityCost) {
+    public PreferentialEqualityConstraint(final DiscreteVariable<V> var1,
+            final DiscreteVariable<V> var2,
+            final double[] pref1,
+            final double[] pref2,
+            final double inequalityCost) {
         super(var1,
                 var2,
                 PreferentialEqualityConstraint.buildCostMatrix(pref1, inequalityCost),
@@ -50,9 +50,9 @@ public class PreferentialEqualityConstraint<V> extends CostMatrixConstraint<V> {
      * @param inequalityCost
      * @return
      */
-    private static double[][] buildCostMatrix(double[] pref, double inequalityCost) {
-        int size = pref.length;
-        double[][] costs = new double[size][size];
+    private static double[][] buildCostMatrix(final double[] pref, final double inequalityCost) {
+        final int size = pref.length;
+        final double[][] costs = new double[size][size];
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 if (x == y) {
