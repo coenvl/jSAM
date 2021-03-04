@@ -36,10 +36,10 @@ import nl.coenvl.sam.variables.Variable;
  */
 public abstract class AbstractSolver<T extends Variable<V>, V> {
 
-    protected final Agent<? extends T, V> parent;
+    protected final Agent<T, V> parent;
     protected final T myVariable;
 
-    protected AbstractSolver(final Agent<? extends T, V> agent) {
+    protected AbstractSolver(final Agent<T, V> agent) {
         this.parent = agent;
         this.myVariable = agent.getVariable();
     }

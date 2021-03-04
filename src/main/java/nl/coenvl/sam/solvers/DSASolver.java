@@ -59,7 +59,7 @@ public class DSASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> impleme
      * @param dsaAgent
      * @param costfun
      */
-    public DSASolver(final Agent<? extends DiscreteVariable<V>, V> agent) {
+    public DSASolver(final Agent<DiscreteVariable<V>, V> agent) {
         super(agent);
         this.context = new AssignmentMap<>();
         this.state = State.SENDVALUE;
