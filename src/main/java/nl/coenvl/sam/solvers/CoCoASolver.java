@@ -22,6 +22,7 @@ package nl.coenvl.sam.solvers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +30,7 @@ import nl.coenvl.sam.MailMan;
 import nl.coenvl.sam.agents.Agent;
 import nl.coenvl.sam.messages.HashMessage;
 import nl.coenvl.sam.messages.Message;
+import nl.coenvl.sam.solvers.CoCoASolver.State;
 import nl.coenvl.sam.variables.AssignmentMap;
 import nl.coenvl.sam.variables.CostMap;
 import nl.coenvl.sam.variables.DiscreteVariable;
@@ -102,9 +104,14 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
 
         if (m.getType().equals(CoCoASolver.ASSIGN_VAR)) {
             // Check if we are not currently busy or on hold, start
-            if ((this.currentState == State.IDLE) || (this.currentState == State.HOLD)) {
+        	if ((this.currentState == State.IDLE) || (this.currentState == State.HOLD)) {
                 this.updateLocalState(State.ACTIVE);
-                this.sendInquireMsgs();
+                if (this.numNeighbors() == 0) {
+                    this.receivedMaps = Collections.emptyList();
+                    this.pickValue();
+                } else {
+                    this.sendInquireMsgs();
+                }
             }
         } else if (m.getType().equals(CoCoASolver.INQUIRE_MSG)) {
             this.respond(m);
