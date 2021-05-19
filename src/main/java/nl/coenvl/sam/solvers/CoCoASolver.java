@@ -61,12 +61,12 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
     private static final String INQUIRE_MSG = "CoCoASolver:InquireAssignment";
 
     protected final AssignmentMap<State> neighborStates;
-    private final AssignmentMap<V> context;
+    protected final AssignmentMap<V> context;
 
     private volatile State currentState;
     private volatile List<CostMap<V>> receivedMaps;
 
-    private int uniquenessBound;
+    protected int uniquenessBound;
 
     public CoCoASolver(final Agent<DiscreteVariable<V>, V> agent) {
         super(agent);
@@ -206,7 +206,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
      *
      * @param m
      */
-    private synchronized void processCostMessage(final Message m) {
+    protected synchronized void processCostMessage(final Message m) {
         @SuppressWarnings("unchecked")
         final CostMap<V> costMap = (CostMap<V>) m.get("costMap");
         this.receivedMaps.add(costMap);
@@ -274,7 +274,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
      *
      * @param newState
      */
-    private void updateLocalState(final State newState) {
+    protected void updateLocalState(final State newState) {
         this.currentState = newState;
 
         final Message updateMessage = new HashMessage(this.myVariable.getID(), CoCoASolver.CURRENT_STATE);
@@ -308,7 +308,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
     /**
      * Send an activation message (ASSIGN_VAR) to the non-active neighbors
      */
-    private void activateNeighbors() {
+    protected void activateNeighbors() {
         final HashMessage nextMessage = new HashMessage(this.myVariable.getID(), CoCoASolver.ASSIGN_VAR);
         nextMessage.put("cpa", this.context);
 
@@ -328,7 +328,7 @@ public class CoCoASolver<V> extends AbstractSolver<DiscreteVariable<V>, V> imple
      *
      * @return the number of neighbors that are active
      */
-    private int getActiveNeighbors() {
+    protected int getActiveNeighbors() {
         int activeNeighbors = 0;
 
         for (final State neighborState : this.neighborStates.values()) {
